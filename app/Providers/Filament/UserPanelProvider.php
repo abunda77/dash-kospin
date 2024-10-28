@@ -25,6 +25,7 @@ class UserPanelProvider extends PanelProvider
         return $panel
             ->id('user')
             ->path('user')
+            ->login()
             ->colors([
                 'primary' => Color::Green,
             ])
