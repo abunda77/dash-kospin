@@ -17,16 +17,23 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Spatie\Permission\Models\Role;
 
 class UserPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
+
     {
+        // Dapatkan role_id
+    $roleId = Role::where('name', 'panel_user')->first()->id;
         return $panel
             ->id('user')
             ->path('user')
             ->login()
             ->brandName('Kospin Sinara Artha')
+            ->authGuard('web')
+
+            ->authPasswordBroker('users')
             ->colors([
                 'primary' => Color::Green,
             ])

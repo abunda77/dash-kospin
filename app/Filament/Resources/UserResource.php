@@ -41,9 +41,10 @@ class UserResource extends Resource
                             ->nullable()
                             ->dehydrated(fn ($state) => filled($state)),
                     ]),
-                Forms\Components\CheckboxList::make('roles')
-                    ->relationship('roles', 'name')
-                    ->searchable(),
+                // Forms\Components\CheckboxList::make('roles')
+                //     ->relationship('roles', 'id')
+                //     ->searchable()
+                //     ->default([5]),
             ]);
     }
 
