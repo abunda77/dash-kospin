@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\Admin;
-use Spatie\Permission\Models\Role;
+use Rupadana\ApiService\Models\Token;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class RolePolicy
+class TokenPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class RolePolicy
      */
     public function viewAny(Admin $user): bool
     {
-        return $user->can('view_any_role');
+        return $user->can('view_any_token');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(Admin $user, Role $role): bool
+    public function view(Admin $user, Token $token): bool
     {
-        return $user->can('view_role');
+        return $user->can('view_token');
     }
 
     /**
@@ -31,23 +31,23 @@ class RolePolicy
      */
     public function create(Admin $user): bool
     {
-        return $user->can('create_role');
+        return $user->can('create_token');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(Admin $user, Role $role): bool
+    public function update(Admin $user, Token $token): bool
     {
-        return $user->can('update_role');
+        return $user->can('update_token');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(Admin $user, Role $role): bool
+    public function delete(Admin $user, Token $token): bool
     {
-        return $user->can('delete_role');
+        return $user->can('delete_token');
     }
 
     /**
@@ -55,15 +55,15 @@ class RolePolicy
      */
     public function deleteAny(Admin $user): bool
     {
-        return $user->can('delete_any_role');
+        return $user->can('delete_any_token');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(Admin $user, Role $role): bool
+    public function forceDelete(Admin $user, Token $token): bool
     {
-        return $user->can('{{ ForceDelete }}');
+        return $user->can('force_delete_token');
     }
 
     /**
@@ -71,15 +71,15 @@ class RolePolicy
      */
     public function forceDeleteAny(Admin $user): bool
     {
-        return $user->can('{{ ForceDeleteAny }}');
+        return $user->can('force_delete_any_token');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(Admin $user, Role $role): bool
+    public function restore(Admin $user, Token $token): bool
     {
-        return $user->can('{{ Restore }}');
+        return $user->can('restore_token');
     }
 
     /**
@@ -87,15 +87,15 @@ class RolePolicy
      */
     public function restoreAny(Admin $user): bool
     {
-        return $user->can('{{ RestoreAny }}');
+        return $user->can('restore_any_token');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(Admin $user, Role $role): bool
+    public function replicate(Admin $user, Token $token): bool
     {
-        return $user->can('{{ Replicate }}');
+        return $user->can('replicate_token');
     }
 
     /**
@@ -103,6 +103,6 @@ class RolePolicy
      */
     public function reorder(Admin $user): bool
     {
-        return $user->can('{{ Reorder }}');
+        return $user->can('reorder_token');
     }
 }

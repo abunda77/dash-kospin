@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use BezhanSalleh\FilamentShield\Traits\HasPanelShield;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-// use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class User extends Authenticatable
+class Admin extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasPanelShield;
-    protected $guard = 'web';
+
+    protected $guard = 'admin';
 
     /**
      * The attributes that are mass assignable.
@@ -24,8 +22,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password'
-
+        'password',
     ];
 
     /**
@@ -50,9 +47,4 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    /**
-     * Get the nasabah associated with the user.
-     */
-
 }
