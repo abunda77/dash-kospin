@@ -18,6 +18,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Spatie\Permission\Models\Role;
+use Rupadana\ApiService\ApiServicePlugin;
 
 class UserPanelProvider extends PanelProvider
 {
@@ -60,6 +61,12 @@ class UserPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->plugins([
+                //\BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                ApiServicePlugin::make()
+            ])
+            ;
+
     }
 }
