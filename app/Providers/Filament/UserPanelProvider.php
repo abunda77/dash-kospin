@@ -26,7 +26,7 @@ class UserPanelProvider extends PanelProvider
 
     {
         // Dapatkan role_id
-    $roleId = Role::where('name', 'panel_user')->first()->id;
+    // $roleId = Role::where('name', 'panel_user')->first()->id;
         return $panel
             ->id('user')
             ->path('user')
