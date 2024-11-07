@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Profile extends Model
+{
+    protected $fillable = [
+        'id_user',
+        'firt_name',
+        'last_name',
+        'address',
+        'sign_identity',
+        'no_identity',
+        'image_identity',
+        'phone',
+        'email',
+        'whatsapp',
+        'gender',
+        'birthday',
+        'mariage',
+        'job',
+        'province_id',
+        'district_id',
+        'city_id',
+        'village_id',
+        'monthly_income',
+        'is_active',
+        'type_member',
+        'avatar',
+        'remote_url',
+        'notes'
+    ];
+
+    protected $casts = [
+        'image_identity' => 'json',
+        'monthly_income' => 'decimal:2',
+        'birthday' => 'date',
+        'created_at' => 'date',
+        'updated_at' => 'date'
+    ];
+
+    /**
+     * Get the user that owns the profile
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
+}

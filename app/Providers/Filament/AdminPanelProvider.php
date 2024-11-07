@@ -30,6 +30,9 @@ class AdminPanelProvider extends PanelProvider
             ->authGuard('admin')
             ->authPasswordBroker('admin')
             ->brandName('Kospin Sinara Artha')
+            ->brandLogo(asset('images/logo_kospin.png'))
+            ->brandLogoHeight('4rem')
+            ->darkModeBrandLogo(asset('images/logo_kospin.png'))
             ->login()
             ->colors([
                 'primary' => Color::Amber,
@@ -60,7 +63,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-                // ApiServicePlugin::make()
+                ApiServicePlugin::make()
             ]);
     }
 }

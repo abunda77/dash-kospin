@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-// use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasPanelShield;
+    use HasFactory, Notifiable, HasRoles, HasPanelShield, HasApiTokens;
     protected $guard = 'web';
 
     /**
@@ -52,7 +54,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the nasabah associated with the user.
+     * Get the profile associated with the user.
      */
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class, 'id_user');
+    }
+
+    /**
+     * Get all profiles associated with the user.
+     */
+    public function profiles(): HasMany
+    {
+        return $this->hasMany(Profile::class, 'id_user');
+    }
 
 }

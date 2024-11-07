@@ -31,7 +31,11 @@ class UserPanelProvider extends PanelProvider
             ->id('user')
             ->path('user')
             ->login()
+            ->registration()
             ->brandName('Kospin Sinara Artha')
+            ->brandLogo(asset('images/logo_kospin.png'))
+            ->brandLogoHeight('4rem')
+            ->darkModeBrandLogo(asset('images/logo_kospin.png'))
             ->authGuard('web')
 
             ->authPasswordBroker('users')
@@ -64,7 +68,7 @@ class UserPanelProvider extends PanelProvider
             ])
             ->plugins([
                 //\BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-                ApiServicePlugin::make()
+                //ApiServicePlugin::make()
             ])
             ;
 
