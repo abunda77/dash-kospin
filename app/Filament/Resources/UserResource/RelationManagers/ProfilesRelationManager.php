@@ -23,7 +23,7 @@ class ProfilesRelationManager extends RelationManager
                     ->schema([
                         Forms\Components\Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('firt_name')
+                                Forms\Components\TextInput::make('first_name')
                                     ->label('Nama Depan')
                                     ->required(),
                                 Forms\Components\TextInput::make('last_name')
@@ -186,7 +186,7 @@ class ProfilesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('Profile')
             ->columns([
-                Tables\Columns\TextColumn::make('firt_name')
+                Tables\Columns\TextColumn::make('first_name')
                     ->label('Nama Depan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_name')
