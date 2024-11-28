@@ -13,6 +13,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Support\RawJs;
+use Filament\Forms\Components\Select;
 
 class TransaksiTabunganResource extends Resource
 {
@@ -28,9 +30,10 @@ class TransaksiTabunganResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('id_tabungan')
-                    ->label('No Rekening')
-                    ->relationship('tabungan', 'no_tabungan')
-                    ->required(),
+    ->label('No Rekening')
+    ->options(fn () => Tabungan::pluck('no_tabungan', 'id'))
+    ->searchable()
+    ->required(),
                 Forms\Components\Select::make('jenis_transaksi')
                     ->label('Jenis Transaksi')
                     ->options([
@@ -38,15 +41,47 @@ class TransaksiTabunganResource extends Resource
                         'debit' => 'Debit'
                     ])
                     ->required(),
-                Forms\Components\TextInput::make('nominal')
-                    ->label('Nominal')
-                    ->required()
+                Forms\Components\TextInput::make('jumlah')
+                    ->label('Jumlah')
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
                     ->numeric()
-                    ->prefix('Rp'),
-                Forms\Components\Textarea::make('keterangan')
+                    ->prefix('Rp')
+                    ->placeholder('1,000,000')
+                    ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
+                        if ($state) {
+                            $component->state(number_format($state, 0, '.', ','));
+                        }
+                    })
+                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
+                    ->required(),
+                Forms\Components\DateTimePicker::make('tanggal_transaksi')
+                    ->label('Tanggal Transaksi')
+                    ->required(),
+                Forms\Components\TextInput::make('keterangan')
                     ->label('Keterangan')
-                    ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('kode_transaksi')
+                    ->label('Kode Transaksi')
+                    ->options([
+                        '0' => '000 DB Bunga Deposito',
+                        '1' => '001 Penyetoran',
+                        '2' => '002 Pengambilan di Teller',
+                        '3' => '003 Pengambilan di ATM',
+                        '4' => '004 Pemindahbukuan (DK), Biaya Adm',
+                        '5' => '005 Setoran/Tolakan Kliring',
+                        '6' => '006 Bunga',
+                        'K' => '00K Koreksi',
+                        'S' => '00S Saldo Penutupan',
+                        'P' => '00P Pajak'
+                    ])
+                    ->required(),
+
+                    Forms\Components\TextInput::make('kode_teller')
+                    ->label('Kode Teller')
+                    ->default(auth('admin')->id()) // Menggunakan guard 'admin'
+                    ->disabled()
+                    ->required(),
             ]);
     }
 
@@ -60,9 +95,18 @@ class TransaksiTabunganResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('jenis_transaksi')
                     ->label('Jenis Transaksi')
+                    ->badge()
                     ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('nominal')
+                    ->sortable()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'kredit' => 'Kredit',
+                        'debit' => 'Debit',
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'kredit' => 'success',
+                        'debit' => 'danger',
+                    }),
+                Tables\Columns\TextColumn::make('jumlah')
                     ->label('Nominal')
                     ->money('IDR')
                     ->sortable(),

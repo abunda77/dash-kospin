@@ -29,7 +29,7 @@ class Tabungan extends Model
 
     public function produkTabungan()
     {
-        return $this->belongsTo(ProdukTabungan::class, 'produk_tabungans');
+        return $this->belongsTo(ProdukTabungan::class, 'produk_tabungan');
     }
 
     public function transaksi()

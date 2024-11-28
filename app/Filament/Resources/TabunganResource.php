@@ -14,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Support\RawJs;
 
 class TabunganResource extends Resource
 {
@@ -21,7 +22,7 @@ class TabunganResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static ?string $navigationLabel = 'Tabungan';
+    protected static ?string $navigationLabel = 'Rekening Tabungan';
     protected static ?string $navigationGroup = 'Tabungan';
 
     public static function form(Form $form): Form
@@ -34,7 +35,8 @@ class TabunganResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Select::make('id_profile')
                     ->label('Nasabah')
-                    ->relationship('profile', 'nama')
+                    ->relationship('profile', 'first_name')
+                    ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->first_name} {$record->last_name}")
                     ->required(),
                 Forms\Components\Select::make('produk_tabungan')
                     ->label('Produk Tabungan')
@@ -42,9 +44,18 @@ class TabunganResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('saldo')
                     ->label('Saldo')
-                    ->required()
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
                     ->numeric()
-                    ->prefix('Rp'),
+                    ->prefix('Rp')
+                    ->placeholder('1,000,000')
+                    ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
+                        if ($state) {
+                            $component->state(number_format($state, 0, '.', ','));
+                        }
+                    })
+                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
+                    ->required(),
                 Forms\Components\DatePicker::make('tanggal_buka_rekening')
                     ->label('Tanggal Buka')
                     ->required(),
@@ -67,8 +78,9 @@ class TabunganResource extends Resource
                     ->label('No Rekening')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('profile.nama')
+                Tables\Columns\TextColumn::make('profile.first_name')
                     ->label('Nasabah')
+                    ->formatStateUsing(fn ($record) => "{$record->profile->first_name} {$record->profile->last_name}")
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('produkTabungan.nama_produk')
@@ -85,8 +97,19 @@ class TabunganResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status_rekening')
                     ->label('Status')
+                    ->badge()
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'aktif' => 'Aktif',
+                        'tidak_aktif' => 'Tidak Aktif',
+                        'blokir' => 'Blokir',
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'aktif' => 'success',
+                        'tidak_aktif' => 'danger',
+                        'blokir' => 'warning',
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime()

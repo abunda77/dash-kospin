@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('transaksi_tabungans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_tabungan')->constrained('tabungans')->onDelete('cascade');
-            $table->enum('jenis_transaksi', ['setoran', 'penarikan']);
-            $table->decimal('jumlah', 10, 2);
+            $table->enum('jenis_transaksi', ['kredit', 'debit']);
+            $table->decimal('jumlah', 15, 2); // Disesuaikan dengan cast di model
             $table->dateTime('tanggal_transaksi');
             $table->string('keterangan')->nullable();
+            $table->string('kode_transaksi');
+            $table->unsignedBigInteger('kode_teller')->nullable()->default(null);
             $table->timestamps();
         });
     }
