@@ -16,7 +16,6 @@ class Profile extends Model
         'no_identity',
         'image_identity',
         'phone',
-        'email',
         'whatsapp',
         'gender',
         'birthday',

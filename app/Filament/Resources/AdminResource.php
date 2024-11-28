@@ -19,7 +19,7 @@ class AdminResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Setting';
-    protected static ?string $modelLabel = 'Administrator';
+    protected static ?string $navigationLabel = 'Administrator';
 
     public static function form(Form $form): Form
     {

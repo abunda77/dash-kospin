@@ -30,16 +30,14 @@ class ProfilesRelationManager extends RelationManager
                                     ->label('Nama Belakang')
                                     ->required(),
                             ]),
-                        Forms\Components\Grid::make(3)
+                        Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('phone')
                                     ->label('No. Telepon')
                                     ->tel(),
                                 Forms\Components\TextInput::make('whatsapp')
                                     ->label('WhatsApp'),
-                                Forms\Components\TextInput::make('email')
-                                    ->email()
-                                    ->label('Email'),
+
                             ]),
                         Forms\Components\Grid::make(3)
                             ->schema([
@@ -195,7 +193,7 @@ class ProfilesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('phone')
                     ->label('No. Telepon')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('user.email')
                     ->label('Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type_member')
