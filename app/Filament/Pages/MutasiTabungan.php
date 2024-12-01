@@ -12,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class MutasiTabungan extends Page implements HasTable
 {
@@ -30,67 +31,99 @@ class MutasiTabungan extends Page implements HasTable
 
     public function mount()
     {
-        $this->reset();
+        try {
+            $this->reset();
+            Log::info('MutasiTabungan mounted successfully');
+        } catch (\Exception $e) {
+            Log::error('Error in mount: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function search()
     {
-        $this->validate([
-            'no_rekening' => 'required'
-        ]);
+        try {
+            $this->validate([
+                'no_rekening' => 'required'
+            ]);
 
-        // Reset semua state terlebih dahulu
-        $this->reset(['saldo_berjalan', 'firstRecord', 'tabungan']);
-        $this->isSearchSubmitted = false;
+            Log::info('Searching for account: ' . $this->no_rekening);
 
-        // Reset table state untuk memastikan data bersih
-        $this->resetTable();
+            $this->resetSearchState();
 
-        // Cari tabungan berdasarkan nomor rekening
-        $this->tabungan = Tabungan::with(['profile', 'produkTabungan'])
-            ->where('no_tabungan', $this->no_rekening)
-            ->first();
+            $this->tabungan = $this->findTabungan();
 
-        if ($this->tabungan) {
-            // Set saldo awal dari tabungan yang baru dicari
-            $this->saldo_berjalan = $this->tabungan->saldo;
-
-            $this->isSearchSubmitted = true;
-
-            // Refresh tabel dengan data baru
-            $this->dispatch('refresh');
-        } else {
+            if ($this->tabungan) {
+                $this->handleSuccessfulSearch();
+            } else {
+                $this->handleFailedSearch();
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in search: ' . $e->getMessage());
             Notification::make()
-                ->title('Rekening tidak ditemukan')
+                ->title('Terjadi kesalahan')
                 ->danger()
                 ->send();
         }
     }
 
+    private function resetSearchState()
+    {
+        $this->reset(['saldo_berjalan', 'firstRecord', 'tabungan']);
+        $this->isSearchSubmitted = false;
+        $this->resetTable();
+    }
+
+    private function findTabungan()
+    {
+        return Tabungan::with(['profile', 'produkTabungan'])
+            ->where('no_tabungan', $this->no_rekening)
+            ->first();
+    }
+
+    private function handleSuccessfulSearch()
+    {
+        $this->saldo_berjalan = $this->tabungan->saldo;
+        $this->isSearchSubmitted = true;
+        $this->dispatch('refresh');
+        Log::info('Account found: ' . $this->no_rekening);
+    }
+
+    private function handleFailedSearch()
+    {
+        Log::warning('Account not found: ' . $this->no_rekening);
+        Notification::make()
+            ->title('Rekening tidak ditemukan')
+            ->danger()
+            ->send();
+    }
+
     public function clearSearch()
     {
-        // Reset semua properti
-        $this->reset();
+        try {
+            $this->reset();
+            $this->resetTable();
 
-        // Reset state tabel
-        $this->resetTable();
+            cache()->forget('mutasi_tabungan_' . $this->no_rekening);
+            session()->forget('mutasi_tabungan_search');
 
-        // Hapus cache pencarian
-        cache()->forget('mutasi_tabungan_' . $this->no_rekening);
+            $this->resetSearchProperties();
 
-        // Reset flag pencarian
+            $this->dispatch('refresh');
+
+            Log::info('Search cleared successfully');
+        } catch (\Exception $e) {
+            Log::error('Error in clearSearch: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    private function resetSearchProperties()
+    {
         $this->isSearchSubmitted = false;
-
-        // Hapus data tabungan
         $this->tabungan = null;
         $this->saldo_berjalan = 0;
         $this->firstRecord = null;
-
-        // Bersihkan session
-        session()->forget('mutasi_tabungan_search');
-
-        // Refresh halaman untuk membersihkan state
-        $this->dispatch('refresh');
     }
 
     public function form(Form $form): Form
@@ -107,86 +140,122 @@ class MutasiTabungan extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(function () {
-                // Hanya return query jika pencarian sudah disubmit dan tabungan ditemukan
-                if (!$this->isSearchSubmitted || !$this->tabungan) {
-                    return TransaksiTabungan::query()->whereNull('id'); // Return empty query
-                }
-
-                return TransaksiTabungan::query()
-                    ->where('id_tabungan', $this->tabungan->id)
-                    ->orderBy('tanggal_transaksi', 'ASC')
-                    ->orderBy('id', 'ASC');
-            })
+            ->query($this->getTableQuery())
             ->heading(
                 fn() => $this->isSearchSubmitted ? $this->getAccountInfo() : null
             )
-            ->columns([
-                TextColumn::make('kode_transaksi')
-                    ->label('Kode Transaksi'),
-                TextColumn::make('tanggal_transaksi')
-                    ->label('Tanggal')
-                    ->dateTime(),
-                TextColumn::make('kredit')
-                    ->label('Kredit')
-                    ->money('IDR')
-                    ->getStateUsing(fn ($record) => $record->jenis_transaksi === 'kredit' ? $record->jumlah : null),
-                TextColumn::make('debit')
-                    ->label('Debit')
-                    ->money('IDR')
-                    ->getStateUsing(fn ($record) => $record->jenis_transaksi === 'debit' ? $record->jumlah : null),
-                TextColumn::make('saldo_berjalan')
-                    ->label('Saldo')
-                    ->money('IDR')
-                    ->getStateUsing(function ($record) {
-                        if (!$this->tabungan || $record->id_tabungan !== $this->tabungan->id) {
-                            return 0;
-                        }
-
-                        // Gunakan saldo awal dari tabungan yang sedang aktif
-                        $saldo = $this->tabungan->saldo;
-
-                        // Ambil semua transaksi sebelum record saat ini untuk tabungan yang sedang aktif
-                        $previousTransactions = TransaksiTabungan::where('id_tabungan', $this->tabungan->id)
-                            ->where(function($query) use ($record) {
-                                $query->where('tanggal_transaksi', '<', $record->tanggal_transaksi)
-                                    ->orWhere(function($q) use ($record) {
-                                        $q->where('tanggal_transaksi', '=', $record->tanggal_transaksi)
-                                          ->where('id', '<=', $record->id);
-                                    });
-                            })
-                            ->orderBy('tanggal_transaksi', 'ASC')
-                            ->orderBy('id', 'ASC')
-                            ->get();
-
-                        // Hitung saldo berjalan
-                        foreach ($previousTransactions as $transaction) {
-                            if ($transaction->jenis_transaksi === 'debit') {
-                                $saldo += $transaction->jumlah;
-                            } else {
-                                $saldo -= $transaction->jumlah;
-                            }
-                        }
-
-                        return $saldo;
-                    }),
-                TextColumn::make('kode_teller')
-                    ->label('Kode Teller')
-            ])
+            ->columns($this->getTableColumns())
             ->defaultSort('tanggal_transaksi', 'ASC');
+    }
+
+    private function getTableQuery()
+    {
+        return function () {
+            if (!$this->isSearchSubmitted || !$this->tabungan) {
+                return TransaksiTabungan::query()->whereNull('id');
+            }
+
+            return TransaksiTabungan::query()
+                ->where('id_tabungan', $this->tabungan->id)
+                ->orderBy('tanggal_transaksi', 'ASC')
+                ->orderBy('id', 'ASC');
+        };
+    }
+
+    private function getTableColumns()
+    {
+        return [
+            TextColumn::make('kode_transaksi')
+                ->label('Kode Transaksi'),
+            TextColumn::make('tanggal_transaksi')
+                ->label('Tanggal')
+                ->dateTime(),
+            TextColumn::make('kredit')
+                ->label('Kredit')
+                ->money('IDR')
+                ->getStateUsing(fn ($record) => $record->jenis_transaksi === 'kredit' ? $record->jumlah : null),
+            TextColumn::make('debit')
+                ->label('Debit')
+                ->money('IDR')
+                ->getStateUsing(fn ($record) => $record->jenis_transaksi === 'debit' ? $record->jumlah : null),
+            TextColumn::make('saldo_berjalan')
+                ->label('Saldo')
+                ->money('IDR')
+                ->getStateUsing(fn ($record) => $this->calculateSaldoBerjalan($record)),
+            TextColumn::make('kode_teller')
+                ->label('Kode Teller')
+        ];
+    }
+
+    private function calculateSaldoBerjalan($record)
+    {
+        try {
+            if (!$this->tabungan || $record->id_tabungan !== $this->tabungan->id) {
+                return 0;
+            }
+
+            $saldo = $this->tabungan->saldo;
+            $previousTransactions = $this->getPreviousTransactions($record);
+
+            foreach ($previousTransactions as $transaction) {
+                $saldo = $this->updateSaldo($saldo, $transaction);
+            }
+
+            return $saldo;
+        } catch (\Exception $e) {
+            Log::error('Error calculating saldo berjalan: ' . $e->getMessage());
+            return 0;
+        }
+    }
+
+    private function getPreviousTransactions($record)
+    {
+        return TransaksiTabungan::where('id_tabungan', $this->tabungan->id)
+            ->where(function($query) use ($record) {
+                $query->where('tanggal_transaksi', '<', $record->tanggal_transaksi)
+                    ->orWhere(function($q) use ($record) {
+                        $q->where('tanggal_transaksi', '=', $record->tanggal_transaksi)
+                          ->where('id', '<=', $record->id);
+                    });
+            })
+            ->orderBy('tanggal_transaksi', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->get();
+    }
+
+    private function updateSaldo($saldo, $transaction)
+    {
+        return $transaction->jenis_transaksi === 'debit'
+            ? $saldo + $transaction->jumlah
+            : $saldo - $transaction->jumlah;
     }
 
     private function getAccountInfo()
     {
-        if (!$this->tabungan) {
-            Notification::make()
-                ->title('Rekening tidak ditemukan')
-                ->danger()
-                ->send();
+        try {
+            if (!$this->tabungan) {
+                $this->handleMissingAccount();
+                return null;
+            }
 
+            return $this->renderAccountInfo();
+        } catch (\Exception $e) {
+            Log::error('Error getting account info: ' . $e->getMessage());
             return null;
         }
+    }
 
+    private function handleMissingAccount()
+    {
+        Log::warning('Attempt to get account info with no account selected');
+        Notification::make()
+            ->title('Rekening tidak ditemukan')
+            ->danger()
+            ->send();
+    }
+
+    private function renderAccountInfo()
+    {
         return view('filament.components.account-info', [
             'nama' => $this->tabungan->profile->first_name . ' ' . $this->tabungan->profile->last_name,
             'no_rekening' => $this->tabungan->no_tabungan,

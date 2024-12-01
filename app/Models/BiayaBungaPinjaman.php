@@ -11,13 +11,13 @@ class BiayaBungaPinjaman extends Model
     protected $fillable = [
         'name',
         'persentase_bunga',
-        'biaya_administrasi',
-        'denda_keterlambatan'
+        'biaya_administrasi'
+
     ];
 
     protected $casts = [
         'persentase_bunga' => 'decimal:2',
-        'biaya_administrasi' => 'decimal:2',
-        'denda_keterlambatan' => 'decimal:2'
+        'biaya_administrasi' => 'decimal:2'
+
     ];
 }

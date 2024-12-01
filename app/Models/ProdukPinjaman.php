@@ -12,7 +12,7 @@ class ProdukPinjaman extends Model
         'kode_produk',
         'nama_produk',
         'beaya_bunga_id',
-        'denda',
+        'denda_id',
         'keterangan'
     ];
 
@@ -23,6 +23,6 @@ class ProdukPinjaman extends Model
 
     public function denda()
     {
-        return $this->belongsTo(Denda::class, 'denda');
+        return $this->belongsTo(Denda::class, 'denda_id');
     }
 }

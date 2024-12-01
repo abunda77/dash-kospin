@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('kode_produk');
             $table->string('nama_produk');
             $table->foreignId('beaya_bunga_id')->constrained('beaya_bunga_pinjamans');
-            $table->foreignId('denda')->constrained('dendas');
+            $table->foreignId('denda_id')->constrained('dendas');
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });

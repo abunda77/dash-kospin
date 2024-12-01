@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Profile extends Model
 {
+    protected $primaryKey = 'id_user';  // atau 'id_user' sesuai struktur tabel Anda
     protected $fillable = [
         'id_user',
         'first_name',

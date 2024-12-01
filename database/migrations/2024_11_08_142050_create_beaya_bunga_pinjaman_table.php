@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('persentase_bunga', 10, 2);
             $table->decimal('biaya_administrasi', 10, 2);
-            $table->decimal('denda_keterlambatan', 10, 2);
             $table->timestamps();
         });
     }

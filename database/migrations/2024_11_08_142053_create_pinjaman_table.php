@@ -15,13 +15,15 @@ return new class extends Migration
             $table->id('id_pinjaman');
             $table->string('no_pinjaman');
             $table->foreignId('profile_id')->constrained('profiles');
-            $table->foreignId('produk_pinjaman')->constrained('produk_pinjamans');
+            $table->foreignId('produk_pinjaman_id')->constrained('produk_pinjamans');
             $table->decimal('jumlah_pinjaman', 10, 2);
-            $table->decimal('suku_bunga', 5, 2);
+            $table->foreignId('beaya_bunga_pinjaman_id')->constrained('beaya_bunga_pinjamans');
             $table->date('tanggal_pinjaman');
             $table->integer('jangka_waktu');
-            $table->string('jangka_waktu_satuan');
-            $table->string('status_pinjaman');
+            $table->date('tanggal_jatuh_tempo');
+            $table->enum('jangka_waktu_satuan', ['bulan', 'tahun']);
+            $table->enum('status_pinjaman', ['pending', 'approved', 'rejected', 'completed']);
+            $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }

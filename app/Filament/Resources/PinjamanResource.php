@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Support\RawJs;
 
 class PinjamanResource extends Resource
 {
@@ -19,12 +20,92 @@ class PinjamanResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Pinjaman';
+    protected static ?string $label = 'Rekening Pinjaman';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Section::make('Informasi Pinjaman')
+                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('profile_id')
+                                    ->label('Nasabah')
+                                    ->relationship(
+                                        name: 'profile.user',
+                                        titleAttribute: 'name'
+                                    )
+                                    ->searchable()
+                                    ->required(),
+                                Forms\Components\Select::make('produk_pinjaman_id')
+                                    ->label('Produk Pinjaman')
+                                    ->relationship('produkPinjaman', 'nama_produk')
+                                    ->searchable()
+                                    ->required(),
+                            ]),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('no_pinjaman')
+                                    ->label('Nomor Pinjaman')
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('jumlah_pinjaman')
+                                    ->label('Jumlah Pinjaman')
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
+                                    ->numeric()
+                                    ->prefix('Rp')
+                                    ->placeholder('1,000,000')
+                                    ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
+                                        if ($state) {
+                                            $component->state(number_format($state, 0, '.', ','));
+                                        }
+                                    })
+                                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
+                                    ->required(),
+                                Forms\Components\TextInput::make('jangka_waktu')
+                                    ->label('Jangka Waktu (Bulan)')
+                                    ->numeric()
+                                    ->required(),
+                            ]),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('tanggal_pinjaman')
+                                    ->label('Tanggal Pinjaman')
+                                    ->required(),
+                                Forms\Components\DatePicker::make('tanggal_jatuh_tempo')
+                                    ->label('Tanggal Jatuh Tempo')
+                                    ->required(),
+                            ]),
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\Select::make('beaya_bunga_pinjaman_id')
+                                    ->label('Biaya Bunga')
+                                    ->relationship('biayaBungaPinjaman', 'name')
+                                    ->searchable()
+                                    ->required(),
+                                Forms\Components\Select::make('jangka_waktu_satuan')
+                                    ->label('Satuan Waktu')
+                                    ->options([
+                                        'bulan' => 'Bulan',
+                                        'tahun' => 'Tahun'
+                                    ])
+                                    ->required(),
+                            ]),
+                        Forms\Components\Select::make('status_pinjaman')
+                            ->label('Status')
+                            ->options([
+                                'pending' => 'Pending',
+                                'approved' => 'Approved',
+                                'rejected' => 'Rejected',
+                                'completed' => 'Completed'
+                            ])
+                            ->required(),
+                        Forms\Components\Textarea::make('keterangan')
+                            ->label('Keterangan')
+                            ->rows(3),
+                    ]),
             ]);
     }
 
@@ -32,7 +113,38 @@ class PinjamanResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('profile.user.name')
+                    ->label('Nasabah')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('produkPinjaman.nama_produk')
+                    ->label('Produk Pinjaman')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('jumlah_pinjaman')
+                    ->label('Jumlah Pinjaman')
+                    ->money('IDR')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('jangka_waktu')
+                    ->label('Jangka Waktu')
+                    ->suffix(' Bulan')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('tanggal_pinjaman')
+                    ->label('Tanggal Pinjaman')
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('tanggal_jatuh_tempo')
+                    ->label('Jatuh Tempo')
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('status_pinjaman')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                        'completed' => 'info',
+                    }),
             ])
             ->filters([
                 //

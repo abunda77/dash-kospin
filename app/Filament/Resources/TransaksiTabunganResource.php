@@ -66,7 +66,7 @@ class TransaksiTabunganResource extends Resource
                     ->options([
                         '0' => '000 DB Bunga Deposito',
                         '1' => '001 Penyetoran',
-                        '2' => '002 Pengambilan di Teller',
+                        '2' => '002 Penarikan di Teller',
                         '3' => '003 Pengambilan di ATM',
                         '4' => '004 Pemindahbukuan (DK), Biaya Adm',
                         '5' => '005 Setoran/Tolakan Kliring',
@@ -77,11 +77,15 @@ class TransaksiTabunganResource extends Resource
                     ])
                     ->required(),
 
-                    Forms\Components\TextInput::make('kode_teller')
-                    ->label('Kode Teller')
-                    ->default(auth('admin')->id()) // Menggunakan guard 'admin'
-                    ->disabled()
-                    ->required(),
+                    Forms\Components\Fieldset::make('Kode Teller')
+                        ->schema([
+                            Forms\Components\TextInput::make('kode_teller')
+                                ->label('Kode Teller')
+                                ->default(auth('admin')->user()->id)
+                                ->disabled()
+                                ->dehydrated(fn ($state) => filled($state))
+                                ->required(),
+                        ]),
             ]);
     }
 
@@ -114,6 +118,11 @@ class TransaksiTabunganResource extends Resource
                     ->label('Keterangan')
                     ->searchable()
                     ->limit(50),
+
+                Tables\Columns\TextColumn::make('kode_teller')
+                    ->label('Kode Teller')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal')
                     ->dateTime()

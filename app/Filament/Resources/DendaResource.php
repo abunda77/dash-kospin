@@ -24,7 +24,17 @@ class DendaResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('penalty_code')
+                    ->label('Kode Denda')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('rate_denda')
+                    ->label('Rate Denda')
+                    ->required()
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(100)
+                    ->suffix('%'),
             ]);
     }
 
@@ -32,7 +42,17 @@ class DendaResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('penalty_code')
+                    ->label('Kode Denda')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('rate_denda')
+                    ->label('Rate Denda')
+                    ->suffix('%')
+                    ->numeric(
+                        decimalPlaces: 2,
+                    )
+                    ->sortable()
             ])
             ->filters([
                 //

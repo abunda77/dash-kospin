@@ -24,7 +24,27 @@ class ProdukPinjamanResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('kode_produk')
+                    ->label('Kode Produk')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('nama_produk')
+                    ->label('Nama Produk')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Select::make('beaya_bunga_id')
+                    ->label('Biaya & Bunga')
+                    ->relationship('biayaBunga', 'name')
+                    ->searchable()
+                    ->required(),
+                Forms\Components\Select::make('denda_id')
+                    ->label('Denda')
+                    ->relationship('denda', 'penalty_code')
+                    ->searchable()
+                    ->required(),
+                Forms\Components\TextInput::make('keterangan')
+                    ->label('Keterangan')
+                    ->maxLength(255),
             ]);
     }
 
@@ -32,7 +52,26 @@ class ProdukPinjamanResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('kode_produk')
+                    ->label('Kode Produk')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('nama_produk')
+                    ->label('Nama Produk')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('biayaBunga.name')
+                    ->label('Biaya & Bunga')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('denda.penalty_code')
+                    ->label('Denda')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('keterangan')
+                    ->label('Keterangan')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
                 //

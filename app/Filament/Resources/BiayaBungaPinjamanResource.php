@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Support\RawJs;
 
 class BiayaBungaPinjamanResource extends Resource
 {
@@ -24,7 +25,32 @@ class BiayaBungaPinjamanResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('name')
+                    ->label('Nama')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('persentase_bunga')
+                    ->label('Persentase Bunga Per Tahun p.a')
+                    ->required()
+                    ->numeric()
+                    ->minValue(0)
+                    ->maxValue(100)
+                    ->suffix('%'),
+                Forms\Components\TextInput::make('biaya_administrasi')
+                    ->label('Biaya Administrasi')
+                    ->mask(RawJs::make('$money($input)'))
+                    ->stripCharacters(',')
+                    ->numeric()
+                    ->prefix('Rp')
+                    ->placeholder('1,000,000')
+                    ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
+                        if ($state) {
+                            $component->state(number_format($state, 0, '.', ','));
+                        }
+                    })
+                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
+                    ->required(),
+
             ]);
     }
 
@@ -32,7 +58,19 @@ class BiayaBungaPinjamanResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nama')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('persentase_bunga')
+                    ->label('Persentase Bunga')
+                    ->suffix('%')
+                    ->numeric(
+                        decimalPlaces: 2,
+                    ),
+                Tables\Columns\TextColumn::make('biaya_administrasi')
+                    ->label('Biaya Administrasi')
+                    ->money('idr'),
+
             ])
             ->filters([
                 //

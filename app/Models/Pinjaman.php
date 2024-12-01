@@ -13,11 +13,12 @@ class Pinjaman extends Model
     protected $fillable = [
         'no_pinjaman',
         'profile_id',
-        'produk_pinjaman',
+        'produk_pinjaman_id',
         'jumlah_pinjaman',
-        'suku_bunga',
+        'beaya_bunga_pinjaman_id',
         'tanggal_pinjaman',
         'jangka_waktu',
+        'tanggal_jatuh_tempo',
         'jangka_waktu_satuan',
         'status_pinjaman'
     ];
@@ -37,6 +38,11 @@ class Pinjaman extends Model
 
     public function produkPinjaman()
     {
-        return $this->belongsTo(ProdukPinjaman::class, 'produk_pinjaman');
+        return $this->belongsTo(ProdukPinjaman::class, 'produk_pinjaman_id');
+    }
+
+    public function biayaBungaPinjaman()
+    {
+        return $this->belongsTo(BiayaBungaPinjaman::class, 'beaya_bunga_pinjaman_id');
     }
 }
