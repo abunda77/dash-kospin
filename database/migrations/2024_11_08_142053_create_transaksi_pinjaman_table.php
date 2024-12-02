@@ -15,9 +15,14 @@ return new class extends Migration
             $table->id();
             $table->date('tanggal_pembayaran');
             $table->foreignId('pinjaman_id')->constrained('pinjamans', 'id_pinjaman');
+            $table->decimal('angsuran_pokok', 15, 2);
+            $table->decimal('angsuran_bunga', 15, 2);
             $table->decimal('total_pembayaran', 10, 2);
             $table->decimal('sisa_pinjaman', 10, 2);
             $table->string('status_pembayaran');
+            $table->decimal('denda', 15, 2)->default(0);
+            $table->integer('hari_terlambat')->default(0);
+            $table->integer('angsuran_ke');
             $table->timestamps();
         });
     }

@@ -20,7 +20,8 @@ class Pinjaman extends Model
         'jangka_waktu',
         'tanggal_jatuh_tempo',
         'jangka_waktu_satuan',
-        'status_pinjaman'
+        'status_pinjaman',
+        'denda_id'
     ];
 
     protected $casts = [
@@ -46,5 +47,10 @@ class Pinjaman extends Model
     public function biayaBungaPinjaman()
     {
         return $this->belongsTo(BiayaBungaPinjaman::class, 'beaya_bunga_pinjaman_id');
+    }
+
+    public function denda()
+    {
+        return $this->belongsTo(Denda::class, 'denda_id');
     }
 }

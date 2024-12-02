@@ -99,7 +99,11 @@ class PinjamanResource extends Resource
                                     ->relationship('biayaBungaPinjaman', 'name')
                                     ->searchable()
                                     ->required(),
-
+                                Forms\Components\Select::make('denda_id')
+                                    ->label('Denda')
+                                    ->relationship('denda', 'rate_denda')
+                                    ->searchable()
+                                    ->nullable(),
                             ]),
 
                         Forms\Components\Grid::make(2)
@@ -218,6 +222,10 @@ class PinjamanResource extends Resource
                 Tables\Columns\TextColumn::make('tanggal_jatuh_tempo')
                     ->label('Jatuh Tempo')
                     ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('denda.rate_denda')
+                    ->label('Rate Denda')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\SelectColumn::make('status_pinjaman')
                     ->options([

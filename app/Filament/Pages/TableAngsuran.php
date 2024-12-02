@@ -9,17 +9,38 @@ use Illuminate\Contracts\View\View;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use App\Models\TransaksiPinjaman;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Grid;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Table;
+use Carbon\Carbon;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Columns\Column;
+use Filament\Tables\Columns\Actions\Column as ActionsColumn;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Action;
+use Filament\Notifications\Actions\Action as NotificationAction;
+use Illuminate\Support\Facades\DB;
+use Filament\Tables\Actions\DeleteAction;
 
-class TableAngsuran extends Page
+class TableAngsuran extends Page implements HasForms, HasTable
 {
     use InteractsWithForms;
+    use InteractsWithTable;
+    use InteractsWithActions;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationGroup = 'Pinjaman';
     protected static string $view = 'filament.pages.table-angsuran';
 
     public ?string $noPinjaman = '';
     public $pinjaman = null;
     public $angsuranList = [];
+    public $showPaymentForm = false;
+    public $selectedPeriod = null;
 
     public function mount(): void
     {
@@ -32,7 +53,21 @@ class TableAngsuran extends Page
             ->schema([
                 TextInput::make('noPinjaman')
                     ->label('No Pinjaman')
-                    ->required()
+                    ->required(),
+
+                Grid::make(2)
+                    ->schema([
+                        DatePicker::make('tanggal_pembayaran')
+                            ->label('Tanggal Pembayaran')
+                            ->required()
+                            ->visible(fn() => $this->showPaymentForm),
+
+                        TextInput::make('total_pembayaran')
+                            ->label('Total Pembayaran')
+                            ->disabled()
+                            ->visible(fn() => $this->showPaymentForm),
+                    ])
+                    ->visible(fn() => $this->showPaymentForm)
             ]);
     }
 
@@ -100,5 +135,154 @@ class TableAngsuran extends Page
 
             $sisaPokok -= $angsuranPokok;
         }
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(
+                TransaksiPinjaman::query()
+                    ->where('pinjaman_id', optional($this->pinjaman)->id_pinjaman)
+            )
+            ->columns([
+                TextColumn::make('angsuran_ke')
+                    ->label('Angsuran Ke'),
+                TextColumn::make('tanggal_pembayaran')
+                    ->label('Tanggal Bayar')
+                    ->date(),
+                TextColumn::make('angsuran_pokok')
+                    ->label('Pokok')
+                    ->money('IDR'),
+                TextColumn::make('angsuran_bunga')
+                    ->label('Bunga')
+                    ->money('IDR'),
+                TextColumn::make('denda')
+                    ->label('Denda')
+                    ->money('IDR'),
+                TextColumn::make('total_pembayaran')
+                    ->label('Total')
+                    ->money('IDR'),
+                TextColumn::make('status_pembayaran')
+                    ->label('Status'),
+                Column::make('actions')
+                    ->label('Aksi')
+                    ->alignEnd()
+                    ->view('filament.tables.columns.actions'),
+            ])
+            ->defaultSort('angsuran_ke', 'desc')
+            ->poll('5s');
+    }
+
+    public function bayarAngsuran($periode)
+    {
+        // Cek apakah periode sebelumnya sudah dibayar
+        $periodeSebelumnya = $periode - 1;
+
+        if ($periodeSebelumnya > 0) {
+            $pembayaranSebelumnya = TransaksiPinjaman::where('pinjaman_id', $this->pinjaman->id_pinjaman)
+                ->where('angsuran_ke', $periodeSebelumnya)
+                ->exists();
+
+            if (!$pembayaranSebelumnya) {
+                Notification::make()
+                    ->title('Tidak dapat melakukan pembayaran')
+                    ->body('Harap bayar angsuran periode sebelumnya terlebih dahulu')
+                    ->danger()
+                    ->send();
+
+                return;
+            }
+        }
+
+        $this->selectedPeriod = $periode;
+        $this->showPaymentForm = true;
+
+        // Ambil data angsuran yang akan dibayar
+        $angsuran = $this->angsuranList[$periode - 1];
+
+        // Hitung denda jika ada keterlambatan
+        $tanggalJatuhTempo = Carbon::createFromFormat('d/m/Y', $angsuran['tanggal_jatuh_tempo']);
+        $tanggalBayar = Carbon::now();
+
+        $denda = 0;
+        if ($tanggalBayar->gt($tanggalJatuhTempo)) {
+            $hariTerlambat = $tanggalBayar->diffInDays($tanggalJatuhTempo);
+            $rateDenda = $this->pinjaman->produkPinjaman->rate_denda;
+            $totalAngsuran = $angsuran['pokok'] + $angsuran['bunga'];
+
+            // Rumus: rate_denda * angsuran_per_bulan / 30 * hari_terlambat
+            $denda = ($rateDenda/100 * $totalAngsuran / 30) * $hariTerlambat;
+        }
+
+        // Simpan transaksi
+        TransaksiPinjaman::create([
+            'pinjaman_id' => $this->pinjaman->id_pinjaman,
+            'tanggal_pembayaran' => $tanggalBayar,
+            'angsuran_ke' => $periode,
+            'angsuran_pokok' => $angsuran['pokok'],
+            'angsuran_bunga' => $angsuran['bunga'],
+            'denda' => $denda,
+            'total_pembayaran' => $angsuran['pokok'] + $angsuran['bunga'] + $denda,
+            'sisa_pinjaman' => $angsuran['sisa_pokok'],
+            'status_pembayaran' => 'LUNAS',
+            'hari_terlambat' => $hariTerlambat ?? 0
+        ]);
+
+        Notification::make()
+            ->title('Pembayaran berhasil')
+            ->success()
+            ->send();
+
+        $this->showPaymentForm = false;
+    }
+
+    public function deletePembayaran($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Cari transaksi yang akan dihapus
+            $transaksi = TransaksiPinjaman::findOrFail($id);
+
+            // Update sisa pinjaman pada tabel pinjaman
+            $pinjaman = Pinjaman::findOrFail($transaksi->pinjaman_id);
+            $pinjaman->jumlah_pinjaman += $transaksi->angsuran_pokok; // Menggunakan jumlah_pinjaman sebagai pengganti sisa_pinjaman
+            $pinjaman->save();
+
+            // Hapus transaksi
+            $transaksi->delete();
+
+            DB::commit();
+
+            Notification::make()
+                ->title('Pembayaran berhasil dihapus')
+                ->success()
+                ->send();
+
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            Notification::make()
+                ->title('Gagal menghapus pembayaran')
+                ->danger()
+                ->body('Terjadi kesalahan saat menghapus data: ' . $e->getMessage())
+                ->send();
+        }
+    }
+
+    public function isAngsuranPaid($periode): bool
+    {
+        // Jika tidak ada pinjaman, kembalikan false agar tombol tetap aktif
+        if (!$this->pinjaman) {
+            return false;
+        }
+
+        // Cek apakah ada history pembayaran untuk periode ini
+        $pembayaran = TransaksiPinjaman::where('pinjaman_id', $this->pinjaman->id_pinjaman)
+            ->where('angsuran_ke', $periode)
+            ->exists();
+
+        // Kembalikan true jika sudah ada pembayaran, false jika belum
+        return $pembayaran;
     }
 }

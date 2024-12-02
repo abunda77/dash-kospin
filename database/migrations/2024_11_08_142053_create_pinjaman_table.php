@@ -23,7 +23,7 @@ return new class extends Migration
             $table->date('tanggal_jatuh_tempo');
             $table->enum('jangka_waktu_satuan', ['bulan', 'tahun']);
             $table->enum('status_pinjaman', ['pending', 'approved', 'rejected', 'completed']);
-            $table->text('keterangan')->nullable();
+            $table->foreignId('denda_id')->nullable()->constrained('dendas');
             $table->timestamps();
         });
     }
