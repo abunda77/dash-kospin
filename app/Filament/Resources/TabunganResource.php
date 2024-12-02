@@ -15,6 +15,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\RawJs;
+use Illuminate\Support\Facades\Log;
 
 class TabunganResource extends Resource
 {
@@ -80,7 +81,16 @@ class TabunganResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('profile.first_name')
                     ->label('Nasabah')
-                    ->formatStateUsing(fn ($record) => "{$record->profile->first_name} {$record->profile->last_name}")
+                    ->formatStateUsing(function ($record) {
+                        Log::info('Debug Tabungan-Profile:', [
+                            'id_profile' => $record->id_profile,
+                            'profile' => $record->profile
+                        ]);
+
+                        return $record->profile
+                            ? "{$record->profile->first_name} {$record->profile->last_name}"
+                            : '-';
+                    })
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('produkTabungan.nama_produk')
@@ -120,6 +130,10 @@ class TabunganResource extends Resource
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('id_profile')
+                    ->label('ID Profile')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
                 //

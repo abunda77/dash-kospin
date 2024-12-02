@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('jaminans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_pinjaman')->constrained('pinjamans', 'id_pinjaman');
+            $table->foreignId('id_pinjaman')->constrained('pinjamans', 'id_pinjaman')->onDelete('cascade');
             $table->string('jenis_jaminan');
             $table->decimal('nilai_jaminan', 10, 2);
-            $table->string('keterangan');
+            $table->string('keterangan')->nullable();
             $table->timestamps();
         });
     }

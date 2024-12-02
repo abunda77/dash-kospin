@@ -141,9 +141,6 @@ class MutasiTabungan extends Page implements HasTable
     {
         return $table
             ->query($this->getTableQuery())
-            ->heading(
-                fn() => $this->isSearchSubmitted ? $this->getAccountInfo() : null
-            )
             ->columns($this->getTableColumns())
             ->defaultSort('tanggal_transaksi', 'ASC');
     }
@@ -230,37 +227,4 @@ class MutasiTabungan extends Page implements HasTable
             : $saldo - $transaction->jumlah;
     }
 
-    private function getAccountInfo()
-    {
-        try {
-            if (!$this->tabungan) {
-                $this->handleMissingAccount();
-                return null;
-            }
-
-            return $this->renderAccountInfo();
-        } catch (\Exception $e) {
-            Log::error('Error getting account info: ' . $e->getMessage());
-            return null;
-        }
-    }
-
-    private function handleMissingAccount()
-    {
-        Log::warning('Attempt to get account info with no account selected');
-        Notification::make()
-            ->title('Rekening tidak ditemukan')
-            ->danger()
-            ->send();
-    }
-
-    private function renderAccountInfo()
-    {
-        return view('filament.components.account-info', [
-            'nama' => $this->tabungan->profile->first_name . ' ' . $this->tabungan->profile->last_name,
-            'no_rekening' => $this->tabungan->no_tabungan,
-            'saldo' => $this->tabungan->saldo,
-            'jenis_tabungan' => $this->tabungan->produkTabungan->nama_produk
-        ]);
-    }
 }

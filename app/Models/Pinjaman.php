@@ -27,6 +27,8 @@ class Pinjaman extends Model
         'jumlah_pinjaman' => 'decimal:2',
         'suku_bunga' => 'decimal:2',
         'tanggal_pinjaman' => 'date',
+        'jangka_waktu' => 'integer',
+        'tanggal_jatuh_tempo' => 'date',
         'jangka_waktu_satuan' => 'string',
         'status_pinjaman' => 'string'
     ];

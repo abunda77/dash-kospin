@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\RawJs;
+use Illuminate\Support\Facades\Log;
 
 class PinjamanResource extends Resource
 {
@@ -58,8 +59,12 @@ class PinjamanResource extends Resource
                                     ->prefix('Rp')
                                     ->placeholder('1,000,000')
                                     ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
-                                        if ($state) {
-                                            $component->state(number_format($state, 0, '.', ','));
+                                        try {
+                                            if ($state) {
+                                                $component->state(number_format($state, 0, '.', ','));
+                                            }
+                                        } catch (\Exception $e) {
+                                            Log::error('Error in jumlah_pinjaman hydration: ' . $e->getMessage());
                                         }
                                     })
                                     ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
@@ -67,32 +72,105 @@ class PinjamanResource extends Resource
                                 Forms\Components\TextInput::make('jangka_waktu')
                                     ->label('Jangka Waktu (Bulan)')
                                     ->numeric()
-                                    ->required(),
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(function($state, $get, $set) {
+                                        if (!$state || !$get('tanggal_pinjaman')) {
+                                            return;
+                                        }
+
+                                        $tanggalPinjaman = \Carbon\Carbon::parse($get('tanggal_pinjaman'));
+                                        $jangkaWaktu = (int)$state;
+                                        $satuan = $get('jangka_waktu_satuan') ?? 'bulan';
+
+                                        if ($satuan === 'tahun') {
+                                            $jangkaWaktu *= 12;
+                                        }
+
+                                        $tanggalJatuhTempo = $tanggalPinjaman->copy()->addMonths($jangkaWaktu);
+                                        $set('tanggal_jatuh_tempo', $tanggalJatuhTempo->format('Y-m-d'));
+                                    }),
                             ]),
-                        Forms\Components\Grid::make(2)
-                            ->schema([
-                                Forms\Components\DatePicker::make('tanggal_pinjaman')
-                                    ->label('Tanggal Pinjaman')
-                                    ->required(),
-                                Forms\Components\DatePicker::make('tanggal_jatuh_tempo')
-                                    ->label('Tanggal Jatuh Tempo')
-                                    ->required(),
-                            ]),
-                        Forms\Components\Grid::make(2)
+
+                            Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\Select::make('beaya_bunga_pinjaman_id')
                                     ->label('Biaya Bunga')
                                     ->relationship('biayaBungaPinjaman', 'name')
                                     ->searchable()
                                     ->required(),
-                                Forms\Components\Select::make('jangka_waktu_satuan')
+
+                            ]),
+
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('tanggal_pinjaman')
+                                    ->label('Tanggal Pinjaman')
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(function($state, $get, $set) {
+                                        try {
+                                            if ($state && $get('jangka_waktu')) {
+                                                $tanggalPinjaman = \Carbon\Carbon::parse($state);
+                                                $jangkaWaktu = (int)$get('jangka_waktu');
+                                                $satuan = $get('jangka_waktu_satuan') ?? 'bulan';
+
+                                                if ($satuan === 'tahun') {
+                                                    $jangkaWaktu *= 12;
+                                                }
+
+                                                $tanggalJatuhTempo = $tanggalPinjaman->copy()->addMonths($jangkaWaktu);
+                                                $set('tanggal_jatuh_tempo', $tanggalJatuhTempo);
+                                            }
+                                        } catch (\Exception $e) {
+                                            Log::error('Error in tanggal_pinjaman calculation: ' . $e->getMessage());
+                                        }
+                                    }),
+                                    Forms\Components\Select::make('jangka_waktu_satuan')
                                     ->label('Satuan Waktu')
                                     ->options([
                                         'bulan' => 'Bulan',
                                         'tahun' => 'Tahun'
                                     ])
-                                    ->required(),
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(function($state, $get, $set) {
+                                        if (!$state || !$get('tanggal_pinjaman') || !$get('jangka_waktu')) {
+                                            return;
+                                        }
+
+                                        $tanggalPinjaman = \Carbon\Carbon::parse($get('tanggal_pinjaman'));
+                                        $jangkaWaktu = (int)$get('jangka_waktu');
+
+                                        if ($state === 'tahun') {
+                                            $jangkaWaktu *= 12;
+                                        }
+
+                                        $tanggalJatuhTempo = $tanggalPinjaman->copy()->addMonths($jangkaWaktu);
+                                        $set('tanggal_jatuh_tempo', $tanggalJatuhTempo->format('Y-m-d'));
+                                    }),
+
+                                Forms\Components\DatePicker::make('tanggal_jatuh_tempo')
+                                    ->label('Tanggal Jatuh Tempo')
+                                    ->required()
+                                    ->dehydrated(true)
+                                    ->disabled(false)
+                                    ->afterStateHydrated(function($state, $get, $set) {
+                                        if ($get('tanggal_pinjaman') && $get('jangka_waktu')) {
+                                            $tanggalPinjaman = \Carbon\Carbon::parse($get('tanggal_pinjaman'));
+                                            $jangkaWaktu = (int)$get('jangka_waktu');
+                                            $satuan = $get('jangka_waktu_satuan') ?? 'bulan';
+
+                                            if ($satuan === 'tahun') {
+                                                $jangkaWaktu *= 12;
+                                            }
+
+                                            $tanggalJatuhTempo = $tanggalPinjaman->copy()->addMonths($jangkaWaktu);
+                                            $set('tanggal_jatuh_tempo', $tanggalJatuhTempo->format('Y-m-d'));
+                                        }
+                                    }),
                             ]),
+
                         Forms\Components\Select::make('status_pinjaman')
                             ->label('Status')
                             ->options([
@@ -113,6 +191,10 @@ class PinjamanResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('no_pinjaman')
+                    ->label('Nomor Pinjaman')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('profile.user.name')
                     ->label('Nasabah')
                     ->searchable()
@@ -137,14 +219,14 @@ class PinjamanResource extends Resource
                     ->label('Jatuh Tempo')
                     ->date()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status_pinjaman')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'approved' => 'success',
-                        'rejected' => 'danger',
-                        'completed' => 'info',
-                    }),
+                Tables\Columns\SelectColumn::make('status_pinjaman')
+                    ->options([
+                        'pending' => 'Pending',
+                        'approved' => 'Approved',
+                        'rejected' => 'Rejected',
+                        'completed' => 'Completed'
+                    ])
+                    ->rules(['required']),
             ])
             ->filters([
                 //

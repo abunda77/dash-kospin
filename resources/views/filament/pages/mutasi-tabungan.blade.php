@@ -13,7 +13,31 @@
         </div>
     </form>
 
-    @if($isSearchSubmitted)
+    @if($isSearchSubmitted && $tabungan)
+        <div class="mt-4">
+            <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Nama</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">
+                            {{ $tabungan->profile?->first_name  ?? '-' }} {{ $tabungan->profile?->last_name  ?? '-' }}
+                        </p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Nomor Rekening</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">{{ $tabungan->no_tabungan ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Jenis Tabungan</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">{{ $tabungan->produkTabungan?->nama_produk ?? '-' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Saldo</p>
+                        <p class="font-semibold text-gray-900 dark:text-white">Rp {{ number_format($tabungan->saldo ?? 0, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="mt-4">
             {{ $this->table }}
         </div>
