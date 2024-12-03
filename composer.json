@@ -7,11 +7,14 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-debugbar": "^3.14",
+        "barryvdh/laravel-dompdf": "^3.0",
         "bezhansalleh/filament-shield": "^3.2",
+        "dompdf/dompdf": "^3.0",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "malzariey/filament-daterangepicker-filter": "^3.1",
         "rupadana/filament-api-service": "^3.3",
         "ysfkaya/filament-phone-input": "^3.1"
     },

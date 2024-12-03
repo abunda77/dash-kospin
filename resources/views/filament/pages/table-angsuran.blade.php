@@ -17,41 +17,39 @@
 
     @if($pinjaman)
         <div class="p-6 mt-8 bg-white rounded-lg shadow-sm dark:bg-gray-800">
-            <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="info">
+                <table style="width: 75%; border: none;">
+                    <tr>
+                        <td style="border: none;">Nama</td>
+                        <td style="border: none;">: {{ $pinjaman->profile->first_name }} {{ $pinjaman->profile->last_name }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Alamat</td>
+                        <td style="border: none;">: {{ $pinjaman->profile->address }}, {{ \App\Models\Region::where('code', $pinjaman->profile->village_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->district_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->city_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->province_id)->first()?->name }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">No Pinjaman</td>
+                        <td style="border: none;">: {{ $pinjaman->no_pinjaman }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Produk Pinjaman</td>
+                        <td style="border: none;">: {{ $pinjaman->produkPinjaman->nama_produk }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Jumlah Pinjaman</td>
+                        <td style="border: none;">: Rp {{ number_format($pinjaman->jumlah_pinjaman, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Tanggal Pinjaman</td>
+                        <td style="border: none;">: {{ $pinjaman->tanggal_pinjaman->format('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Jangka Waktu</td>
+                        <td style="border: none;">: {{ $pinjaman->jangka_waktu }} {{ $pinjaman->jangka_waktu_satuan }}</td>
+                    </tr>
+                </table>
+
                 <div class="mt-4">
-                    <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Informasi Peminjam</h3>
-                    <div class="space-y-2">
-                        <div class="flex">
-                            <span class="w-40 text-gray-600 dark:text-gray-400">Nama</span>
-                            <span class="text-gray-900 dark:text-gray-100">: {{ $pinjaman->profile->first_name }} {{ $pinjaman->profile->last_name }}</span>
-                        </div>
-                        <div class="flex">
-                            <span class="w-40 text-gray-600 dark:text-gray-400">Alamat</span>
-                            <span class="text-gray-900 dark:text-gray-100">: {{ $pinjaman->profile->address }}, {{ \App\Models\Region::where('code', $pinjaman->profile->village_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->district_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->city_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->province_id)->first()?->name }}</span>
-                        </div>
-                        <div class="flex">
-                            <span class="w-40 text-gray-600 dark:text-gray-400">No Pinjaman</span>
-                            <span class="text-gray-900 dark:text-gray-100">: {{ $pinjaman->no_pinjaman }}</span>
-                        </div>
-                        <div class="flex">
-                            <span class="w-40 text-gray-600 dark:text-gray-400">Produk Pinjaman</span>
-                            <span class="text-gray-900 dark:text-gray-100">: {{ $pinjaman->produkPinjaman->nama_produk }}</span>
-                        </div>
-                        <div class="flex">
-                            <span class="w-40 text-gray-600 dark:text-gray-400">Jumlah Pinjaman</span>
-                            <span class="text-gray-900 dark:text-gray-100">: Rp {{ number_format($pinjaman->jumlah_pinjaman, 2) }}</span>
-                        </div>
-                        <div class="flex">
-                            <span class="w-40 text-gray-600 dark:text-gray-400">Tanggal Pinjaman</span>
-                            <span class="text-gray-900 dark:text-gray-100">: {{ $pinjaman->tanggal_pinjaman->format('d/m/Y') }}</span>
-                        </div>
-                        <div class="flex">
-                            <span class="w-40 text-gray-600 dark:text-gray-400">Jangka Waktu</span>
-                            <span class="text-gray-900 dark:text-gray-100">: {{ $pinjaman->jangka_waktu }} {{ $pinjaman->jangka_waktu_satuan }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div>
                     <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Foto Identitas</h3>
                     <div class="grid grid-cols-2 gap-4">
                         @if($pinjaman->profile->image_identity)

@@ -13,6 +13,11 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
 
 class MutasiTabungan extends Page implements HasTable
 {
@@ -142,6 +147,11 @@ class MutasiTabungan extends Page implements HasTable
         return $table
             ->query($this->getTableQuery())
             ->columns($this->getTableColumns())
+            ->filters([
+                DateRangeFilter::make('tanggal_transaksi')
+                    ->label('Rentang Waktu')
+                    ->placeholder('Pilih rentang waktu')
+            ])
             ->defaultSort('tanggal_transaksi', 'ASC');
     }
 
@@ -166,7 +176,11 @@ class MutasiTabungan extends Page implements HasTable
                 ->label('Kode Transaksi'),
             TextColumn::make('tanggal_transaksi')
                 ->label('Tanggal')
-                ->dateTime(),
+                ->dateTime()
+                ->sortable()
+                ->toggleable()
+                ->searchable()
+                ->sortable(['tanggal_transaksi']),
             TextColumn::make('kredit')
                 ->label('Kredit')
                 ->money('IDR')
@@ -225,6 +239,106 @@ class MutasiTabungan extends Page implements HasTable
         return $transaction->jenis_transaksi === 'debit'
             ? $saldo + $transaction->jumlah
             : $saldo - $transaction->jumlah;
+    }
+
+    public function print()
+    {
+        try {
+            if (!$this->tabungan) {
+                Notification::make()
+                    ->title('Silahkan cari data terlebih dahulu')
+                    ->warning()
+                    ->send();
+                return;
+            }
+
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isPhpEnabled', true);
+            $options->set('defaultFont', 'Arial');
+
+            $dompdf = new Dompdf($options);
+            $dompdf->setPaper('A4', 'portrait');
+
+            $query = $this->getFilteredTransactionQuery();
+            $transaksi = $this->processTransactions($query);
+
+            $html = $this->generatePdfHtml($transaksi);
+
+            $dompdf->loadHtml($html);
+            $dompdf->render();
+
+            $filename = $this->generatePdfFilename();
+
+            return response()->streamDownload(
+                fn () => print($dompdf->output()),
+                $filename,
+                ['Content-Type' => 'application/pdf']
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Error in print: ' . $e->getMessage());
+            Notification::make()
+                ->title('Terjadi kesalahan saat mencetak')
+                ->danger()
+                ->send();
+            return null;
+        }
+    }
+
+    private function getFilteredTransactionQuery()
+    {
+        $query = TransaksiTabungan::query()
+            ->where('id_tabungan', $this->tabungan->id);
+
+        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+        if ($dateFilter) {
+            if (!empty($dateFilter['start'])) {
+                $query->whereDate('tanggal_transaksi', '>=', $dateFilter['start']);
+            }
+            if (!empty($dateFilter['end'])) {
+                $query->whereDate('tanggal_transaksi', '<=', $dateFilter['end']);
+            }
+        }
+
+        return $query->orderBy('tanggal_transaksi', 'ASC')
+                    ->orderBy('id', 'ASC');
+    }
+
+    private function processTransactions($query)
+    {
+        return $query->get()->map(function ($record) {
+            $record->saldo_berjalan = $this->calculateSaldoBerjalan($record);
+            return $record;
+        });
+    }
+
+    private function generatePdfHtml($transaksi)
+    {
+        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+        return view('pdf.mutasi-tabungan', [
+            'tabungan' => $this->tabungan,
+            'transaksi' => $transaksi,
+            'saldo_berjalan' => $this->saldo_berjalan,
+            'filter_date' => $dateFilter ? [
+                'start' => $dateFilter['start'] ?? null,
+                'end' => $dateFilter['end'] ?? null,
+            ] : null
+        ])->render();
+    }
+
+    private function generatePdfFilename()
+    {
+        $filename = 'mutasi_' . $this->no_rekening;
+        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+        if ($dateFilter) {
+            $start = $dateFilter['start'] ?? '';
+            $end = $dateFilter['end'] ?? '';
+            if ($start && $end) {
+                $filename .= "_{$start}_{$end}";
+            }
+        }
+        return $filename . '_' . date('Y-m-d_H-i-s') . '.pdf';
     }
 
 }
