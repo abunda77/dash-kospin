@@ -3,12 +3,12 @@
         <form wire:submit="search" class="space-y-6">
             {{ $this->form }}
 
-            <div class="flex gap-4">
-                <x-filament::button type="submit" class="bg-primary-600 hover:bg-primary-500 dark:bg-primary-700 dark:hover:bg-primary-600">
+            <div class="flex gap-4 mt-4">
+                <x-filament::button type="submit">
                     Cari
                 </x-filament::button>
 
-                <x-filament::button wire:click="clearSearch" class="bg-danger-500 hover:bg-danger-400 dark:bg-danger-600 dark:hover:bg-danger-500">
+                <x-filament::button color="danger" wire:click="clearSearch" type="button">
                     Reset
                 </x-filament::button>
             </div>
@@ -18,12 +18,16 @@
     @if($pinjaman)
         <div class="p-6 mt-8 bg-white rounded-lg shadow-sm dark:bg-gray-800">
             <div class="grid grid-cols-2 gap-4 mb-6">
-                <div>
+                <div class="mt-4">
                     <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Informasi Peminjam</h3>
                     <div class="space-y-2">
                         <div class="flex">
                             <span class="w-40 text-gray-600 dark:text-gray-400">Nama</span>
                             <span class="text-gray-900 dark:text-gray-100">: {{ $pinjaman->profile->first_name }} {{ $pinjaman->profile->last_name }}</span>
+                        </div>
+                        <div class="flex">
+                            <span class="w-40 text-gray-600 dark:text-gray-400">Alamat</span>
+                            <span class="text-gray-900 dark:text-gray-100">: {{ $pinjaman->profile->address }}, {{ \App\Models\Region::where('code', $pinjaman->profile->village_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->district_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->city_id)->first()?->name }}, {{ \App\Models\Region::where('code', $pinjaman->profile->province_id)->first()?->name }}</span>
                         </div>
                         <div class="flex">
                             <span class="w-40 text-gray-600 dark:text-gray-400">No Pinjaman</span>
@@ -47,6 +51,20 @@
                         </div>
                     </div>
                 </div>
+                <div>
+                    <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Foto Identitas</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        @if($pinjaman->profile->image_identity)
+                            @foreach($pinjaman->profile->image_identity as $image)
+                                <img src="{{ Storage::url($image) }}" alt="Foto Identitas" class="object-cover w-12 h-auto rounded-lg">
+                            @endforeach
+                        @else
+                            <div class="flex items-center justify-center w-full h-32 bg-gray-100 rounded-lg dark:bg-gray-700">
+                                <span class="text-gray-500 dark:text-gray-400">Tidak ada foto identitas</span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -68,10 +86,10 @@
                         @foreach($angsuranList as $index => $angsuran)
                         <tr class="transition duration-150 hover:bg-gray-300 dark:hover:bg-gray-600">
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">{{ $angsuran['periode'] }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp {{ number_format($angsuran['pokok'], 2) }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp {{ number_format($angsuran['bunga'], 2) }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp {{ number_format($angsuran['angsuran'], 2) }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp {{ number_format($angsuran['sisa_pokok'], 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp. {{ number_format($angsuran['pokok'], 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp. {{ number_format($angsuran['bunga'], 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp. {{ number_format($angsuran['angsuran'], 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">Rp. {{ number_format($angsuran['sisa_pokok'], 2) }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 whitespace-nowrap">{{ $angsuran['tanggal_jatuh_tempo'] }}</td>
                             <td class="px-6 py-4 text-sm whitespace-nowrap">
                                 <x-filament::button

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Support\RawJs;
 
 class ProfilesRelationManager extends RelationManager
 {
@@ -153,8 +154,18 @@ class ProfilesRelationManager extends RelationManager
                                     ->label('Pekerjaan'),
                                 Forms\Components\TextInput::make('monthly_income')
                                     ->label('Pendapatan Bulanan')
+                                    ->mask(RawJs::make('$money($input)'))
+                                    ->stripCharacters(',')
                                     ->numeric()
-                                    ->prefix('Rp'),
+                                    ->prefix('Rp')
+                                    ->placeholder('1,000,000')
+                                    ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
+                                        if ($state) {
+                                            $component->state(number_format($state, 0, '.', ','));
+                                        }
+                                    })
+                                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
+                                    ->required(),
                             ]),
                         Forms\Components\Grid::make(2)
                             ->schema([

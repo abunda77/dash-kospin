@@ -25,6 +25,7 @@ use Filament\Actions\Action;
 use Filament\Notifications\Actions\Action as NotificationAction;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Columns\Summarizers\Sum;
 
 class TableAngsuran extends Page implements HasForms, HasTable
 {
@@ -152,16 +153,32 @@ class TableAngsuran extends Page implements HasForms, HasTable
                     ->date(),
                 TextColumn::make('angsuran_pokok')
                     ->label('Pokok')
-                    ->money('IDR'),
+                    ->money('Rp.')
+                    ->summarize([
+                        Sum::make()
+                            ->money('Rp.')
+                    ]),
                 TextColumn::make('angsuran_bunga')
                     ->label('Bunga')
-                    ->money('IDR'),
+                    ->money('Rp.')
+                    ->summarize([
+                        Sum::make()
+                            ->money('Rp.')
+                    ]),
                 TextColumn::make('denda')
                     ->label('Denda')
-                    ->money('IDR'),
+                    ->money('Rp.')
+                    ->summarize([
+                        Sum::make()
+                            ->money('Rp.')
+                    ]),
                 TextColumn::make('total_pembayaran')
                     ->label('Total')
-                    ->money('IDR'),
+                    ->money('Rp.')
+                    ->summarize([
+                        Sum::make()
+                            ->money('Rp.')
+                    ]),
                 TextColumn::make('status_pembayaran')
                     ->label('Status'),
                 Column::make('actions')
@@ -247,6 +264,7 @@ class TableAngsuran extends Page implements HasForms, HasTable
             // Update sisa pinjaman pada tabel pinjaman
             $pinjaman = Pinjaman::findOrFail($transaksi->pinjaman_id);
             $pinjaman->jumlah_pinjaman += $transaksi->angsuran_pokok; // Menggunakan jumlah_pinjaman sebagai pengganti sisa_pinjaman
+            $pinjaman->jumlah_pinjaman -= $transaksi->angsuran_pokok;
             $pinjaman->save();
 
             // Hapus transaksi
