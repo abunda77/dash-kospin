@@ -36,6 +36,9 @@
 <body>
     <div class="header">
         <h2>Laporan Mutasi Tabungan</h2>
+        @if($filter_date)
+            <p>Periode: {{ \Carbon\Carbon::parse($filter_date['start'])->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($filter_date['end'])->format('d/m/Y') }}</p>
+        @endif
     </div>
 
     <div class="info">
@@ -62,10 +65,11 @@
     <table>
         <thead>
             <tr>
-                <th>Kode Transaksi</th>
                 <th>Tanggal</th>
-                <th>Debit</th>
+                <th>Kode Transaksi</th>
+                <th>Debet</th>
                 <th>Kredit</th>
+                <th>PC</th>
                 <th>Saldo</th>
                 <th>Kode Teller</th>
             </tr>
@@ -73,14 +77,15 @@
         <tbody>
             @foreach($transaksi as $t)
             <tr>
-                <td>{{ $t->kode_transaksi }}</td>
                 <td>{{ \Carbon\Carbon::parse($t->tanggal_transaksi)->format('d/m/Y H:i:s') }}</td>
+                <td>{{ $t->kode_transaksi }}</td>
                 <td style="text-align: right">
                     {{ $t->jenis_transaksi === 'debit' ? 'Rp ' . number_format($t->jumlah, 0, ',', '.') : '-' }}
                 </td>
                 <td style="text-align: right">
                     {{ $t->jenis_transaksi === 'kredit' ? 'Rp ' . number_format($t->jumlah, 0, ',', '.') : '-' }}
                 </td>
+                <td></td>
                 <td style="text-align: right">
                     Rp {{ number_format($t->saldo_berjalan, 0, ',', '.') }}
                 </td>

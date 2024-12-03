@@ -16,6 +16,24 @@
     </div>
 
     @if($pinjaman)
+        <div class="flex justify-end gap-4 mt-4">
+            <x-filament::button
+                wire:click="printSimulasi"
+                icon="heroicon-o-document"
+                color="success"
+            >
+                Cetak Simulasi
+            </x-filament::button>
+
+            <x-filament::button
+                wire:click="print"
+                icon="heroicon-o-printer"
+                color="warning"
+            >
+                Cetak Riwayat
+            </x-filament::button>
+        </div>
+
         <div class="p-6 mt-8 bg-white rounded-lg shadow-sm dark:bg-gray-800">
             <div class="info">
                 <table style="width: 75%; border: none;">

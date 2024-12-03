@@ -26,6 +26,9 @@ use Filament\Notifications\Actions\Action as NotificationAction;
 use Illuminate\Support\Facades\DB;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\Summarizers\Sum;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Illuminate\Support\Facades\Log;
 
 class TableAngsuran extends Page implements HasForms, HasTable
 {
@@ -302,5 +305,113 @@ class TableAngsuran extends Page implements HasForms, HasTable
 
         // Kembalikan true jika sudah ada pembayaran, false jika belum
         return $pembayaran;
+    }
+
+    public function print()
+    {
+        try {
+            if (!$this->pinjaman) {
+                Notification::make()
+                    ->title('Silahkan cari data terlebih dahulu')
+                    ->warning()
+                    ->send();
+                return;
+            }
+
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isPhpEnabled', true);
+            $options->set('defaultFont', 'Arial');
+
+            $dompdf = new Dompdf($options);
+            $dompdf->setPaper('A4', 'portrait');
+
+            // Ambil data transaksi
+            $transaksi = TransaksiPinjaman::where('pinjaman_id', $this->pinjaman->id_pinjaman)
+                ->orderBy('angsuran_ke', 'asc')
+                ->get();
+
+            // Generate HTML
+            $html = view('pdf.angsuran', [
+                'pinjaman' => $this->pinjaman,
+                'transaksi' => $transaksi,
+                'angsuranList' => $this->angsuranList
+            ])->render();
+
+            $dompdf->loadHtml($html);
+            $dompdf->render();
+
+            $filename = $this->generatePdfFilename();
+
+            return response()->streamDownload(
+                fn () => print($dompdf->output()),
+                $filename,
+                ['Content-Type' => 'application/pdf']
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Error in print: ' . $e->getMessage());
+            Notification::make()
+                ->title('Terjadi kesalahan saat mencetak')
+                ->danger()
+                ->send();
+            return null;
+        }
+    }
+
+    private function generatePdfFilename()
+    {
+        return 'angsuran_' . $this->noPinjaman . '_' . date('Y-m-d_H-i-s') . '.pdf';
+    }
+
+    public function printSimulasi()
+    {
+        try {
+            if (!$this->pinjaman) {
+                Notification::make()
+                    ->title('Silahkan cari data terlebih dahulu')
+                    ->warning()
+                    ->send();
+                return;
+            }
+
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isPhpEnabled', true);
+            $options->set('defaultFont', 'Arial');
+
+            $dompdf = new Dompdf($options);
+            $dompdf->setPaper('A4', 'portrait');
+
+            // Generate HTML
+            $html = view('pdf.simulasi-angsuran', [
+                'pinjaman' => $this->pinjaman,
+                'angsuranList' => $this->angsuranList
+            ])->render();
+
+            $dompdf->loadHtml($html);
+            $dompdf->render();
+
+            $filename = $this->generateSimulasiPdfFilename();
+
+            return response()->streamDownload(
+                fn () => print($dompdf->output()),
+                $filename,
+                ['Content-Type' => 'application/pdf']
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Error in printSimulasi: ' . $e->getMessage());
+            Notification::make()
+                ->title('Terjadi kesalahan saat mencetak simulasi')
+                ->danger()
+                ->send();
+            return null;
+        }
+    }
+
+    private function generateSimulasiPdfFilename()
+    {
+        return 'simulasi_angsuran_' . $this->noPinjaman . '_' . date('Y-m-d_H-i-s') . '.pdf';
     }
 }

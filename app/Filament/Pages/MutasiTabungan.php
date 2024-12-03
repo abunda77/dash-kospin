@@ -316,14 +316,20 @@ class MutasiTabungan extends Page implements HasTable
     private function generatePdfHtml($transaksi)
     {
         $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+        $formattedFilter = null;
+
+        if ($dateFilter) {
+            $formattedFilter = [
+                'start' => !empty($dateFilter['start']) ? date('Y-m-d', strtotime($dateFilter['start'])) : null,
+                'end' => !empty($dateFilter['end']) ? date('Y-m-d', strtotime($dateFilter['end'])) : null,
+            ];
+        }
+
         return view('pdf.mutasi-tabungan', [
             'tabungan' => $this->tabungan,
             'transaksi' => $transaksi,
             'saldo_berjalan' => $this->saldo_berjalan,
-            'filter_date' => $dateFilter ? [
-                'start' => $dateFilter['start'] ?? null,
-                'end' => $dateFilter['end'] ?? null,
-            ] : null
+            'filter_date' => $formattedFilter
         ])->render();
     }
 
@@ -331,13 +337,99 @@ class MutasiTabungan extends Page implements HasTable
     {
         $filename = 'mutasi_' . $this->no_rekening;
         $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+
         if ($dateFilter) {
-            $start = $dateFilter['start'] ?? '';
-            $end = $dateFilter['end'] ?? '';
+            $start = !empty($dateFilter['start']) ? date('Y-m-d', strtotime($dateFilter['start'])) : '';
+            $end = !empty($dateFilter['end']) ? date('Y-m-d', strtotime($dateFilter['end'])) : '';
+
             if ($start && $end) {
                 $filename .= "_{$start}_{$end}";
             }
         }
+
+        return $filename . '_' . date('Y-m-d_H-i-s') . '.pdf';
+    }
+
+    public function printTable()
+    {
+        try {
+            if (!$this->tabungan) {
+                Notification::make()
+                    ->title('Silahkan cari data terlebih dahulu')
+                    ->warning()
+                    ->send();
+                return;
+            }
+
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isPhpEnabled', true);
+            $options->set('defaultFont', 'Arial');
+
+            $dompdf = new Dompdf($options);
+
+            // Set custom paper size: 130mm x 180mm portrait
+            $dompdf->setPaper(array(0, 0, 368.504, 510.236), 'portrait'); // Convert cm to points (1cm = 28.346 points)
+
+            $query = $this->getFilteredTransactionQuery();
+            $transaksi = $this->processTransactions($query);
+
+            $html = $this->generateTablePdfHtml($transaksi);
+
+            $dompdf->loadHtml($html);
+            $dompdf->render();
+
+            $filename = $this->generateTablePdfFilename();
+
+            return response()->streamDownload(
+                fn () => print($dompdf->output()),
+                $filename,
+                ['Content-Type' => 'application/pdf']
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Error in printTable: ' . $e->getMessage());
+            Notification::make()
+                ->title('Terjadi kesalahan saat mencetak tabel')
+                ->danger()
+                ->send();
+            return null;
+        }
+    }
+
+    private function generateTablePdfHtml($transaksi)
+    {
+        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+        $formattedFilter = null;
+
+        if ($dateFilter) {
+            $formattedFilter = [
+                'start' => !empty($dateFilter['start']) ? date('Y-m-d', strtotime($dateFilter['start'])) : null,
+                'end' => !empty($dateFilter['end']) ? date('Y-m-d', strtotime($dateFilter['end'])) : null,
+            ];
+        }
+
+        return view('pdf.mutasi-tabungan-table', [
+            'tabungan' => $this->tabungan,
+            'transaksi' => $transaksi,
+            'filter_date' => $formattedFilter
+        ])->render();
+    }
+
+    private function generateTablePdfFilename()
+    {
+        $filename = 'tabel_mutasi_' . $this->no_rekening;
+        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+
+        if ($dateFilter) {
+            $start = !empty($dateFilter['start']) ? date('Y-m-d', strtotime($dateFilter['start'])) : '';
+            $end = !empty($dateFilter['end']) ? date('Y-m-d', strtotime($dateFilter['end'])) : '';
+
+            if ($start && $end) {
+                $filename .= "_{$start}_{$end}";
+            }
+        }
+
         return $filename . '_' . date('Y-m-d_H-i-s') . '.pdf';
     }
 
