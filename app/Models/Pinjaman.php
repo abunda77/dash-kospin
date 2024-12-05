@@ -53,4 +53,9 @@ class Pinjaman extends Model
     {
         return $this->belongsTo(Denda::class, 'denda_id');
     }
+
+    public function transaksiPinjaman()
+    {
+        return $this->hasMany(TransaksiPinjaman::class, 'pinjaman_id', 'id_pinjaman');
+    }
 }

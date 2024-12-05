@@ -195,9 +195,8 @@ class TableAngsuran extends Page implements HasForms, HasTable
 
     public function bayarAngsuran($periode)
     {
-        // Cek apakah periode sebelumnya sudah dibayar
+        // Cek periode sebelumnya
         $periodeSebelumnya = $periode - 1;
-
         if ($periodeSebelumnya > 0) {
             $pembayaranSebelumnya = TransaksiPinjaman::where('pinjaman_id', $this->pinjaman->id_pinjaman)
                 ->where('angsuran_ke', $periodeSebelumnya)
@@ -209,7 +208,6 @@ class TableAngsuran extends Page implements HasForms, HasTable
                     ->body('Harap bayar angsuran periode sebelumnya terlebih dahulu')
                     ->danger()
                     ->send();
-
                 return;
             }
         }
@@ -220,32 +218,40 @@ class TableAngsuran extends Page implements HasForms, HasTable
         // Ambil data angsuran yang akan dibayar
         $angsuran = $this->angsuranList[$periode - 1];
 
-        // Hitung denda jika ada keterlambatan
-        $tanggalJatuhTempo = Carbon::createFromFormat('d/m/Y', $angsuran['tanggal_jatuh_tempo']);
-        $tanggalBayar = Carbon::now();
+        // Konversi tanggal jatuh tempo dari format d/m/Y ke objek Carbon
+        $tanggalJatuhTempo = Carbon::createFromFormat('d/m/Y', $angsuran['tanggal_jatuh_tempo'])->startOfDay();
+        $tanggalBayar = Carbon::now()->startOfDay();
 
         $denda = 0;
-        if ($tanggalBayar->gt($tanggalJatuhTempo)) {
-            $hariTerlambat = $tanggalBayar->diffInDays($tanggalJatuhTempo);
-            $rateDenda = $this->pinjaman->produkPinjaman->rate_denda;
-            $totalAngsuran = $angsuran['pokok'] + $angsuran['bunga'];
+        $hariTerlambat = 0;
 
-            // Rumus: rate_denda * angsuran_per_bulan / 30 * hari_terlambat
-            $denda = ($rateDenda/100 * $totalAngsuran / 30) * $hariTerlambat;
+        // Hitung hari terlambat jika tanggal bayar lebih besar dari tanggal jatuh tempo
+        if ($tanggalBayar->gt($tanggalJatuhTempo)) {
+            // Gunakan abs() untuk memastikan nilai positif
+            $hariTerlambat = abs($tanggalJatuhTempo->diffInDays($tanggalBayar));
+
+            // Ambil rate_denda dari relasi denda (dalam persen)
+            $rateDenda = abs($this->pinjaman->denda->rate_denda);
+
+            // Pastikan angsuran pokok positif
+            $angsuranPokok = abs($angsuran['pokok']);
+
+            // Hitung denda: (rate_denda * angsuran_pokok / 30) * hari_terlambat
+            $denda = ($rateDenda/100 * $angsuranPokok / 30) * $hariTerlambat;
         }
 
-        // Simpan transaksi
+        // Simpan transaksi dengan memastikan semua nilai positif
         TransaksiPinjaman::create([
             'pinjaman_id' => $this->pinjaman->id_pinjaman,
             'tanggal_pembayaran' => $tanggalBayar,
             'angsuran_ke' => $periode,
-            'angsuran_pokok' => $angsuran['pokok'],
-            'angsuran_bunga' => $angsuran['bunga'],
-            'denda' => $denda,
-            'total_pembayaran' => $angsuran['pokok'] + $angsuran['bunga'] + $denda,
-            'sisa_pinjaman' => $angsuran['sisa_pokok'],
+            'angsuran_pokok' => abs($angsuran['pokok']),
+            'angsuran_bunga' => abs($angsuran['bunga']),
+            'denda' => abs($denda),
+            'total_pembayaran' => abs($angsuran['pokok']) + abs($angsuran['bunga']) + abs($denda),
+            'sisa_pinjaman' => abs($angsuran['sisa_pokok']),
             'status_pembayaran' => 'LUNAS',
-            'hari_terlambat' => $hariTerlambat ?? 0
+            'hari_terlambat' => $hariTerlambat
         ]);
 
         Notification::make()

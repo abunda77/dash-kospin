@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('no_pinjaman');
             $table->foreignId('profile_id')->constrained('profiles');
             $table->foreignId('produk_pinjaman_id')->constrained('produk_pinjamans');
-            $table->decimal('jumlah_pinjaman', 10, 2);
+            $table->decimal('jumlah_pinjaman', 20, 2);
             $table->foreignId('beaya_bunga_pinjaman_id')->constrained('beaya_bunga_pinjamans');
             $table->date('tanggal_pinjaman');
             $table->integer('jangka_waktu');

@@ -19,6 +19,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Rupadana\ApiService\ApiServicePlugin;
 use App\Filament\Pages\MutasiTabungan;
+use App\Filament\Widgets\StatistikNasabahWidget;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -50,6 +51,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                StatistikNasabahWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
