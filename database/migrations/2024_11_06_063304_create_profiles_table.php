@@ -20,8 +20,7 @@ return new class extends Migration
             $table->string('sign_identity')->nullable();
             $table->string('no_identity')->nullable();
             $table->json('image_identity')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
+            $table->string('phone')->nullable();            
             $table->string('whatsapp')->nullable();
             $table->string('gender')->nullable();
             $table->date('birthday')->nullable();

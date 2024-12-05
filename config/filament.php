@@ -86,4 +86,12 @@ return [
 
     'livewire_loading_delay' => 'default',
 
+    'pages' => [
+        'namespace' => 'App\\Filament\\Pages',
+        'path' => app_path('Filament/Pages'),
+        'register' => [
+            App\Filament\Pages\BackupDatabase::class,
+        ],
+    ],
+
 ];
