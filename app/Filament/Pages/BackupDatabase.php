@@ -63,7 +63,11 @@ class BackupDatabase extends Page implements HasTable
                     ->label('Download')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->action(function (BackupLog $record) {
-                        if (!Storage::exists($record->path)) {
+                        // Cek path file lengkap
+                        $fullPath = storage_path('app/' . $record->path);
+
+                        // Validasi file exists menggunakan File facade
+                        if (!File::exists($fullPath)) {
                             Notification::make()
                                 ->danger()
                                 ->title('File tidak ditemukan')
@@ -71,7 +75,12 @@ class BackupDatabase extends Page implements HasTable
                             return;
                         }
 
-                        return response()->download(storage_path('app/' . $record->path));
+                        // Return response download dengan nama file asli
+                        return response()->download(
+                            $fullPath,
+                            $record->filename,
+                            ['Content-Type' => 'application/sql']
+                        );
                     })
                     ->visible(fn (BackupLog $record) => $record->status === BackupLog::STATUS_SUCCESS),
                 Action::make('delete')
