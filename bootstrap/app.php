@@ -15,5 +15,30 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (\Throwable $e, $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                // Tentukan status code dengan fallback
+                $statusCode = $e instanceof \Symfony\Component\HttpKernel\Exception\HttpException
+                    ? $e->getStatusCode()
+                    : 500;
+
+                // Struktur response JSON
+                $response = [
+                    'status' => false,
+                    'message' => 'Terjadi kesalahan pada server'
+                ];
+
+                // Tambahkan informasi error jika mode debug aktif
+                if (config('app.debug')) {
+                    $response['error'] = [
+                        'message' => $e->getMessage(),
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine()
+                    ];
+                }
+
+                return response()->json($response, $statusCode);
+            }
+        });
+
     })->create();

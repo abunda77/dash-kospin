@@ -92,7 +92,7 @@ class TabunganController extends Controller
                 'data' => [
                     'info_rekening' => [
                         'no_tabungan' => $tabungan->no_tabungan,
-                        'nama_nasabah' => $tabungan->profile->nama_lengkap,
+                        'nama_nasabah' => $tabungan->profile->first_name . ' ' . $tabungan->profile->last_name,
                         'produk_tabungan' => $tabungan->produkTabungan->nama_produk,
                         'saldo_akhir' => $tabungan->saldo,
                         'status_rekening' => $tabungan->status_rekening,
@@ -186,7 +186,7 @@ class TabunganController extends Controller
                     'data' => [
                         'info_rekening' => [
                             'no_tabungan' => $tabungan->no_tabungan,
-                            'nama_nasabah' => $tabungan->profile->nama_lengkap,
+                            'nama_nasabah' => $tabungan->profile->first_name . ' ' . $tabungan->profile->last_name,
                             'produk_tabungan' => $tabungan->produkTabungan->nama_produk,
                             'saldo_berjalan' => 0
                         ]
@@ -203,7 +203,7 @@ class TabunganController extends Controller
                 'data' => [
                     'info_rekening' => [
                         'no_tabungan' => $tabungan->no_tabungan,
-                        'nama_nasabah' => $tabungan->profile->nama_lengkap,
+                        'nama_nasabah' => $tabungan->profile->first_name . ' ' . $tabungan->profile->last_name,
                         'produk_tabungan' => $tabungan->produkTabungan->nama_produk,
                         'saldo_berjalan' => $saldoBerjalan
                     ]
@@ -255,7 +255,7 @@ class TabunganController extends Controller
                 'data' => [
                     'info_profile' => [
                         'id_profile' => $validatedData['id_profile'],
-                        'nama_lengkap' => $firstTabungan->profile->nama_lengkap,
+                        'nama_lengkap' => $firstTabungan->profile->first_name . ' ' . $firstTabungan->profile->last_name,
                         'no_identity' => $firstTabungan->profile->no_identity,
                         'phone' => $firstTabungan->profile->phone
                     ],
