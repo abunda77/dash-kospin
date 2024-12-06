@@ -46,7 +46,7 @@ class DepositoResource extends Resource
                     ->placeholder('1,000,000')
                     ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
                         if ($state) {
-                            $component->state(number_format($state, 0, '.', ','));
+                            $component->state(number_format($state, 0, ',', '.'));
                         }
                     })
                     ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
@@ -80,6 +80,14 @@ class DepositoResource extends Resource
                             $jangkaWaktu = is_numeric($state) ? (int) $state : 0;
                             $set('tanggal_jatuh_tempo', $tanggalPembukaan->copy()->addMonths($jangkaWaktu)->format('Y-m-d'));
                         }
+
+                        // Hitung ulang nominal bunga
+                        $nominal = (float) str_replace([',', '.'], '', $get('nominal_penempatan')) ?: 0;
+                        $rate = (float) $get('rate_bunga') ?: 0;
+                        $jangka = (float) $state ?: 0;
+
+                        $bunga = $nominal * ($rate/100/12 * $jangka);
+                        $set('nominal_bunga', round($bunga));
                     }),
 
                 Forms\Components\DatePicker::make('tanggal_pembukaan')
@@ -154,22 +162,6 @@ class DepositoResource extends Resource
                         }
                     })
                     ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state)),
-                    // ->dehydrated()
-                    // ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
-                    //     if ($state) {
-                    //         $component->state(number_format($state, 0, ',', '.'));
-                    //     }
-                    // })
-                    // ->dehydrateStateUsing(fn ($state) => (int) str_replace('.', '', $state))
-                    // ->afterStateUpdated(function ($state, callable $set, $get) {
-                    //     $nominal = (float) str_replace('.', '', $get('nominal_penempatan')) ?: 0;
-                    //     $rate = (float) $get('rate_bunga') ?: 0;
-                    //     $jangka = (float) $get('jangka_waktu') ?: 0;
-
-                    //     $bunga = $nominal * ($rate/100/12 * $jangka);
-                    //     $set('nominal_bunga', round($bunga));
-                    // })
-                    // ->required(),
 
                 Forms\Components\Toggle::make('perpanjangan_otomatis')
                     ->default(false),
@@ -194,6 +186,7 @@ class DepositoResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('profile.first_name')
                     ->label('Nama Nasabah')
+                    ->formatStateUsing(fn ($record) => "{$record->profile->first_name} {$record->profile->last_name}")
                     ->searchable()
                     ->sortable(),
 

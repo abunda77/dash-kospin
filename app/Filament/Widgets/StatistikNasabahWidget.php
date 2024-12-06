@@ -7,12 +7,13 @@ use App\Models\TransaksiTabungan;
 use App\Models\Pinjaman;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use App\Models\Deposito;
 
 class StatistikNasabahWidget extends BaseWidget
 {
     protected static ?string $pollingInterval = '15s'; // Refresh setiap 15 detik
 
-    protected int | string | array $columnSpan = '3';
+    protected int | string | array $columnSpan = '4';
 
     protected function getStats(): array
     {
@@ -29,6 +30,10 @@ class StatistikNasabahWidget extends BaseWidget
 
         // Hitung total pencairan kredit
         $totalPencairanKredit = Pinjaman::sum('jumlah_pinjaman');
+
+        // Hitung total deposito aktif
+        $totalDeposito = Deposito::where('status', 'active')->count();
+        $totalNominalDeposito = Deposito::where('status', 'active')->sum('nominal_penempatan');
 
         // Hitung total nasabah telat bayar
         $today = now();
@@ -63,6 +68,16 @@ class StatistikNasabahWidget extends BaseWidget
                 ->description('Jumlah nasabah yang telat bayar')
                 ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('danger'),
+
+            Stat::make('Total Rekening Deposito', number_format($totalDeposito))
+                ->description('Jumlah rekening deposito aktif')
+                ->descriptionIcon('heroicon-m-building-library')
+                ->color('success'),
+
+            Stat::make('Total Nominal Deposito', 'Rp ' . number_format($totalNominalDeposito, 2))
+                ->description('Total penempatan deposito')
+                ->descriptionIcon('heroicon-m-banknotes')
+                ->color('success'),
         ];
     }
 }

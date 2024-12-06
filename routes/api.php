@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PinjamanController;
 use App\Http\Controllers\Api\TabunganController;
+use App\Http\Controllers\Api\DepositoController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -22,5 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tabungan/by-profile', [TabunganController::class, 'getTabunganByProfile']);
     Route::get('pinjaman/by-profile', [PinjamanController::class, 'getPinjamanByProfile']);
     Route::post('/pinjaman/history-pembayaran', [PinjamanController::class, 'getHistoryPembayaran']);
+    Route::get('/deposito/by-profile', [DepositoController::class, 'getDepositoByProfile']);
+    Route::get('/deposito/detail', [DepositoController::class, 'getDetailByNoRekening']);
 
 });

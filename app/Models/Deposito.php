@@ -39,4 +39,25 @@ class Deposito extends Model
     {
         return $this->belongsTo(Profile::class, 'id_user', 'id_user');
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (!$model->tanggal_jatuh_tempo) {
+                $tanggalPembukaan = \Carbon\Carbon::parse($model->tanggal_pembukaan);
+                $jangkaWaktu = (int) $model->jangka_waktu;
+                $model->tanggal_jatuh_tempo = $tanggalPembukaan->copy()->addMonths($jangkaWaktu);
+            }
+
+            if (!$model->nominal_bunga) {
+                $nominal = (float) $model->nominal_penempatan;
+                $rate = (float) $model->rate_bunga;
+                $jangkaWaktu = (int) $model->jangka_waktu;
+
+                $model->nominal_bunga = ($nominal * $rate * $jangkaWaktu) / (100 * 12);
+            }
+        });
+    }
 }
