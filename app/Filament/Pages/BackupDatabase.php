@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
 
 class BackupDatabase extends Page implements HasTable
 {
@@ -89,16 +91,77 @@ class BackupDatabase extends Page implements HasTable
                     ->color('danger')
                     ->requiresConfirmation()
                     ->action(function (BackupLog $record) {
-                        if (Storage::exists($record->path)) {
-                            Storage::delete($record->path);
-                        }
-                        $record->delete();
+                        try {
+                            // Cek dan hapus file fisik menggunakan path lengkap
+                            $fullPath = storage_path('app/' . $record->path);
+                            if (File::exists($fullPath)) {
+                                File::delete($fullPath);
+                            }
 
-                        Notification::make()
-                            ->success()
-                            ->title('Backup berhasil dihapus')
-                            ->send();
+                            // Hapus file dari storage jika masih ada
+                            if (Storage::exists($record->path)) {
+                                Storage::delete($record->path);
+                            }
+
+                            // Hapus record dari database
+                            $record->delete();
+
+                            Notification::make()
+                                ->success()
+                                ->title('Backup berhasil dihapus')
+                                ->send();
+
+                        } catch (\Exception $e) {
+                            Log::error('Error deleting backup: ' . $e->getMessage());
+
+                            Notification::make()
+                                ->danger()
+                                ->title('Gagal menghapus backup')
+                                ->body('Terjadi kesalahan saat menghapus file backup')
+                                ->send();
+                        }
                     }),
+            ])
+            ->bulkActions([
+                BulkAction::make('delete')
+                    ->label('Hapus yang dipilih')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->deselectRecordsAfterCompletion()
+                    ->action(function (Collection $records) {
+                        try {
+                            foreach ($records as $record) {
+                                // Hapus file fisik
+                                $fullPath = storage_path('app/' . $record->path);
+                                if (File::exists($fullPath)) {
+                                    File::delete($fullPath);
+                                }
+
+                                // Hapus dari storage jika masih ada
+                                if (Storage::exists($record->path)) {
+                                    Storage::delete($record->path);
+                                }
+
+                                // Hapus record dari database
+                                $record->delete();
+                            }
+
+                            Notification::make()
+                                ->success()
+                                ->title('Backup berhasil dihapus')
+                                ->send();
+
+                        } catch (\Exception $e) {
+                            Log::error('Error deleting backups: ' . $e->getMessage());
+
+                            Notification::make()
+                                ->danger()
+                                ->title('Gagal menghapus backup')
+                                ->body('Terjadi kesalahan saat menghapus file backup')
+                                ->send();
+                        }
+                    })
             ])
             ->headerActions([
                 Action::make('create_backup')
