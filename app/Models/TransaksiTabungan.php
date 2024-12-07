@@ -23,8 +23,8 @@ class TransaksiTabungan extends Model
         'tanggal_transaksi' => 'datetime'
     ];
 
-    const JENIS_SETORAN = 'kredit';
-    const JENIS_PENARIKAN = 'debit';
+    const JENIS_SETORAN = 'debit';
+    const JENIS_PENARIKAN = 'kredit';
 
     public function tabungan()
     {

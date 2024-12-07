@@ -41,4 +41,8 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-    })->create();
+    })
+    ->withCommands([
+        App\Console\Commands\HitungBungaTabungan::class,
+    ])
+    ->create();

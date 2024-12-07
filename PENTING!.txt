@@ -1,0 +1,9 @@
+# Jalankan scheduler (development)
+php artisan schedule:work
+
+# Atau tambahkan ke crontab (production)
+* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
+
+protected $signature = 'tabungan:hitung-bunga
+                          {--check-previous : Cek dan hitung bunga bulan-bulan sebelumnya}
+                          {--check-duplikat : Cek dan koreksi bunga duplikat}';

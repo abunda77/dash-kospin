@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Eloquent\Model;
-
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,7 +19,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
-        //Model::unguard();
+        // Hapus kode schedule dari sini karena sudah dipindah ke routes/console.php
     }
 }
