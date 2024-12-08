@@ -18,6 +18,7 @@ use Dompdf\Options;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Malzariey\FilamentDaterangepickerFilter\Filters\DateRangeFilter;
+use Carbon\Carbon;
 
 class MutasiTabungan extends Page implements HasTable
 {
@@ -33,6 +34,7 @@ class MutasiTabungan extends Page implements HasTable
     public $isSearchSubmitted = false;
     public $firstRecord = null;
     public $tabungan = null;
+    public $filterDate = [];
 
     public function mount()
     {
@@ -288,21 +290,43 @@ class MutasiTabungan extends Page implements HasTable
 
     private function getFilteredTransactionQuery()
     {
-        $query = TransaksiTabungan::query()
-            ->where('id_tabungan', $this->tabungan->id);
+        try {
+            $query = TransaksiTabungan::query()
+                ->where('id_tabungan', $this->tabungan->id);
 
-        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
-        if ($dateFilter) {
-            if (!empty($dateFilter['start'])) {
-                $query->whereDate('tanggal_transaksi', '>=', $dateFilter['start']);
+            $dateFilter = $this->tableFilters['tanggal_transaksi'] ?? null;
+
+            if ($dateFilter) {
+                if (is_array($dateFilter)) {
+                    $dateFilter = $dateFilter['tanggal_transaksi'] ?? '';
+                }
+
+                if (is_string($dateFilter) && !empty($dateFilter)) {
+                    $dates = explode(' - ', $dateFilter);
+                    if (count($dates) === 2) {
+                        $start = Carbon::createFromFormat('d/m/Y', trim($dates[0]))->startOfDay();
+                        $end = Carbon::createFromFormat('d/m/Y', trim($dates[1]))->endOfDay();
+
+                        $this->filterDate = [
+                            'start' => $start->format('Y-m-d'),
+                            'end' => $end->format('Y-m-d')
+                        ];
+
+                        $query->whereBetween('tanggal_transaksi', [$start, $end]);
+                    }
+                }
             }
-            if (!empty($dateFilter['end'])) {
-                $query->whereDate('tanggal_transaksi', '<=', $dateFilter['end']);
-            }
+
+            return $query->orderBy('tanggal_transaksi', 'ASC')
+                        ->orderBy('id', 'ASC');
+
+        } catch (\Exception $e) {
+            Log::error('Error saat filter transaksi:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new \Exception('Terjadi kesalahan saat memfilter data: ' . $e->getMessage());
         }
-
-        return $query->orderBy('tanggal_transaksi', 'ASC')
-                    ->orderBy('id', 'ASC');
     }
 
     private function processTransactions($query)
@@ -315,28 +339,35 @@ class MutasiTabungan extends Page implements HasTable
 
     private function generatePdfHtml($transaksi)
     {
-        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
-        $formattedFilter = null;
+        try {
+            $dateFilter = $this->tableFilters['tanggal_transaksi'] ?? null;
 
-        if ($dateFilter) {
-            $formattedFilter = [
-                'start' => !empty($dateFilter['start']) ? date('Y-m-d', strtotime($dateFilter['start'])) : null,
-                'end' => !empty($dateFilter['end']) ? date('Y-m-d', strtotime($dateFilter['end'])) : null,
-            ];
+            Log::info('Mempersiapkan data PDF:', [
+                'jumlah_transaksi' => $transaksi->count(),
+                'filter_tanggal' => $dateFilter
+            ]);
+
+            return view('pdf.mutasi-tabungan', [
+                'tabungan' => $this->tabungan,
+                'transaksi' => $transaksi,
+                'saldo_berjalan' => $this->saldo_berjalan,
+                'filter_date' => $dateFilter
+            ])->render();
+
+        } catch (\Exception $e) {
+            Log::error('Error saat generate PDF:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            throw new \Exception('Terjadi kesalahan saat menyiapkan PDF: ' . $e->getMessage());
         }
-
-        return view('pdf.mutasi-tabungan', [
-            'tabungan' => $this->tabungan,
-            'transaksi' => $transaksi,
-            'saldo_berjalan' => $this->saldo_berjalan,
-            'filter_date' => $formattedFilter
-        ])->render();
     }
 
     private function generatePdfFilename()
     {
         $filename = 'mutasi_' . $this->no_rekening;
-        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+        $dateFilter = $this->tableFilters['tanggal_transaksi'] ?? null;
 
         if ($dateFilter) {
             $start = !empty($dateFilter['start']) ? date('Y-m-d', strtotime($dateFilter['start'])) : '';
@@ -399,7 +430,7 @@ class MutasiTabungan extends Page implements HasTable
 
     private function generateTablePdfHtml($transaksi)
     {
-        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+        $dateFilter = $this->tableFilters['tanggal_transaksi'] ?? null;
         $formattedFilter = null;
 
         if ($dateFilter) {
@@ -419,7 +450,7 @@ class MutasiTabungan extends Page implements HasTable
     private function generateTablePdfFilename()
     {
         $filename = 'tabel_mutasi_' . $this->no_rekening;
-        $dateFilter = $this->getTableFilterState('tanggal_transaksi');
+        $dateFilter = $this->tableFilters['tanggal_transaksi'] ?? null;
 
         if ($dateFilter) {
             $start = !empty($dateFilter['start']) ? date('Y-m-d', strtotime($dateFilter['start'])) : '';

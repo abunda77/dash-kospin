@@ -36,8 +36,8 @@
 <body>
     <div class="header">
         <h2>Laporan Mutasi Tabungan</h2>
-        @if($filter_date)
-            <p>Periode: {{ \Carbon\Carbon::parse($filter_date['start'])->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($filter_date['end'])->format('d/m/Y') }}</p>
+        @if(isset($filterDate['start']) && isset($filterDate['end']))
+            <p>Periode: {{ \Carbon\Carbon::parse($filterDate['start'])->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($filterDate['end'])->format('d/m/Y') }}</p>
         @endif
     </div>
 

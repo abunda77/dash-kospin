@@ -123,7 +123,7 @@ class TransaksiTabunganResource extends Resource
                     ->label('Kode Teller')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('tanggal_transaksi')
                     ->label('Tanggal')
                     ->dateTime()
                     ->sortable(),
