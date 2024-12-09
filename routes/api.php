@@ -25,5 +25,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pinjaman/history-pembayaran', [PinjamanController::class, 'getHistoryPembayaran']);
     Route::get('/deposito/by-profile', [DepositoController::class, 'getDepositoByProfile']);
     Route::get('/deposito/detail', [DepositoController::class, 'getDetailByNoRekening']);
-
+    Route::patch('/update-password', [AuthController::class, 'updatePassword']);
 });
