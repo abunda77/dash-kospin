@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pinjamans', function (Blueprint $table) {
             $table->id('id_pinjaman');
-            $table->string('no_pinjaman');
+            $table->string('no_pinjaman')->unique();
             $table->foreignId('profile_id')->constrained('profiles');
             $table->foreignId('produk_pinjaman_id')->constrained('produk_pinjamans');
             $table->decimal('jumlah_pinjaman', 20, 2);

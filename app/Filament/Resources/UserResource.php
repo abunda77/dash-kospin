@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Services\ActivityLogService;
 
 class UserResource extends Resource
 {
@@ -96,4 +97,35 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
+
+    // Di dalam method afterCreate
+protected function afterCreate($record): void
+{
+    ActivityLogService::log(
+        'created',
+        'Created new admin: ' . $record->name,
+        $record->id
+    );
+}
+
+// Di dalam method afterUpdate
+protected function afterUpdate($record): void
+{
+    ActivityLogService::log(
+        'updated',
+        'Updated admin: ' . $record->name,
+        $record->id
+
+    );
+}
+
+// Di dalam method afterDelete
+protected function afterDelete($record): void
+{
+    ActivityLogService::log(
+        'deleted',
+        'Deleted admin: ' . $record->name,
+        $record->id
+    );
+}
 }

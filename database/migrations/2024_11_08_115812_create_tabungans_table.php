@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('tabungans', function (Blueprint $table) {
             $table->id();
-            $table->string('no_tabungan');
+            $table->string('no_tabungan')->unique();
             $table->foreignId('id_profile')->constrained('profiles');
             $table->foreignId('produk_tabungan')->constrained('produk_tabungans');
             $table->decimal('saldo', 15, 2);

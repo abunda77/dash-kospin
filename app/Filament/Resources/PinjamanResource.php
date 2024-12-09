@@ -50,7 +50,14 @@ class PinjamanResource extends Resource
                                 Forms\Components\TextInput::make('no_pinjaman')
                                     ->label('Nomor Pinjaman')
                                     ->required()
-                                    ->maxLength(255),
+                                    ->maxLength(255)
+                                    ->default(function() {
+                                        do {
+                                            $number = '7777-' . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+                                        } while (Pinjaman::where('no_pinjaman', $number)->exists());
+                                        return $number;
+                                    })
+                                    ->disabled(),
                                 Forms\Components\TextInput::make('jumlah_pinjaman')
                                     ->label('Jumlah Pinjaman')
                                     ->mask(RawJs::make('$money($input)'))

@@ -33,7 +33,14 @@ class TabunganResource extends Resource
                 Forms\Components\TextInput::make('no_tabungan')
                     ->label('No Rekening')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->default(function() {
+                        do {
+                            $number = '8888-' . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+                        } while (Tabungan::where('no_tabungan', $number)->exists());
+                        return $number;
+                    })
+                    ->disabled(),
                 Forms\Components\Select::make('id_profile')
                     ->label('Nasabah')
                     ->relationship('profile', 'first_name')

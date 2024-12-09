@@ -7,101 +7,94 @@ use App\Models\Tabungan;
 use App\Models\TransaksiTabungan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use function Laravel\Prompts\select;
+use function Laravel\Prompts\text;
+use function Laravel\Prompts\confirm;
+use function Laravel\Prompts\info;
+use function Laravel\Prompts\progress;
 
 class HitungBungaTabungan extends Command
 {
-    protected $signature = 'tabungan:hitung-bunga
-                          {--check-previous : Cek dan hitung bunga bulan-bulan sebelumnya}
-                          {--check-duplikat : Cek dan koreksi bunga duplikat}';
+    protected $signature = 'tabungan:hitung-bunga';
 
-    protected $description = 'Menghitung bunga tabungan berdasarkan saldo harian.
-                            Gunakan --check-previous untuk menghitung bunga bulan-bulan sebelumnya.
-                            Gunakan --check-duplikat untuk mengecek dan mengoreksi bunga duplikat.';
+    protected $description = 'Menghitung bunga tabungan berdasarkan saldo harian.';
 
     public function handle()
     {
-        if ($this->option('check-duplikat')) {
-            $this->info('Mengecek transaksi bunga duplikat...');
-            $this->cekDanKoreksiBungaDuplikat();
-            return;
-        }
+        // Pilihan no_tabungan atau all
+        $pilihan = select(
+            'Pilih rekening tabungan yang akan dihitung bunganya:',
+            [
+                'all' => 'Semua rekening aktif',
+                'specific' => 'Rekening spesifik'
+            ]
+        );
 
-        if ($this->option('check-previous')) {
-            $this->info('Mengecek perhitungan bunga bulan-bulan sebelumnya...');
-            $this->hitungBungaBulanSebelumnya();
-            return;
-        }
-
-        // Proses normal untuk bulan ini
-        $this->info('Mulai menghitung bunga tabungan bulan ini...');
-        $tabungans = Tabungan::where('status_rekening', 'aktif')->get();
-
-        foreach ($tabungans as $tabungan) {
-            $this->info("Menghitung bunga untuk rekening {$tabungan->no_tabungan}...");
-            $this->hitungBungaPerTabungan($tabungan);
-        }
-
-        $this->info('Perhitungan bunga selesai');
-    }
-
-    private function cekDanKoreksiBungaDuplikat()
-    {
-        // Cari transaksi bunga duplikat berdasarkan id_tabungan, jumlah, dan tanggal_transaksi
-        $duplikatBunga = DB::table('transaksi_tabungans')
-            ->select('id_tabungan', 'jumlah', 'tanggal_transaksi', DB::raw('COUNT(*) as jumlah_duplikat'))
-            ->where('kode_transaksi', '6') // Kode untuk bunga
-            ->groupBy('id_tabungan', 'jumlah', 'tanggal_transaksi')
-            ->having('jumlah_duplikat', '>', 1)
-            ->get();
-
-        if ($duplikatBunga->isEmpty()) {
-            $this->info("Tidak ditemukan transaksi bunga duplikat");
-            return;
-        }
-
-        foreach ($duplikatBunga as $duplikat) {
-            // Ambil semua transaksi duplikat
-            $transaksiDuplikat = DB::table('transaksi_tabungans')
-                ->where('id_tabungan', $duplikat->id_tabungan)
-                ->where('jumlah', $duplikat->jumlah)
-                ->where('tanggal_transaksi', $duplikat->tanggal_transaksi)
-                ->where('kode_transaksi', '6')
-                ->orderBy('id', 'asc')
-                ->get();
-
-            $this->info("Menemukan {$duplikat->jumlah_duplikat} transaksi bunga duplikat:");
-            $this->info("Rekening ID: {$duplikat->id_tabungan}");
-            $this->info("Tanggal: {$duplikat->tanggal_transaksi}");
-            $this->info("Jumlah: Rp " . number_format($duplikat->jumlah, 2));
-
-            // Simpan transaksi pertama, koreksi sisanya
-            $firstTransaction = true;
-            foreach ($transaksiDuplikat as $transaksi) {
-                if ($firstTransaction) {
-                    $firstTransaction = false;
-                    continue; // Skip transaksi pertama
+        $noTabungan = null;
+        if ($pilihan === 'specific') {
+            $noTabungan = text(
+                'Masukkan nomor rekening:',
+                validate: fn (string $value) => match(true) {
+                    strlen($value) < 5 => 'Nomor rekening minimal 5 karakter',
+                    !Tabungan::where('no_tabungan', $value)->exists() => 'Nomor rekening tidak ditemukan',
+                    default => null
                 }
+            );
+        }
 
-                // Buat transaksi koreksi untuk duplikat
-                TransaksiTabungan::create([
-                    'id_tabungan' => $transaksi->id_tabungan,
-                    'jenis_transaksi' => TransaksiTabungan::JENIS_PENARIKAN,
-                    'jumlah' => $transaksi->jumlah,
-                    'tanggal_transaksi' => now(),
-                    'keterangan' => 'Koreksi bunga',
-                    'kode_transaksi' => 'K',
-                    'kode_teller' => '00'
-                ]);
+        // Pilihan periode perhitungan
+        $periode = select(
+            'Pilih periode perhitungan bunga:',
+            [
+                'current' => 'Bulan ini',
+                'previous' => 'Bulan sebelumnya'
+            ]
+        );
 
-                $this->info("Transaksi koreksi telah dibuat untuk ID: {$transaksi->id}");
+        // Konfirmasi sebelum eksekusi
+        if (!confirm('Apakah Anda yakin akan melanjutkan perhitungan bunga?')) {
+            info('Perhitungan bunga dibatalkan.');
+            return;
+        }
+
+        // Proses perhitungan
+        $this->newLine();
+        info('Memulai perhitungan bunga tabungan...');
+
+        if ($pilihan === 'all') {
+            $tabungans = Tabungan::where('status_rekening', 'aktif')->get();
+
+            progress(
+                label: 'Menghitung bunga tabungan',
+                steps: $tabungans,
+                callback: function ($tabungan) use ($periode) {
+                    if ($periode === 'current') {
+                        $this->hitungBungaPerTabungan($tabungan);
+                    } else {
+                        $this->hitungBungaBulanSebelumnya($tabungan);
+                    }
+                },
+                hint: 'Proses ini mungkin membutuhkan beberapa waktu.'
+            );
+
+            $this->newLine(2);
+        } else {
+            $tabungan = Tabungan::where('no_tabungan', $noTabungan)->first();
+            info("Menghitung bunga untuk rekening {$tabungan->no_tabungan}...");
+
+            if ($periode === 'current') {
+                $this->hitungBungaPerTabungan($tabungan);
+            } else {
+                $this->hitungBungaBulanSebelumnya($tabungan);
             }
         }
+
+        info('Perhitungan bunga selesai');
+        $this->newLine();
     }
 
-    private function hitungBungaBulanSebelumnya()
+    private function hitungBungaBulanSebelumnya($tabungan)
     {
-        $tabungans = Tabungan::where('status_rekening', 'aktif')->get();
-
         // Ambil bulan saat ini
         $bulanSekarang = now();
 
@@ -112,18 +105,16 @@ class HitungBungaTabungan extends Command
         for ($i = 1; $i <= $selisihBulan; $i++) {
             $bulanCheck = $bulanSekarang->copy()->subMonths($i);
 
-            foreach ($tabungans as $tabungan) {
-                // Cek apakah sudah ada transaksi bunga untuk bulan tersebut
-                $sudahDihitung = TransaksiTabungan::where('id_tabungan', $tabungan->id)
-                    ->where('kode_transaksi', '6') // Kode untuk bunga
-                    ->whereYear('tanggal_transaksi', $bulanCheck->year)
-                    ->whereMonth('tanggal_transaksi', $bulanCheck->month)
-                    ->exists();
+            // Cek apakah sudah ada transaksi bunga untuk bulan tersebut
+            $sudahDihitung = TransaksiTabungan::where('id_tabungan', $tabungan->id)
+                ->where('kode_transaksi', '6') // Kode untuk bunga
+                ->whereYear('tanggal_transaksi', $bulanCheck->year)
+                ->whereMonth('tanggal_transaksi', $bulanCheck->month)
+                ->exists();
 
-                if (!$sudahDihitung) {
-                    $this->info("Menghitung bunga untuk rekening {$tabungan->no_tabungan} bulan {$bulanCheck->format('F Y')}...");
-                    $this->hitungBungaPerTabungan($tabungan, $bulanCheck);
-                }
+            if (!$sudahDihitung) {
+                $this->info("Menghitung bunga untuk rekening {$tabungan->no_tabungan} bulan {$bulanCheck->format('F Y')}...");
+                $this->hitungBungaPerTabungan($tabungan, $bulanCheck);
             }
         }
     }

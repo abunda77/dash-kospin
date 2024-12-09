@@ -12,6 +12,7 @@
         "dompdf/dompdf": "^3.0",
         "filament/filament": "^3.2",
         "laravel/framework": "^11.9",
+        "laravel/prompts": "^0.3.2",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "malzariey/filament-daterangepicker-filter": "^3.1",

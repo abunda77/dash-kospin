@@ -33,9 +33,16 @@ class DepositoResource extends Resource
                     ->preload(),
 
                 Forms\Components\TextInput::make('nomor_rekening')
+                    ->label('No Rekening')
                     ->required()
-                    ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->default(function() {
+                        do {
+                            $number = '9999-' . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+                        } while (Deposito::where('nomor_rekening', $number)->exists());
+                        return $number;
+                    })
+                    ->disabled(),
 
                 Forms\Components\TextInput::make('nominal_penempatan')
                     ->label('Nominal Penempatan')
