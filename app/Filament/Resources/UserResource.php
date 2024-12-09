@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Contracts\ActivityLogger;
 use App\Services\ActivityLogService;
 
 class UserResource extends Resource
@@ -99,33 +100,29 @@ class UserResource extends Resource
     }
 
     // Di dalam method afterCreate
-protected function afterCreate($record): void
-{
-    ActivityLogService::log(
-        'created',
-        'Created new admin: ' . $record->name,
-        $record->id
-    );
-}
+    protected function afterCreate($record): void
+    {
+        app(ActivityLogger::class)->log(
+            'created',
+            "Created new user: {$record->name}"
+        );
+    }
 
-// Di dalam method afterUpdate
-protected function afterUpdate($record): void
-{
-    ActivityLogService::log(
-        'updated',
-        'Updated admin: ' . $record->name,
-        $record->id
+    // Di dalam method afterUpdate
+    protected function afterUpdate($record): void
+    {
+        app(ActivityLogger::class)->log(
+            'updated',
+            "Updated user: {$record->name}"
+        );
+    }
 
-    );
-}
-
-// Di dalam method afterDelete
-protected function afterDelete($record): void
-{
-    ActivityLogService::log(
-        'deleted',
-        'Deleted admin: ' . $record->name,
-        $record->id
-    );
-}
+    // Di dalam method afterDelete
+    protected function afterDelete($record): void
+    {
+        app(ActivityLogger::class)->log(
+            'deleted',
+            "Deleted user: {$record->name}"
+        );
+    }
 }
