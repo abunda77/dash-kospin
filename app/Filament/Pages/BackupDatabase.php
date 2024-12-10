@@ -17,10 +17,11 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\File;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Database\Eloquent\Collection;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class BackupDatabase extends Page implements HasTable
 {
-    use InteractsWithTable;
+    use InteractsWithTable,HasPageShield ;
 
     protected static ?string $navigationIcon = 'heroicon-o-server';
     protected static ?string $navigationLabel = 'Database Backup';

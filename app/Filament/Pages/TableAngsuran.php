@@ -29,12 +29,14 @@ use Filament\Tables\Columns\Summarizers\Sum;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Log;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class TableAngsuran extends Page implements HasForms, HasTable
 {
     use InteractsWithForms;
     use InteractsWithTable;
     use InteractsWithActions;
+    use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Pinjaman';

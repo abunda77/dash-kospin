@@ -11,10 +11,12 @@ use Filament\Tables\Table;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
 use Illuminate\Database\Eloquent\Builder;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class HistoryLog extends Page implements HasTable
 {
     use InteractsWithTable;
+    use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static string $view = 'filament.pages.history-log';
@@ -22,7 +24,7 @@ class HistoryLog extends Page implements HasTable
     protected static ?string $title = 'Activity Logs';
 
     // Tambahkan navigation group jika diperlukan
-    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $navigationGroup = 'Setting';
 
     public function table(Table $table): Table
     {

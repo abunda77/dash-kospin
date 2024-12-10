@@ -10,9 +10,11 @@ use App\Models\TransaksiTabungan;
 use App\Models\TransaksiPinjaman;
 use App\Models\Tabungan;
 use App\Models\Pinjaman;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class EmptyData extends Page
 {
+    use HasPageShield;
     protected static ?string $navigationIcon = 'heroicon-o-trash';
     protected static ?string $navigationLabel = 'Hapus Data';
     protected static ?string $title = 'Hapus Data';

@@ -16,11 +16,13 @@ use Illuminate\Support\Facades\Log;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Filament\Notifications\Notification;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class ListKeterlambatan extends Page implements HasTable, HasForms
 {
     use InteractsWithTable;
     use InteractsWithForms;
+    use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Pinjaman';

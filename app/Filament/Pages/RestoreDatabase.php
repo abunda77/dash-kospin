@@ -12,9 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class RestoreDatabase extends Page
 {
+    use HasPageShield;
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path';
     protected static ?string $navigationLabel = 'Database Restore';
     protected static ?string $navigationGroup = 'Setting';

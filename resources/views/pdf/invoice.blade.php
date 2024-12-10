@@ -10,6 +10,9 @@
         table, th, td { border: 1px solid black; }
         th, td { padding: 10px; text-align: left; }
         .title { text-align: center; font-size: 24px; margin-bottom: 20px; }
+        .signature { text-align: right; margin-top: 10px; }
+        .date { text-align: right; margin-top: 20px; }
+        .billing { text-align: center; margin-top: 100px; }
     </style>
 </head>
 <body>
@@ -45,5 +48,19 @@
         </tr>
     </table>
     <p>Terima kasih atas pembayaran Anda.</p>
+
+    <div class="date">
+        Surabaya, {{ date('d/m/Y') }}
+    </div>
+
+    <div class="signature">
+        Hormat kami,<br><br><br><br>
+
+         (Koperasi Siantar Artha)
+    </div>
+{{--
+    <div class="billing">
+        Billing Service
+    </div> --}}
 </body>
 </html>
