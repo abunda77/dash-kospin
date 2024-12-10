@@ -24,9 +24,9 @@ class BackupDatabase extends Page implements HasTable
     use InteractsWithTable, HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-server';
-    protected static ?string $navigationLabel = 'Database Backup';
-    protected static ?string $navigationGroup = 'Setting';
-    protected static ?string $title = 'Database Backup';
+    protected static ?string $navigationLabel = 'Backup Database';
+    protected static ?string $navigationGroup = 'Settings';
+    protected static ?string $title = 'Backup Database';
     protected static ?string $slug = 'backup-database';
     protected static ?int $navigationSort = 1;
     protected static string $view = 'filament.pages.backup-database';
