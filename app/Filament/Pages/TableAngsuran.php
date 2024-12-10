@@ -188,6 +188,10 @@ class TableAngsuran extends Page implements HasForms, HasTable
                     ->label('Aksi')
                     ->alignEnd()
                     ->view('filament.tables.columns.actions'),
+                Column::make('cetak_invoice')
+                    ->label('Cetak Invoice')
+                    ->view('filament.tables.columns.invoice'),
+
             ])
             ->defaultSort('angsuran_ke', 'desc')
             ->poll('5s');
@@ -420,4 +424,45 @@ class TableAngsuran extends Page implements HasForms, HasTable
     {
         return 'simulasi_angsuran_' . $this->noPinjaman . '_' . date('Y-m-d_H-i-s') . '.pdf';
     }
+
+    public function cetakInvoice(TransaksiPinjaman $record)
+{
+    try {
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $options->set('defaultFont', 'Arial');
+
+        $dompdf = new Dompdf($options);
+        $dompdf->setPaper('A4', 'portrait');
+
+        $html = view('pdf.invoice', [
+            'nama' => $record->pinjaman->profile->first_name . ' ' . $record->pinjaman->profile->last_name,
+            'no_pinjaman' => $record->pinjaman->no_pinjaman,
+            'angsuran_ke' => $record->angsuran_ke,
+            'angsuran_pokok' => $record->angsuran_pokok,
+            'denda' => $record->denda,
+            'total_pembayaran' => $record->total_pembayaran,
+            'tanggal_pembayaran' => $record->tanggal_pembayaran->format('d/m/Y'),
+        ])->render();
+
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        $filename = 'invoice_' . $record->angsuran_ke . '_' . date('Y-m-d_H-i-s') . '.pdf';
+
+        return response()->streamDownload(
+            fn () => print($dompdf->output()),
+            $filename,
+            ['Content-Type' => 'application/pdf']
+        );
+    } catch (\Exception $e) {
+        Log::error('Error generating invoice PDF: ' . $e->getMessage());
+        Notification::make()
+            ->title('Gagal mencetak Invoice')
+            ->danger()
+            ->body('Terjadi kesalahan: ' . $e->getMessage())
+            ->send();
+    }
+}
 }
