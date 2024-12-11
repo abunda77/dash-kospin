@@ -18,7 +18,10 @@ class TransaksiPinjamanResource extends Resource
     protected static ?string $model = TransaksiPinjaman::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Pinjaman';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Pinjaman';
+            }
 
     public static function form(Form $form): Form
     {

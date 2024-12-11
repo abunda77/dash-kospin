@@ -22,7 +22,10 @@ class JatuhTempo extends Page implements HasTable
     protected static ?string $navigationLabel = 'Jatuh Tempo';
     protected static ?string $title = 'Daftar Jatuh Tempo Deposito';
     protected static string $view = 'filament.pages.jatuh-tempo';
-    protected static ?string $navigationGroup = 'Deposito';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Deposito';
+            }
 
     public $periode = 'bulan-ini';
 

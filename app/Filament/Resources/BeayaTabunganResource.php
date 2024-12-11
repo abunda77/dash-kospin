@@ -21,7 +21,10 @@ class BeayaTabunganResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
     protected static ?string $navigationLabel = 'Bunga & Beaya Tabungan';
-    protected static ?string $navigationGroup = 'Tabungan';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Tabungan';
+            }
 
     public static function form(Form $form): Form
     {

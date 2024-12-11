@@ -24,7 +24,10 @@ class ProfileResource extends Resource
     protected static ?string $model = Profile::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    protected static ?string $navigationGroup = 'Data Member';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Data Nasabah';
+            }
     protected static ?string $navigationLabel = 'Profile';
 
     public static function form(Form $form): Form

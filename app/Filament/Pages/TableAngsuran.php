@@ -39,7 +39,10 @@ class TableAngsuran extends Page implements HasForms, HasTable
     use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationGroup = 'Pinjaman';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Pinjaman';
+            }
     protected static string $view = 'filament.pages.table-angsuran';
 
     public ?string $noPinjaman = '';

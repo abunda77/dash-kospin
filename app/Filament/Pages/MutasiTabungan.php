@@ -28,7 +28,10 @@ class MutasiTabungan extends Page implements HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Mutasi Tabungan';
-    protected static ?string $navigationGroup = 'Tabungan';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Tabungan';
+            }
     protected static string $view = 'filament.pages.mutasi-tabungan';
 
     public $no_rekening = '';

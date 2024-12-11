@@ -19,7 +19,10 @@ class EmptyData extends Page
     protected static ?string $navigationIcon = 'heroicon-o-trash';
     protected static ?string $navigationLabel = 'Hapus Data';
     protected static ?string $title = 'Hapus Data';
-    protected static ?string $navigationGroup = 'Settings';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Settings';
+            }
 
     protected static string $view = 'filament.pages.empty-data';
 

@@ -20,7 +20,10 @@ class JenisTabunganResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $navigationLabel = 'Jenis Tabungan';
-    protected static ?string $navigationGroup = 'Tabungan';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Tabungan';
+            }
 
     public static function form(Form $form): Form
     {

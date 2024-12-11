@@ -19,7 +19,10 @@ class JaminanResource extends Resource
     protected static ?string $model = Jaminan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Pinjaman';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Pinjaman';
+            }
 
     public static function form(Form $form): Form
     {

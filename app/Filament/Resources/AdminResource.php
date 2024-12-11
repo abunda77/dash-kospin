@@ -12,8 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Contracts\ActivityLogger;
-use App\Services\ActivityLogService;
+
 
 class AdminResource extends Resource
 {
@@ -22,11 +21,9 @@ class AdminResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Settings';
     protected static ?string $navigationLabel = 'Administrator';
+    protected static ?int $navigationSort = 1;
 
-    public function __construct(private ActivityLogger $activityLogger)
-    {
-        parent::__construct();
-    }
+
 
     public static function form(Form $form): Form
     {
@@ -115,27 +112,5 @@ class AdminResource extends Resource
         ];
     }
 
-    protected function afterCreate($record): void
-    {
-        $this->activityLogger->log(
-            'created',
-            "Created new admin: {$record->name}"
-        );
-    }
 
-    protected function afterUpdate($record): void
-    {
-        $this->activityLogger->log(
-            'updated',
-            "Updated admin: {$record->name}"
-        );
-    }
-
-    protected function afterDelete($record): void
-    {
-        $this->activityLogger->log(
-            'deleted',
-            "Deleted admin: {$record->name}"
-        );
-    }
 }

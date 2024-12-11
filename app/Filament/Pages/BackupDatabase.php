@@ -28,7 +28,7 @@ class BackupDatabase extends Page implements HasTable
     protected static ?string $navigationGroup = 'Settings';
     protected static ?string $title = 'Backup Database';
     protected static ?string $slug = 'backup-database';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
     protected static string $view = 'filament.pages.backup-database';
 
     private const BACKUP_PATH = 'backup';

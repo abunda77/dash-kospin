@@ -25,7 +25,10 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
     use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationGroup = 'Pinjaman';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Pinjaman';
+            }
     protected static string $view = 'filament.pages.list-keterlambatan';
 
     private function getBaseQuery()

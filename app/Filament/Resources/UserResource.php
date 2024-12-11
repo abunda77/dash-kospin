@@ -20,8 +20,11 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Data Member';
-    protected static ?string $navigationLabel = 'Member';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Data Nasabah';
+            }
+    protected static ?string $navigationLabel = 'Nasabah';
 
     public static function form(Form $form): Form
     {
@@ -99,30 +102,5 @@ class UserResource extends Resource
         ];
     }
 
-    // Di dalam method afterCreate
-    protected function afterCreate($record): void
-    {
-        app(ActivityLogger::class)->log(
-            'created',
-            "Created new user: {$record->name}"
-        );
-    }
 
-    // Di dalam method afterUpdate
-    protected function afterUpdate($record): void
-    {
-        app(ActivityLogger::class)->log(
-            'updated',
-            "Updated user: {$record->name}"
-        );
-    }
-
-    // Di dalam method afterDelete
-    protected function afterDelete($record): void
-    {
-        app(ActivityLogger::class)->log(
-            'deleted',
-            "Deleted user: {$record->name}"
-        );
-    }
 }

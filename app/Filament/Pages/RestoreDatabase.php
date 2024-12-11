@@ -19,7 +19,10 @@ class RestoreDatabase extends Page
     use HasPageShield;
     protected static ?string $navigationIcon = 'heroicon-o-arrow-path';
     protected static ?string $navigationLabel = 'Restore Database';
-    protected static ?string $navigationGroup = 'Settings';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Settings';
+            }
     protected static ?string $title = 'Restore Database';
     protected static ?string $slug = 'restore-database';
     protected static ?int $navigationSort = 2;

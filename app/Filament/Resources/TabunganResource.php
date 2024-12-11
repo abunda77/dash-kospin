@@ -24,7 +24,10 @@ class TabunganResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
     protected static ?string $navigationLabel = 'Rekening Tabungan';
-    protected static ?string $navigationGroup = 'Tabungan';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Tabungan';
+            }
 
     public static function form(Form $form): Form
     {
