@@ -11,6 +11,7 @@ use App\Models\TransaksiPinjaman;
 use App\Models\Tabungan;
 use App\Models\Pinjaman;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Illuminate\Support\Facades\Log;
 
 class EmptyData extends Page
 {
@@ -22,95 +23,72 @@ class EmptyData extends Page
 
     protected static string $view = 'filament.pages.empty-data';
 
-    public function emptyTransaksiTabungan(): Action
+    private function createEmptyAction(string $name, string $model, string $successMessage): Action
     {
-        return Action::make('emptyTransaksiTabungan')
+        return Action::make($name)
             ->label('Hapus Semua Data')
             ->requiresConfirmation()
             ->color('danger')
-            ->action(function () {
+            ->action(function () use ($model, $successMessage) {
                 try {
-                    TransaksiTabungan::truncate();
+                    Log::info("Mencoba menghapus data {$model}");
+
+                    $modelClass = "App\\Models\\{$model}";
+                    $modelClass::truncate();
+
+                    Log::info("Berhasil menghapus data {$model}");
+
                     Notification::make()
-                        ->title('Data transaksi tabungan berhasil dihapus')
+                        ->title($successMessage)
                         ->success()
                         ->send();
+
                 } catch (\Exception $e) {
+                    Log::error("Gagal menghapus data {$model}: " . $e->getMessage());
+
                     Notification::make()
                         ->title('Gagal menghapus data')
                         ->danger()
                         ->send();
+
                     throw new Halt($e->getMessage());
                 }
             });
+    }
+
+    public function emptyTransaksiTabungan(): Action
+    {
+        return $this->createEmptyAction(
+            'emptyTransaksiTabungan',
+            'TransaksiTabungan',
+            'Data transaksi tabungan berhasil dihapus'
+        );
     }
 
     public function emptyTransaksiPinjaman(): Action
     {
-        return Action::make('emptyTransaksiPinjaman')
-            ->label('Hapus Semua Data')
-            ->requiresConfirmation()
-            ->color('danger')
-            ->action(function () {
-                try {
-                    TransaksiPinjaman::truncate();
-                    Notification::make()
-                        ->title('Data transaksi pinjaman berhasil dihapus')
-                        ->success()
-                        ->send();
-                } catch (\Exception $e) {
-                    Notification::make()
-                        ->title('Gagal menghapus data')
-                        ->danger()
-                        ->send();
-                    throw new Halt($e->getMessage());
-                }
-            });
+        return $this->createEmptyAction(
+            'emptyTransaksiPinjaman',
+            'TransaksiPinjaman',
+            'Data transaksi pinjaman berhasil dihapus'
+        );
     }
 
     public function emptyTabungan(): Action
     {
-        return Action::make('emptyTabungan')
-            ->label('Hapus Semua Data')
-            ->requiresConfirmation()
-            ->color('danger')
-            ->action(function () {
-                try {
-                    Tabungan::truncate();
-                    Notification::make()
-                        ->title('Data tabungan berhasil dihapus')
-                        ->success()
-                        ->send();
-                } catch (\Exception $e) {
-                    Notification::make()
-                        ->title('Gagal menghapus data')
-                        ->danger()
-                        ->send();
-                    throw new Halt($e->getMessage());
-                }
-            });
+        return $this->createEmptyAction(
+            'emptyTabungan',
+            'Tabungan',
+            'Data tabungan berhasil dihapus'
+        );
     }
 
     public function emptyPinjaman(): Action
     {
-        return Action::make('emptyPinjaman')
-            ->label('Hapus Semua Data')
-            ->requiresConfirmation()
-            ->color('danger')
-            ->action(function () {
-                try {
-                    Pinjaman::truncate();
-                    Notification::make()
-                        ->title('Data pinjaman berhasil dihapus')
-                        ->success()
-                        ->send();
-                } catch (\Exception $e) {
-                    Notification::make()
-                        ->title('Gagal menghapus data')
-                        ->danger()
-                        ->send();
-                    throw new Halt($e->getMessage());
-                }
-            });
+        return $this->createEmptyAction(
+            'emptyPinjaman',
+            'Pinjaman',
+            'Data pinjaman berhasil dihapus'
+        );
     }
 }

@@ -28,7 +28,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
     protected static ?string $navigationGroup = 'Pinjaman';
     protected static string $view = 'filament.pages.list-keterlambatan';
 
-    public function getData()
+    private function getBaseQuery()
     {
         $today = Carbon::today();
 
@@ -38,8 +38,45 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
                   ->whereYear('tanggal_pembayaran', $today->year);
-            })
-            ->get();
+            });
+    }
+
+    public function getData()
+    {
+        return $this->getBaseQuery()->get();
+    }
+
+    private function calculateAngsuranPokok($record)
+    {
+        return $record->jumlah_pinjaman / $record->jangka_waktu;
+    }
+
+    private function calculateHariTerlambat($record, $today)
+    {
+        $tanggalJatuhTempo = Carbon::create(
+            $today->year,
+            $today->month,
+            Carbon::parse($record->tanggal_jatuh_tempo)->day
+        )->startOfDay();
+
+        return $today->gt($tanggalJatuhTempo) ?
+            abs($tanggalJatuhTempo->diffInDays($today)) : 0;
+    }
+
+    private function calculateDenda($record, $angsuranPokok, $hariTerlambat)
+    {
+        return ($record->denda->rate_denda/100 * $angsuranPokok / 30) * $hariTerlambat;
+    }
+
+    private function formatWhatsAppNumber($whatsapp)
+    {
+        $whatsapp = preg_replace('/[^0-9]/', '', $whatsapp);
+
+        if (substr($whatsapp, 0, 1) === '0') {
+            $whatsapp = '62' . substr($whatsapp, 1);
+        }
+
+        return $whatsapp;
     }
 
     public function table(Table $table): Table
@@ -47,15 +84,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
         $today = Carbon::today();
 
         return $table
-            ->query(
-                Pinjaman::query()
-                    ->with(['profile', 'biayaBungaPinjaman', 'denda'])
-                    ->where('status_pinjaman', 'approved')
-                    ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
-                        $q->whereMonth('tanggal_pembayaran', $today->month)
-                          ->whereYear('tanggal_pembayaran', $today->year);
-                    })
-            )
+            ->query($this->getBaseQuery())
             ->columns([
                 TextColumn::make('no')
                     ->label('No')
@@ -64,7 +93,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                 TextColumn::make('profile.first_name')
                     ->label('Nama')
                     ->formatStateUsing(fn ($record) =>
-                        $record->profile->first_name . ' ' . $record->profile->last_name
+                        trim("{$record->profile->first_name} {$record->profile->last_name}")
                     )
                     ->searchable()
                     ->sortable(),
@@ -77,39 +106,18 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                 TextColumn::make('jumlah_pinjaman')
                     ->label('Angsuran Pokok')
                     ->money('IDR')
-                    ->formatStateUsing(function ($record) {
-                        $angsuranPokok = $record->jumlah_pinjaman / $record->jangka_waktu;
-                        // return $record->jumlah_pinjaman / $record->jangka_waktu;
-                        return $angsuranPokok;
-                    }),
+                    ->formatStateUsing(fn ($record) => $this->calculateAngsuranPokok($record)),
 
                 TextColumn::make('jumlah_pinjaman')
                     ->label('Total Bayar')
                     ->formatStateUsing(function ($record) use ($today) {
                         try {
-                            // Hitung angsuran pokok
-                            $angsuranPokok = $record->jumlah_pinjaman / $record->jangka_waktu;
-
-                            // Hitung denda
-                            $tanggalJatuhTempo = Carbon::create(
-                                $today->year,
-                                $today->month,
-                                Carbon::parse($record->tanggal_jatuh_tempo)->day
-                            )->startOfDay();
-
-                            $hariTerlambat = 0;
-                            if ($today->gt($tanggalJatuhTempo)) {
-                                $hariTerlambat = abs($tanggalJatuhTempo->diffInDays($today));
-                            }
-
-                            $denda = ($record->denda->rate_denda/100 * $angsuranPokok / 30) * $hariTerlambat;
-
-                            // Total bayar
+                            $angsuranPokok = $this->calculateAngsuranPokok($record);
+                            $hariTerlambat = $this->calculateHariTerlambat($record, $today);
+                            $denda = $this->calculateDenda($record, $angsuranPokok, $hariTerlambat);
                             $totalBayar = $angsuranPokok + $denda;
 
-                            // Format angka dengan prefix Rp, 2 desimal, dan pemisah ribuan
                             return 'Rp.' . number_format($totalBayar, 2, ',', '.');
-
                         } catch (\Exception $e) {
                             Log::error('Error calculating total bayar: ' . $e->getMessage());
                             return 'Rp.0,00';
@@ -120,26 +128,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                 TextColumn::make('tanggal_jatuh_tempo')
                     ->label('Hari Terlambat')
                     ->formatStateUsing(function ($record) use ($today) {
-                        Log::info('Calculating hari terlambat for record:', [
-                            'id_pinjaman' => $record->id_pinjaman,
-                            'tanggal_jatuh_tempo' => $record->tanggal_jatuh_tempo
-                        ]);
-
-                        $tanggalJatuhTempo = Carbon::create(
-                            $today->year,
-                            $today->month,
-                            Carbon::parse($record->tanggal_jatuh_tempo)->day
-                        )->startOfDay();
-
-                        $hariTerlambat = 0;
-                        if ($today->gt($tanggalJatuhTempo)) {
-                            $hariTerlambat = abs($tanggalJatuhTempo->diffInDays($today));
-                        }
-
-                        Log::info('Hari terlambat calculated:', [
-                            'hari_terlambat' => $hariTerlambat
-                        ]);
-
+                        $hariTerlambat = $this->calculateHariTerlambat($record, $today);
                         return $hariTerlambat . ' hari';
                     })
                     ->sortable(),
@@ -148,18 +137,9 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                     ->label('WhatsApp')
                     ->formatStateUsing(function ($record) {
                         try {
-                            $nama = $record->profile->first_name . ' ' . $record->profile->last_name;
+                            $nama = trim("{$record->profile->first_name} {$record->profile->last_name}");
                             $pesan = urlencode("Halo {$nama}, ini adalah pengingat untuk pembayaran angsuran pinjaman Anda yang sudah jatuh tempo. Mohon segera melakukan pembayaran. Terima kasih.");
-                            $whatsapp = $record->profile->whatsapp;
-
-                            // Hapus karakter selain angka
-                            $whatsapp = preg_replace('/[^0-9]/', '', $whatsapp);
-
-                            // Tambahkan 62 jika dimulai dengan 0
-                            if (substr($whatsapp, 0, 1) === '0') {
-                                $whatsapp = '62' . substr($whatsapp, 1);
-                            }
-
+                            $whatsapp = $this->formatWhatsAppNumber($record->profile->whatsapp);
                             $url = "https://wa.me/{$whatsapp}?text={$pesan}";
 
                             return view('tables.columns.whatsapp-link', [
@@ -190,14 +170,15 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
             }
 
             $options = new Options();
-            $options->set('isHtml5ParserEnabled', true);
-            $options->set('isPhpEnabled', true);
-            $options->set('defaultFont', 'Arial');
+            $options->set([
+                'isHtml5ParserEnabled' => true,
+                'isPhpEnabled' => true,
+                'defaultFont' => 'Arial'
+            ]);
 
             $dompdf = new Dompdf($options);
             $dompdf->setPaper('A4', 'portrait');
 
-            // Generate HTML
             $html = view('pdf.keterlambatan', [
                 'data' => $data,
                 'today' => Carbon::today()
@@ -206,11 +187,9 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
             $dompdf->loadHtml($html);
             $dompdf->render();
 
-            $filename = $this->generatePdfFilename();
-
             return response()->streamDownload(
                 fn () => print($dompdf->output()),
-                $filename,
+                $this->generatePdfFilename(),
                 ['Content-Type' => 'application/pdf']
             );
 

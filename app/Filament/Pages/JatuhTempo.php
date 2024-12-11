@@ -11,6 +11,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Illuminate\Support\Facades\Log;
 
 class JatuhTempo extends Page implements HasTable
 {
@@ -25,32 +26,44 @@ class JatuhTempo extends Page implements HasTable
 
     public $periode = 'bulan-ini';
 
+    private function getDateRange(string $periode): array
+    {
+        $ranges = [
+            'bulan-ini' => [
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth()
+            ],
+            'bulan-depan' => [
+                Carbon::now()->addMonth()->startOfMonth(),
+                Carbon::now()->addMonth()->endOfMonth()
+            ],
+            'tahun-depan' => [
+                Carbon::now()->addYear()->startOfYear(),
+                Carbon::now()->addYear()->endOfYear()
+            ]
+        ];
+
+        return $ranges[$periode] ?? $ranges['bulan-ini'];
+    }
+
     public function getTableQuery()
     {
-        $query = Deposito::query()->with('profile');
+        try {
+            $query = Deposito::query()->with('profile');
 
-        switch($this->periode) {
-            case 'bulan-ini':
-                $query->whereBetween('tanggal_jatuh_tempo', [
-                    Carbon::now()->startOfMonth(),
-                    Carbon::now()->endOfMonth()
-                ]);
-                break;
-            case 'bulan-depan':
-                $query->whereBetween('tanggal_jatuh_tempo', [
-                    Carbon::now()->addMonth()->startOfMonth(),
-                    Carbon::now()->addMonth()->endOfMonth()
-                ]);
-                break;
-            case 'tahun-depan':
-                $query->whereBetween('tanggal_jatuh_tempo', [
-                    Carbon::now()->addYear()->startOfYear(),
-                    Carbon::now()->addYear()->endOfYear()
-                ]);
-                break;
+            list($startDate, $endDate) = $this->getDateRange($this->periode);
+
+            Log::info("Querying deposits for period: {$this->periode}", [
+                'start_date' => $startDate,
+                'end_date' => $endDate
+            ]);
+
+            return $query->whereBetween('tanggal_jatuh_tempo', [$startDate, $endDate]);
+
+        } catch (\Exception $e) {
+            Log::error("Error in getTableQuery: " . $e->getMessage());
+            throw $e;
         }
-
-        return $query;
     }
 
     protected function getTableColumns(): array
@@ -62,7 +75,9 @@ class JatuhTempo extends Page implements HasTable
                 ->sortable(),
             TextColumn::make('profile.first_name')
                 ->label('Nama Nasabah')
-                ->formatStateUsing(fn ($record) => "{$record->profile->first_name} {$record->profile->last_name}")
+                ->formatStateUsing(function($record) {
+                    return trim("{$record->profile->first_name} {$record->profile->last_name}");
+                })
                 ->searchable()
                 ->sortable(),
             TextColumn::make('nominal_penempatan')
@@ -84,7 +99,9 @@ class JatuhTempo extends Page implements HasTable
             TextColumn::make('total_penarikan')
                 ->label('Total Penarikan')
                 ->money('IDR')
-                ->getStateUsing(fn ($record) => $record->nominal_penempatan + $record->nominal_bunga)
+                ->getStateUsing(function($record) {
+                    return $record->nominal_penempatan + $record->nominal_bunga;
+                })
                 ->sortable(),
         ];
     }
@@ -109,15 +126,27 @@ class JatuhTempo extends Page implements HasTable
 
     public function cetakPDF()
     {
-        $data = $this->getTableQuery()->get();
+        try {
+            Log::info("Generating PDF for period: {$this->periode}");
 
-        $pdf = Pdf::loadView('pdf.jatuh-tempo', [
-            'data' => $data,
-            'periode' => $this->periode
-        ]);
+            $data = $this->getTableQuery()->get();
 
-        return response()->streamDownload(function() use($pdf) {
-            echo $pdf->output();
-        }, 'jatuh-tempo-deposito.pdf');
+            if ($data->isEmpty()) {
+                Log::warning("No data found for PDF generation");
+            }
+
+            $pdf = Pdf::loadView('pdf.jatuh-tempo', [
+                'data' => $data,
+                'periode' => $this->periode
+            ]);
+
+            return response()->streamDownload(function() use($pdf) {
+                echo $pdf->output();
+            }, "jatuh-tempo-deposito-{$this->periode}.pdf");
+
+        } catch (\Exception $e) {
+            Log::error("Error generating PDF: " . $e->getMessage());
+            throw $e;
+        }
     }
 }
