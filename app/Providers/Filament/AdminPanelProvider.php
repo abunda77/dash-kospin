@@ -77,7 +77,8 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 ApiServicePlugin::make(),
-                \TomatoPHP\FilamentLogger\FilamentLoggerPlugin::make()
+                \TomatoPHP\FilamentLogger\FilamentLoggerPlugin::make(),
+                \TomatoPHP\FilamentArtisan\FilamentArtisanPlugin::make()
             ]);
     }
 }

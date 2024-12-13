@@ -18,6 +18,7 @@
         "malzariey/filament-daterangepicker-filter": "^3.1",
         "rupadana/filament-api-service": "^3.3",
         "spatie/laravel-backup": "^9.1",
+        "tomatophp/filament-artisan": "^1.1",
         "tomatophp/filament-logger": "^1.0",
         "ysfkaya/filament-phone-input": "^3.1"
     },
