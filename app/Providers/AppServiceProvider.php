@@ -3,8 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Contracts\ActivityLogger;
-use App\Services\ActivityLogService;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(ActivityLogger::class, ActivityLogService::class);
+
     }
 
     /**

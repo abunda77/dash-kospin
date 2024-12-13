@@ -51,5 +51,20 @@
                 {{ $this->emptyPinjaman() }}
             </div>
         </x-filament::card>
+
+
+        {{-- Halaman Filament untuk menampilkan kbutton hapus activities --}}
+        <x-filament::card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Activities</h2>
+                    <p class="text-sm text-gray-600">
+                        Total Data: {{ \App\Models\Activity::count() }}
+                    </p>
+                </div>
+                {{ $this->emptyActivities() }}
+            </div>
+        </x-filament::card>
+
     </div>
 </x-filament-panels::page>

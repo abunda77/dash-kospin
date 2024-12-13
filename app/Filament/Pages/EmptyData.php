@@ -10,6 +10,8 @@ use App\Models\TransaksiTabungan;
 use App\Models\TransaksiPinjaman;
 use App\Models\Tabungan;
 use App\Models\Pinjaman;
+use App\Models\Activity;
+
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Illuminate\Support\Facades\Log;
 
@@ -20,9 +22,9 @@ class EmptyData extends Page
     protected static ?string $navigationLabel = 'Hapus Data';
     protected static ?string $title = 'Hapus Data';
     public static function getNavigationGroup(): ?string
-            {
-                return 'Settings';
-            }
+    {
+        return 'Settings';
+    }
 
     protected static string $view = 'filament.pages.empty-data';
 
@@ -92,6 +94,15 @@ class EmptyData extends Page
             'emptyPinjaman',
             'Pinjaman',
             'Data pinjaman berhasil dihapus'
+        );
+    }
+
+    public function emptyActivities(): Action
+    {
+        return $this->createEmptyAction(
+            'emptyActivities',
+            'Activity',
+            'Data aktivitas berhasil dihapus'
         );
     }
 }
