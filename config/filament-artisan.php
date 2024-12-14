@@ -12,8 +12,8 @@ return [
     |
     */
     'middlewares' => [
-        'admin'
-        // 'auth'
+        'admin',
+        'auth'
     ],
 
     /*

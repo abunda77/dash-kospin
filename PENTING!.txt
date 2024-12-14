@@ -10,3 +10,10 @@ protected $signature = 'tabungan:hitung-bunga
 
 
 mysql -u kosp_kospin -pkospin123123 kosp_kospin < mysql-kospin.sql
+
+
+Plugin harus pasang :
+https://filamentphp.com/plugins/3x1io-tomato-menus
+https://filamentphp.com/plugins/3x1io-tomato-artisan --done
+https://filamentphp.com/plugins/3x1io-tomato-logger --done
+https://filamentphp.com/plugins/rmsramos-activitylog
