@@ -41,6 +41,9 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
                   ->whereYear('tanggal_pembayaran', $today->year);
+            })
+            ->where(function ($query) use ($today) {
+                $query->whereRaw('DAY(tanggal_jatuh_tempo) < ?', [$today->day]);
             });
     }
 
@@ -56,14 +59,16 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
 
     private function calculateHariTerlambat($record, $today)
     {
+        $tanggalPembayaran = Carbon::parse($record->tanggal_jatuh_tempo)->day;
+
         $tanggalJatuhTempo = Carbon::create(
             $today->year,
             $today->month,
-            Carbon::parse($record->tanggal_jatuh_tempo)->day
+            $tanggalPembayaran
         )->startOfDay();
 
         return $today->gt($tanggalJatuhTempo) ?
-            abs($tanggalJatuhTempo->diffInDays($today)) : 0;
+            $today->diffInDays($tanggalJatuhTempo) : 0;
     }
 
     private function calculateDenda($record, $angsuranPokok, $hariTerlambat)
@@ -132,7 +137,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                     ->label('Hari Terlambat')
                     ->formatStateUsing(function ($record) use ($today) {
                         $hariTerlambat = $this->calculateHariTerlambat($record, $today);
-                        return $hariTerlambat . ' hari';
+                        return abs($hariTerlambat) . ' hari';
                     })
                     ->sortable(),
 

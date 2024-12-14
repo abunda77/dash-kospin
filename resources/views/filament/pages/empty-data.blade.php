@@ -66,5 +66,18 @@
             </div>
         </x-filament::card>
 
+        {{-- Card Activities Log --}}
+        <x-filament::card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Activities Log</h2>
+                    <p class="text-sm text-gray-600">
+                        Total Data: {{ \Spatie\Activitylog\Models\Activity::count() }}
+                    </p>
+                </div>
+                {{ $this->emptyActivitiesLog() }}
+            </div>
+        </x-filament::card>
+
     </div>
 </x-filament-panels::page>

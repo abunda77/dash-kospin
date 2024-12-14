@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Filament Artisan
         Gate::policy(\TomatoPHP\FilamentArtisan\Pages\Artisan::class, \App\Policies\ArtisanPolicy::class);
-
+        // Activity Log
         Gate::policy(Activity::class, \App\Policies\ActivityLogPolicy::class);
     }
 }

@@ -11,6 +11,7 @@ use App\Models\TransaksiPinjaman;
 use App\Models\Tabungan;
 use App\Models\Pinjaman;
 use App\Models\Activity;
+use Spatie\Activitylog\Models\Activity as SpatieActivity;
 
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Illuminate\Support\Facades\Log;
@@ -104,5 +105,38 @@ class EmptyData extends Page
             'Activity',
             'Data aktivitas berhasil dihapus'
         );
+    }
+
+    public function emptyActivitiesLog(): Action
+    {
+        return Action::make('emptyActivitiesLog')
+            ->label('Hapus Semua Log Aktivitas')
+            ->requiresConfirmation()
+            ->color('danger')
+            ->action(function () {
+                try {
+                    Log::info("Mencoba menghapus data log aktivitas");
+
+                    // Menggunakan model Activity dari package spatie
+                    \Spatie\Activitylog\Models\Activity::truncate();
+
+                    Log::info("Berhasil menghapus data log aktivitas");
+
+                    Notification::make()
+                        ->title('Data log aktivitas berhasil dihapus')
+                        ->success()
+                        ->send();
+
+                } catch (\Exception $e) {
+                    Log::error("Gagal menghapus data log aktivitas: " . $e->getMessage());
+
+                    Notification::make()
+                        ->title('Gagal menghapus data log aktivitas')
+                        ->danger()
+                        ->send();
+
+                    throw new Halt($e->getMessage());
+                }
+            });
     }
 }
