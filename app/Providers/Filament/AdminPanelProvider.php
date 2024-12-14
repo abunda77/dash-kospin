@@ -20,6 +20,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Rupadana\ApiService\ApiServicePlugin;
 use App\Filament\Pages\MutasiTabungan;
 use App\Filament\Widgets\StatistikNasabahWidget;
+use Rmsramos\Activitylog\ActivitylogPlugin;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -78,7 +79,10 @@ class AdminPanelProvider extends PanelProvider
                 \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 ApiServicePlugin::make(),
                 \TomatoPHP\FilamentLogger\FilamentLoggerPlugin::make(),
-                \TomatoPHP\FilamentArtisan\FilamentArtisanPlugin::make()
+                \TomatoPHP\FilamentArtisan\FilamentArtisanPlugin::make(),
+                ActivitylogPlugin::make()
+                    ->navigationIcon('heroicon-o-shield-check')
+                    ->navigationCountBadge(true)
             ]);
     }
 }

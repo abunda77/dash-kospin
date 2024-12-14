@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Pinjaman extends Model
 {
+    use LogsActivity;
+
     protected $table = 'pinjamans';
 
     protected $primaryKey = 'id_pinjaman';
@@ -57,5 +61,23 @@ class Pinjaman extends Model
     public function transaksiPinjaman()
     {
         return $this->hasMany(TransaksiPinjaman::class, 'pinjaman_id', 'id_pinjaman');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'no_pinjaman',
+                'profile_id',
+                'produk_pinjaman_id',
+                'jumlah_pinjaman',
+                'beaya_bunga_pinjaman_id',
+                'tanggal_pinjaman',
+                'jangka_waktu',
+                'tanggal_jatuh_tempo',
+                'jangka_waktu_satuan',
+                'status_pinjaman',
+                'denda_id'
+            ]);
     }
 }

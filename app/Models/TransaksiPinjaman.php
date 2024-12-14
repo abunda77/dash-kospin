@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class TransaksiPinjaman extends Model
 {
+    use LogsActivity;
+
     protected $table = 'transaksi_pinjamans';
 
     protected $fillable = [
@@ -36,5 +40,22 @@ class TransaksiPinjaman extends Model
     public function pinjaman()
     {
         return $this->belongsTo(Pinjaman::class, 'pinjaman_id', 'id_pinjaman');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'tanggal_pembayaran',
+                'pinjaman_id',
+                'angsuran_pokok',
+                'angsuran_bunga',
+                'denda',
+                'total_pembayaran',
+                'sisa_pinjaman',
+                'status_pembayaran',
+                'angsuran_ke',
+                'hari_terlambat'
+            ]);
     }
 }

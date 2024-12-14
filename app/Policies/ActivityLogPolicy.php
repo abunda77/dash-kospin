@@ -2,11 +2,12 @@
 
 namespace App\Policies;
 
-use TomatoPHP\FilamentLogger\Models\Activity;
+
 use App\Models\Admin;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Spatie\Activitylog\Models\Activity;
 
-class ActivityPolicy
+class ActivityLogPolicy
 {
     use HandlesAuthorization;
     /**

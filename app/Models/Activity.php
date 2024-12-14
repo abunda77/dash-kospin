@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 /**
  * @property integer $id
@@ -27,6 +29,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Activity extends Model
 {
+    use LogsActivity;
+
     /**
      * @var array
      */
@@ -41,5 +45,28 @@ class Activity extends Model
     public function model()
     {
         return $this->morphTo('model');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'model_id',
+                'model_type',
+                'request_hash',
+                'http_version',
+                'response_time',
+                'status',
+                'method',
+                'url',
+                'referer',
+                'query',
+                'remote_address',
+                'user_agent',
+                'response',
+                'level',
+                'user',
+                'log'
+            ]);
     }
 }

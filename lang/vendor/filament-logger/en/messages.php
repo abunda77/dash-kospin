@@ -1,7 +1,7 @@
 <?php
 
 return [
-    "title" => "Activity Log",
+    "title" => "Activity",
     "group" => "Settings",
     "single" => "Activity",
     "columns" => [

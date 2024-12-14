@@ -4,9 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Deposito extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'id_user',
         'nomor_rekening',
@@ -59,5 +63,23 @@ class Deposito extends Model
                 $model->nominal_bunga = ($nominal * $rate * $jangkaWaktu) / (100 * 12);
             }
         });
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'id_user',
+                'nomor_rekening',
+                'nominal_penempatan',
+                'jangka_waktu',
+                'tanggal_pembukaan',
+                'tanggal_jatuh_tempo',
+                'rate_bunga',
+                'nominal_bunga',
+                'status',
+                'perpanjangan_otomatis',
+                'notes'
+            ]);
     }
 }

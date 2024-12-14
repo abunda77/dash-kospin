@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Tabungan extends Model
 {
+    use LogsActivity;
+
     protected $table = 'tabungans';
 
     protected $fillable = [
@@ -35,5 +39,18 @@ class Tabungan extends Model
     public function transaksi()
     {
         return $this->hasMany(TransaksiTabungan::class, 'id_tabungan');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'no_tabungan',
+                'id_profile',
+                'produk_tabungan',
+                'saldo',
+                'tanggal_buka_rekening',
+                'status_rekening'
+            ]);
     }
 }

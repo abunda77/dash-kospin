@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,7 +29,6 @@ class AppServiceProvider extends ServiceProvider
         // Filament Artisan
         Gate::policy(\TomatoPHP\FilamentArtisan\Pages\Artisan::class, \App\Policies\ArtisanPolicy::class);
 
-        // Contoh Policy untuk model Email
-        //    Gate::policy(\Ramnzys\FilamentEmailLog\Models\Email::class, \App\Policies\EmailPolicy::class);
+        Gate::policy(Activity::class, \App\Policies\ActivityLogPolicy::class);
     }
 }
