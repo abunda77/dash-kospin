@@ -21,6 +21,7 @@ use Rupadana\ApiService\ApiServicePlugin;
 use App\Filament\Pages\MutasiTabungan;
 use App\Filament\Widgets\StatistikNasabahWidget;
 use Rmsramos\Activitylog\ActivitylogPlugin;
+use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -83,6 +84,7 @@ class AdminPanelProvider extends PanelProvider
                 ActivitylogPlugin::make()
                     ->navigationIcon('heroicon-o-shield-check')
                     ->navigationCountBadge(true)
-            ]);
+            ])
+            ->plugin(FilamentSpatieLaravelHealthPlugin::make());
     }
 }

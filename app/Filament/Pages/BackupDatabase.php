@@ -25,7 +25,10 @@ class BackupDatabase extends Page implements HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-server';
     protected static ?string $navigationLabel = 'Backup Database';
-    protected static ?string $navigationGroup = 'Settings';
+    public static function getNavigationGroup(): ?string
+            {
+                return 'Settings';
+            }
     protected static ?string $title = 'Backup Database';
     protected static ?string $slug = 'backup-database';
     protected static ?int $navigationSort = 3;
