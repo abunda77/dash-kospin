@@ -13,6 +13,9 @@ use Filament\Tables\Contracts\HasTable;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Filament\Notifications\Notification;
 
 class Reminder extends Page implements HasTable, HasForms
 {
@@ -191,5 +194,57 @@ class Reminder extends Page implements HasTable, HasForms
                     ->searchable()
                     ->sortable(),
             ]);
+    }
+
+    public function print()
+    {
+        try {
+            $data = $this->getBaseQuery()->get();
+
+            if ($data->isEmpty()) {
+                Notification::make()
+                    ->title('Tidak ada data reminder')
+                    ->warning()
+                    ->send();
+                return;
+            }
+
+            $options = new Options();
+            $options->set([
+                'isHtml5ParserEnabled' => true,
+                'isPhpEnabled' => true,
+                'defaultFont' => 'Arial'
+            ]);
+
+            $dompdf = new Dompdf($options);
+            $dompdf->setPaper('A4', 'portrait');
+
+            $html = view('pdf.reminder', [
+                'data' => $data,
+                'today' => Carbon::today()
+            ])->render();
+
+            $dompdf->loadHtml($html);
+            $dompdf->render();
+
+            return response()->streamDownload(
+                fn () => print($dompdf->output()),
+                $this->generatePdfFilename(),
+                ['Content-Type' => 'application/pdf']
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Error in print: ' . $e->getMessage());
+            Notification::make()
+                ->title('Terjadi kesalahan saat mencetak')
+                ->danger()
+                ->send();
+            return null;
+        }
+    }
+
+    private function generatePdfFilename()
+    {
+        return 'laporan_reminder_' . date('Y-m-d_H-i-s') . '.pdf';
     }
 }
