@@ -35,6 +35,7 @@
 </head>
 <body>
     <div class="header">
+        <img src="{{ public_path('storage/images/01JF7JTWKX7GQRH002930E21K1.jpg') }}" alt="Logo">
         <h2>Laporan Mutasi Tabungan</h2>
         @if(isset($filterDate['start']) && isset($filterDate['end']))
             <p>Periode: {{ \Carbon\Carbon::parse($filterDate['start'])->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($filterDate['end'])->format('d/m/Y') }}</p>

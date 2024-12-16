@@ -35,14 +35,25 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
+            padding: 10px 0;
+        }
+        .header img {
+            height: 100px;
+            width: auto;
+            margin-bottom: 15px;
+            object-fit: contain;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
         .header h2 {
-            margin: 0;
+            margin: 10px;
             padding: 0;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #2d3748;
+            line-height: 1.4;
         }
         .date {
             text-align: right;
@@ -58,6 +69,7 @@
 </head>
 <body>
     <div class="header">
+        <img src="{{ public_path('storage/public/images/01JF7JTWKX7GQRH002930E21K1.jpg') }}" alt="Logo">
         <h2>Laporan Saldo Tabungan</h2>
     </div>
 
