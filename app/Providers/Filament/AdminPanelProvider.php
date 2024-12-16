@@ -22,6 +22,7 @@ use App\Filament\Pages\MutasiTabungan;
 use App\Filament\Widgets\StatistikNasabahWidget;
 use Rmsramos\Activitylog\ActivitylogPlugin;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
+// use Mvenghaus\FilamentScheduleMonitor\FilamentPlugin;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -85,6 +86,7 @@ class AdminPanelProvider extends PanelProvider
                     ->navigationIcon('heroicon-o-shield-check')
                     ->navigationCountBadge(true)
             ])
-            ->plugin(FilamentSpatieLaravelHealthPlugin::make());
+            ->plugin(FilamentSpatieLaravelHealthPlugin::make())
+            ->plugin(\Mvenghaus\FilamentScheduleMonitor\FilamentPlugin::make());
     }
 }
