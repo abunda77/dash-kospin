@@ -69,7 +69,8 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ public_path('storage/public/images/01JF7JTWKX7GQRH002930E21K1.jpg') }}" alt="Logo">
+        <img src="{{ public_path('images/logo_koperasi.jpg') }}"
+             onerror="this.src='path/to/fallback/image.jpg'">
         <h2>Laporan Saldo Tabungan</h2>
     </div>
 

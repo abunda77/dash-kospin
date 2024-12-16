@@ -38,7 +38,7 @@
 </head>
 <body>
     <div class="header">
-        <img src="{{ public_path('storage/public/images/01JF7JTWKX7GQRH002930E21K1.jpg') }}" alt="Logo">
+
         <h2>Rincian Angsuran Pinjaman</h2>
     </div>
 

@@ -16,7 +16,11 @@
     </style>
 </head>
 <body>
-    <h1 class="title">Invoice Pembayaran Angsuran</h1>
+    <div class="header">
+        <h1 class="title">Invoice Pembayaran Angsuran</h1>
+
+    </div>
+
     <table>
         <tr>
             <th>Nama</th>
