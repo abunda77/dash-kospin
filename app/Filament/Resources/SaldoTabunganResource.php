@@ -12,6 +12,10 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
+use App\Models\TransaksiTabungan;
+use Filament\Notifications\Notification;
 
 class SaldoTabunganResource extends Resource
 {
@@ -66,7 +70,42 @@ class SaldoTabunganResource extends Resource
                 //
             ])
             ->bulkActions([
-                //
+                BulkAction::make('updateSaldoAkhir')
+                    ->label('Update Saldo Akhir')
+                    ->icon('heroicon-o-currency-dollar')
+                    ->requiresConfirmation()
+                    ->modalHeading('Sedang memproses pembaruan saldo...')
+                    ->action(function (Collection $records) {
+                        foreach ($records as $saldoTabungan) {
+                            $tabungan = $saldoTabungan->tabungan;
+
+                            // Ambil saldo awal dari tabel tabungan
+                            $saldoAwal = $tabungan->saldo;
+
+                            // Hitung total dari transaksi
+                            $totalDebit = TransaksiTabungan::where('id_tabungan', $tabungan->id)
+                                ->where('jenis_transaksi', 'debit')
+                                ->sum('jumlah');
+
+                            $totalKredit = TransaksiTabungan::where('id_tabungan', $tabungan->id)
+                                ->where('jenis_transaksi', 'kredit')
+                                ->sum('jumlah');
+
+                            // Hitung saldo akhir
+                            $saldoAkhir = $saldoAwal + ($totalDebit - $totalKredit);
+
+                            // Update saldo akhir
+                            $saldoTabungan->update([
+                                'saldo_akhir' => $saldoAkhir
+                            ]);
+                        }
+
+                        Notification::make()
+                            ->title('Saldo akhir berhasil diperbarui')
+                            ->success()
+                            ->send();
+                    })
+                    ->successNotificationTitle('Memperbarui saldo...')
             ]);
     }
 
