@@ -63,7 +63,7 @@
         }
         td:last-child {
             text-align: right;
-            font-family: 'Courier New', monospace;
+
         }
     </style>
 </head>

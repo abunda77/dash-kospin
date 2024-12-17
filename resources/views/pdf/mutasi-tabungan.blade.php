@@ -7,10 +7,29 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
+            line-height: 1.4;
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            padding: 10px 0;
+        }
+        .header img {
+            height: 100px;
+            width: auto;
+            margin-bottom: 15px;
+            object-fit: contain;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .header h2 {
+            margin: 10px;
+            padding: 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3748;
+            line-height: 1.4;
         }
         .info {
             margin-bottom: 20px;
@@ -18,24 +37,32 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #4a5568;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
         }
+
+
         .footer {
             margin-top: 20px;
             text-align: right;
+            font-size: 12px;
+            color: #4a5568;
         }
     </style>
 </head>
 <body>
     <div class="header">
-
+        <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logos">
         <h2>Laporan Mutasi Tabungan</h2>
         @if(isset($filterDate['start']) && isset($filterDate['end']))
             <p>Periode: {{ \Carbon\Carbon::parse($filterDate['start'])->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($filterDate['end'])->format('d/m/Y') }}</p>

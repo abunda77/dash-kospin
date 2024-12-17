@@ -7,10 +7,29 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
+            line-height: 1.4;
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            padding: 10px 0;
+        }
+        .header img {
+            height: 100px;
+            width: auto;
+            margin-bottom: 15px;
+            object-fit: contain;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .header h2 {
+            margin: 10px;
+            padding: 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3748;
+            line-height: 1.4;
         }
         .profile-info {
             margin-bottom: 20px;
@@ -27,21 +46,35 @@
             margin-top: 20px;
         }
         .table-simulasi th, .table-simulasi td {
-            border: 1px solid #000;
-            padding: 5px;
-            text-align: center;
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
         }
         .table-simulasi th {
-            background-color: #f0f0f0;
+            background-color: #4a5568;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .table-simulasi tr:nth-child(even) {
+            background-color: #e3e5e7;
+        }
+        .table-simulasi tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        .table-simulasi tr:hover {
+            background-color: #f5f5f5;
         }
         .text-right {
             text-align: right;
+
         }
     </style>
 </head>
 <body>
     <div class="header">
-
+        <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logos">
+        {{-- <img src="{{ storage_path('app/public/images/logo_koperasi.jpg') }}" alt="Logo"> --}}
         <h2>Simulasi Angsuran Pinjaman</h2>
     </div>
 

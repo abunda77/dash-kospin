@@ -19,7 +19,7 @@
         <div class="flex justify-end gap-4 mt-4">
             <x-filament::button
                 wire:click="printSimulasi"
-                icon="heroicon-o-document"
+                icon="heroicon-o-printer"
                 color="success"
             >
                 Cetak Simulasi

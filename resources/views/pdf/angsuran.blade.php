@@ -12,6 +12,15 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        .header img {
+            height: 100px;
+            width: auto;
+            margin-bottom: 15px;
+            object-fit: contain;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
         .profile-info {
             margin-bottom: 20px;
         }
@@ -38,7 +47,7 @@
 </head>
 <body>
     <div class="header">
-
+        <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logos">
         <h2>Rincian Angsuran Pinjaman</h2>
     </div>
 

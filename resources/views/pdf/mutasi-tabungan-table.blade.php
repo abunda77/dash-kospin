@@ -5,8 +5,9 @@
     <title>Tabel Mutasi Tabungan</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Courier New", Courier, monospace;
             font-size: 12px;
+            line-height: 1.4;
         }
         table {
             width: 100%;

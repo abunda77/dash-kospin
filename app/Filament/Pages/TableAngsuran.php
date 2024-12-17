@@ -337,6 +337,8 @@ class TableAngsuran extends Page implements HasForms, HasTable
             $options->set('isHtml5ParserEnabled', true);
             $options->set('isPhpEnabled', true);
             $options->set('defaultFont', 'Arial');
+            $options->set('isRemoteEnabled', true); // Tambahkan ini
+            $options->set('chroot', public_path()); // Tambahkan ini
 
             $dompdf = new Dompdf($options);
             $dompdf->setPaper('A4', 'portrait');
@@ -394,6 +396,8 @@ class TableAngsuran extends Page implements HasForms, HasTable
             $options->set('isHtml5ParserEnabled', true);
             $options->set('isPhpEnabled', true);
             $options->set('defaultFont', 'Arial');
+            $options->set('isRemoteEnabled', true); // Tambahkan ini
+            $options->set('chroot', public_path()); // Tambahkan ini
 
             $dompdf = new Dompdf($options);
             $dompdf->setPaper('A4', 'portrait');
@@ -437,6 +441,8 @@ class TableAngsuran extends Page implements HasForms, HasTable
         $options->set('isHtml5ParserEnabled', true);
         $options->set('isPhpEnabled', true);
         $options->set('defaultFont', 'Arial');
+        $options->set('isRemoteEnabled', true); // Tambahkan ini
+        $options->set('chroot', public_path()); // Tambahkan ini
 
         $dompdf = new Dompdf($options);
         $dompdf->setPaper('A4', 'portrait');

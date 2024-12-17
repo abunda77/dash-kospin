@@ -13,10 +13,25 @@
         .signature { text-align: right; margin-top: 10px; }
         .date { text-align: right; margin-top: 20px; }
         .billing { text-align: center; margin-top: 100px; }
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px 0;
+        }
+        .header img {
+            height: 100px;
+            width: auto;
+            margin-bottom: 15px;
+            object-fit: contain;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
     <div class="header">
+        <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logos">
         <h1 class="title">Invoice Pembayaran Angsuran</h1>
 
     </div>
