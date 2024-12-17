@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
 class Profile extends Model
 {
-    use LogsActivity;
+    use LogsActivity, HasFactory;
 
     protected $primaryKey = 'id_user';  // atau 'id_user' sesuai struktur tabel Anda
     protected $fillable = [
