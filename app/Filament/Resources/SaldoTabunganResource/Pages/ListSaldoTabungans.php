@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class ListSaldoTabungans extends ListRecords
 {
     protected static string $resource = SaldoTabunganResource::class;
+    protected static ?string $title = 'Saldo Tabungan';
 
     protected function getActions(): array
     {

@@ -9,7 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListProfiles extends ListRecords
 {
     protected static string $resource = ProfileResource::class;
-
+    protected static ?string $title = 'Data Anggota';
     protected function getHeaderActions(): array
     {
         return [

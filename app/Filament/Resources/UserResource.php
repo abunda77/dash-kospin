@@ -24,7 +24,7 @@ class UserResource extends Resource
             {
                 return 'Data Nasabah';
             }
-    protected static ?string $navigationLabel = 'Nasabah';
+    protected static ?string $navigationLabel = 'Account Nasabah';
 
     public static function form(Form $form): Form
     {

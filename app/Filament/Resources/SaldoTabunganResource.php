@@ -22,6 +22,7 @@ class SaldoTabunganResource extends Resource
     protected static ?string $model = SaldoTabungan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $title = 'Saldo Tabungan';
 
     protected static ?string $navigationLabel = 'Saldo Tabungan';
     public static function getNavigationGroup(): ?string

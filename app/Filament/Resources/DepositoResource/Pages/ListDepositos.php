@@ -9,7 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListDepositos extends ListRecords
 {
     protected static string $resource = DepositoResource::class;
-
+    protected static ?string $title = 'Rekening Deposito';
     protected function getHeaderActions(): array
     {
         return [

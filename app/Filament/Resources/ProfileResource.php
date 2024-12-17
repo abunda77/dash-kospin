@@ -28,7 +28,7 @@ class ProfileResource extends Resource
             {
                 return 'Data Nasabah';
             }
-    protected static ?string $navigationLabel = 'Profile';
+    protected static ?string $navigationLabel = 'Profile Nasabah';
 
     public static function form(Form $form): Form
     {

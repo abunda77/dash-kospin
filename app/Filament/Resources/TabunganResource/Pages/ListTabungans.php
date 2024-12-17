@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListTabungans extends ListRecords
 {
     protected static string $resource = TabunganResource::class;
+    protected static ?string $title = 'Rekening Tabungan';
 
     protected function getHeaderActions(): array
     {

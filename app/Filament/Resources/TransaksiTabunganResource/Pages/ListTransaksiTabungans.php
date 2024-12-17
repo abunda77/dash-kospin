@@ -9,7 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListTransaksiTabungans extends ListRecords
 {
     protected static string $resource = TransaksiTabunganResource::class;
-
+    protected static ?string $title = 'Transaksi Tabungan';
     protected function getHeaderActions(): array
     {
         return [

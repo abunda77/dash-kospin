@@ -9,7 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListPinjamen extends ListRecords
 {
     protected static string $resource = PinjamanResource::class;
-
+    protected static ?string $title = 'Rekening Pinjaman';
     protected function getHeaderActions(): array
     {
         return [
