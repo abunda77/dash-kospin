@@ -18,6 +18,9 @@ class ProdukPinjamanResource extends Resource
     protected static ?string $model = ProdukPinjaman::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Produk Kredit';
+    protected static ?string $title = 'Produk Kredit';
+
     public static function getNavigationGroup(): ?string
             {
                 return 'Pinjaman';

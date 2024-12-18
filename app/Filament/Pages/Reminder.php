@@ -24,8 +24,8 @@ class Reminder extends Page implements HasTable, HasForms
     use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-bell';
-    protected static ?string $navigationLabel = 'Reminder';
-    protected static ?string $title = 'Reminder';
+    protected static ?string $navigationLabel = 'Reminder Jatuh Tempo';
+    protected static ?string $title = 'Reminder Jatuh Tempo';
 
     public static function getNavigationGroup(): ?string
     {

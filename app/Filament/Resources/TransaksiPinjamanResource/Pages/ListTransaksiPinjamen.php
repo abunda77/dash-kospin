@@ -9,7 +9,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListTransaksiPinjamen extends ListRecords
 {
     protected static string $resource = TransaksiPinjamanResource::class;
-    protected static ?string $title = 'Transaksi Pinjaman';
+    protected static ?string $title = 'History Pembayaran Kredit';
     protected function getHeaderActions(): array
     {
         return [

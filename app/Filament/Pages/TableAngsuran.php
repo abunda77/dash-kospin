@@ -39,6 +39,9 @@ class TableAngsuran extends Page implements HasForms, HasTable
     use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationLabel = 'Pembayaran Angsuran';
+    protected static ?string $title = 'Pembayaran Angsuran';
+
     public static function getNavigationGroup(): ?string
             {
                 return 'Pinjaman';

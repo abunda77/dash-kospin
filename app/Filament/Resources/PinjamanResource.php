@@ -20,6 +20,9 @@ class PinjamanResource extends Resource
     protected static ?string $model = Pinjaman::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Rekening Kredit';
+    protected static ?string $title = 'Rekening Kredit';
+
     public static function getNavigationGroup(): ?string
             {
                 return 'Pinjaman';

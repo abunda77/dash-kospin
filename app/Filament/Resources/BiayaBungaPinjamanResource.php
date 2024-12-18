@@ -19,6 +19,8 @@ class BiayaBungaPinjamanResource extends Resource
     protected static ?string $model = BiayaBungaPinjaman::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Biaya Bunga Kredit';
+    protected static ?string $title = 'Biaya Bunga Kredit';
     public static function getNavigationGroup(): ?string
             {
                 return 'Pinjaman';

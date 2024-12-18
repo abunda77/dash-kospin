@@ -9,7 +9,8 @@ use Filament\Resources\Pages\ListRecords;
 class ListBiayaBungaPinjamen extends ListRecords
 {
     protected static string $resource = BiayaBungaPinjamanResource::class;
-
+    protected static ?string $title = 'Biaya Bunga Kredit';
+    protected static ?string $navigationLabel = 'Biaya Bunga Kredit';
     protected function getHeaderActions(): array
     {
         return [

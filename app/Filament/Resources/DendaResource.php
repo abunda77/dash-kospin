@@ -18,6 +18,9 @@ class DendaResource extends Resource
     protected static ?string $model = Denda::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Denda Kredit';
+    protected static ?string $title = 'Denda Kredit';
+
     public static function getNavigationGroup(): ?string
             {
                 return 'Pinjaman';

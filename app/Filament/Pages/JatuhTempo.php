@@ -19,7 +19,7 @@ class JatuhTempo extends Page implements HasTable
     use HasPageShield;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
-    protected static ?string $navigationLabel = 'Jatuh Tempo';
+    protected static ?string $navigationLabel = 'Jadwal Tempo Deposito';
     protected static ?string $title = 'Daftar Jatuh Tempo Deposito';
     protected static string $view = 'filament.pages.jatuh-tempo';
     public static function getNavigationGroup(): ?string

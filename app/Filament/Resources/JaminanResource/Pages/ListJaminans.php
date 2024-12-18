@@ -9,6 +9,8 @@ use Filament\Resources\Pages\ListRecords;
 class ListJaminans extends ListRecords
 {
     protected static string $resource = JaminanResource::class;
+    protected static ?string $title = 'Jaminan Kredit';
+    protected static ?string $navigationLabel = 'Jaminan Kredit';
 
     protected function getHeaderActions(): array
     {
