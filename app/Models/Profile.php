@@ -56,6 +56,11 @@ class Profile extends Model
         return $this->belongsTo(User::class, 'id_user');
     }
 
+    public function birthdayLogs()
+    {
+        return $this->hasMany(BirthdayLog::class, 'id_profile', 'id_user');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
