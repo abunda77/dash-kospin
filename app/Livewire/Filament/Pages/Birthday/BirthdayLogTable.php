@@ -3,19 +3,17 @@
 namespace App\Livewire\Filament\Pages\Birthday;
 
 use Carbon\Carbon;
-use Livewire\Component;
-use Filament\Tables\Table;
 use App\Models\BirthdayLog;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Table;
 
-class BirthdayLogTable extends \Filament\Tables\TableComponent implements HasForms, HasTable
+class BirthdayLogTable extends \Filament\Tables\TableComponent
 {
     use InteractsWithTable;
-    use InteractsWithForms;
+
+    // Tambahkan listeners
+    protected $listeners = ['birthday-log-updated' => '$refresh'];
 
     public function table(Table $table): Table
     {
@@ -29,10 +27,8 @@ class BirthdayLogTable extends \Filament\Tables\TableComponent implements HasFor
             )
             ->columns([
                 TextColumn::make('profile.first_name')
-                    ->label('First Name')
-                    ->sortable(),
-                TextColumn::make('profile.last_name')
-                    ->label('Last Name')
+                    ->label('Full Name')
+                    ->formatStateUsing(fn ($record) => $record->profile->first_name . ' ' . $record->profile->last_name)
                     ->sortable(),
                 TextColumn::make('profile.birthday')
                     ->label('Birthday')
@@ -45,20 +41,11 @@ class BirthdayLogTable extends \Filament\Tables\TableComponent implements HasFor
                 TextColumn::make('status_sent')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string =>
-                        $state ? 'success' : 'danger'
-                    )
-                    ->formatStateUsing(fn (bool $state): string =>
-                        $state ? 'Sent' : 'Not Sent'
-                    ),
+                    ->color(fn (string $state): string => $state ? 'success' : 'danger')
+                    ->formatStateUsing(fn (bool $state): string => $state ? 'Sent' : 'Not Sent'),
             ])
             ->heading('Log Pengiriman Hari Ini')
             ->defaultSort('date_sent', 'desc')
             ->paginated(false);
-    }
-
-    public function render()
-    {
-        return view('livewire.filament.pages.birthday.birthdaylog-table');
     }
 }

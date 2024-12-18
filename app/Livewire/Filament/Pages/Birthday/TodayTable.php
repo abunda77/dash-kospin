@@ -6,15 +6,14 @@ use App\Models\Profile;
 use Carbon\Carbon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Actions\Action;
+use App\Models\BirthdayLog;
+use Filament\Notifications\Notification;
 
-class TodayTable extends \Filament\Tables\TableComponent implements HasForms, HasTable
+class TodayTable extends \Filament\Tables\TableComponent
 {
     use InteractsWithTable;
-    use InteractsWithForms;
 
     public function table(Table $table): Table
     {
@@ -28,10 +27,8 @@ class TodayTable extends \Filament\Tables\TableComponent implements HasForms, Ha
             )
             ->columns([
                 TextColumn::make('first_name')
-                    ->label('First Name')
-                    ->sortable(),
-                TextColumn::make('last_name')
-                    ->label('Last Name')
+                    ->label('Full Name')
+                    ->formatStateUsing(fn ($record) => $record->first_name . ' ' . $record->last_name)
                     ->sortable(),
                 TextColumn::make('birthday')
                     ->label('Birthday')
@@ -42,13 +39,37 @@ class TodayTable extends \Filament\Tables\TableComponent implements HasForms, Ha
                     ->url(fn ($record) => "https://wa.me/" . $record->whatsapp)
                     ->openUrlInNewTab(),
             ])
+            ->actions([
+                Action::make('send_wish')
+                    ->label('Kirim Ucapan')
+                    ->icon('heroicon-o-gift')
+                    ->action(function (Profile $record) {
+                        $this->dispatch('spin-start');
+
+                        BirthdayLog::create([
+                            'id_profile' => $record->id_user,
+                            'status_sent' => 1,
+                            'date_sent' => now()
+                        ]);
+
+                        $this->dispatch('birthday-log-updated');
+
+                        Notification::make()
+                            ->title('Ucapan telah terkirim')
+                            ->success()
+                            ->send();
+
+                        $this->dispatch('spin-stop');
+                    })
+                    ->extraAttributes([
+                        'x-data' => '{ spinning: false }',
+                        'x-on:spin-start' => 'spinning = true',
+                        'x-on:spin-stop' => 'spinning = false',
+                        'x-bind:class' => "{ 'animate-spin': spinning }"
+                    ])
+            ])
             ->heading('Ulang Tahun Hari Ini')
             ->defaultSort('first_name')
             ->paginated(false);
-    }
-
-    public function render()
-    {
-        return view('livewire.filament.pages.birthday.today-table');
     }
 }

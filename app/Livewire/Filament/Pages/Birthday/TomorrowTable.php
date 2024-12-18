@@ -6,16 +6,11 @@ use App\Models\Profile;
 use Carbon\Carbon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Livewire\Component;
 
-class TomorrowTable extends \Filament\Tables\TableComponent implements HasForms, HasTable
+class TomorrowTable extends \Filament\Tables\TableComponent
 {
     use InteractsWithTable;
-    use InteractsWithForms;
 
     public function table(Table $table): Table
     {
@@ -29,10 +24,8 @@ class TomorrowTable extends \Filament\Tables\TableComponent implements HasForms,
             )
             ->columns([
                 TextColumn::make('first_name')
-                    ->label('First Name')
-                    ->sortable(),
-                TextColumn::make('last_name')
-                    ->label('Last Name')
+                    ->label('Full Name')
+                    ->formatStateUsing(fn ($record) => $record->first_name . ' ' . $record->last_name)
                     ->sortable(),
                 TextColumn::make('birthday')
                     ->label('Birthday')
@@ -46,10 +39,5 @@ class TomorrowTable extends \Filament\Tables\TableComponent implements HasForms,
             ->heading('Ulang Tahun Besok')
             ->defaultSort('first_name')
             ->paginated(false);
-    }
-
-    public function render()
-    {
-        return view('livewire.filament.pages.birthday.tomorrow-table');
     }
 }
