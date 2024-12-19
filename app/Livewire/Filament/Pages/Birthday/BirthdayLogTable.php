@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class BirthdayLogTable extends \Filament\Tables\TableComponent
+class BirthdaylogTable extends \Filament\Tables\TableComponent
 {
     use InteractsWithTable;
 
