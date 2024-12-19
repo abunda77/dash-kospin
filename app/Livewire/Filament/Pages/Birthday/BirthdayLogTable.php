@@ -3,10 +3,11 @@
 namespace App\Livewire\Filament\Pages\Birthday;
 
 use Carbon\Carbon;
+use Filament\Tables\Table;
 use App\Models\BirthdayLog;
+use Illuminate\Support\Facades\Log;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Table;
 
 class BirthdayLogTable extends \Filament\Tables\TableComponent
 {
@@ -17,6 +18,13 @@ class BirthdayLogTable extends \Filament\Tables\TableComponent
 
     // Tambahkan properti $componentName
     protected static string $componentName = 'birthday-log-table';
+
+    public function mount()
+    {
+        Log::info('BirthdayLogTable Component Loaded');
+        Log::info('Current Directory: ' . __DIR__);
+        Log::info('Current Class: ' . get_class($this));
+    }
 
     public function table(Table $table): Table
     {
