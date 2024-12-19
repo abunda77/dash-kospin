@@ -87,6 +87,7 @@ class AdminPanelProvider extends PanelProvider
                     ->navigationCountBadge(true)
             ])
             ->plugin(FilamentSpatieLaravelHealthPlugin::make())
-            ->plugin(\Mvenghaus\FilamentScheduleMonitor\FilamentPlugin::make());
+            ->plugin(\Mvenghaus\FilamentScheduleMonitor\FilamentPlugin::make())
+            ->databaseNotifications();
     }
 }
