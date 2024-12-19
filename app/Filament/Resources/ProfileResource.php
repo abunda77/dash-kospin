@@ -207,10 +207,12 @@ class ProfileResource extends Resource
                     ->formatStateUsing(fn ($state): string => match ($state) {
                         'L' => 'Laki-laki',
                         'P' => 'Perempuan',
+                        default => $state,
                     })
                     ->color(fn ($state): string => match ($state) {
                         'L' => 'success',
                         'P' => 'warning',
+                        default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('mariage')
                     ->badge()
