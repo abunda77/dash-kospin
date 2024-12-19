@@ -17,7 +17,7 @@ class BirthdayLogTable extends \Filament\Tables\TableComponent
     protected $listeners = ['birthday-log-updated' => '$refresh'];
 
     // Tambahkan properti $componentName
-    protected static string $componentName = 'birthday-log-table';
+    //protected static string $componentName = 'birthday-log-table';
 
     public function mount()
     {
