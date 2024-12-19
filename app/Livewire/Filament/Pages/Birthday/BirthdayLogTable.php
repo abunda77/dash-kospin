@@ -14,7 +14,7 @@ class BirthdayLogTable extends \Filament\Tables\TableComponent
     use InteractsWithTable;
 
     // Tambahkan listeners
-    //protected $listeners = ['birthday-log-updated' => '$refresh'];
+    protected $listeners = ['birthday-log-updated' => '$refresh'];
 
     // Tambahkan properti $componentName
     //protected static string $componentName = 'birthday-log-table';
