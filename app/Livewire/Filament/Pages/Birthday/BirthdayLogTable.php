@@ -15,6 +15,9 @@ class BirthdayLogTable extends \Filament\Tables\TableComponent
     // Tambahkan listeners
     protected $listeners = ['birthday-log-updated' => '$refresh'];
 
+    // Tambahkan properti $componentName
+    protected static string $componentName = 'filament.pages.birthday.birthdaylog-table';
+
     public function table(Table $table): Table
     {
         $today = Carbon::now()->timezone('Asia/Jakarta');
