@@ -49,3 +49,5 @@ class BirthdayLogTable extends \Filament\Tables\TableComponent
             ->paginated(false);
     }
 }
+
+// end of file
