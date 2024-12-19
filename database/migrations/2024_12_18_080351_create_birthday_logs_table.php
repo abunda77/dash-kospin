@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('birthday_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_profile')->constrained('profiles', 'id_user');
+            $table->unsignedBigInteger('id_profile');
             $table->boolean('status_sent')->default(false);
             $table->timestamp('date_sent')->nullable();
             $table->timestamps();

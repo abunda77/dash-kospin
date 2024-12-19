@@ -74,8 +74,8 @@ class ProfileResource extends Resource
                     ->defaultCountry('ID'),
                 Forms\Components\Select::make('gender')
                     ->options([
-                        'male' => 'Male',
-                        'female' => 'Female'
+                        'L' => 'Laki-laki',
+                        'P' => 'Perempuan'
                     ])
                     ->required(),
                 Forms\Components\DatePicker::make('birthday')
@@ -203,20 +203,51 @@ class ProfileResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('gender')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => match ($state) {
+                        'L' => 'Laki-laki',
+                        'P' => 'Perempuan',
+                    })
+                    ->color(fn ($state): string => match ($state) {
+                        'L' => 'success',
+                        'P' => 'warning',
+                    }),
                 Tables\Columns\TextColumn::make('mariage')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => match ($state) {
+                        'single' => 'Single',
+                        'married' => 'Menikah',
+                        'divorced' => 'Cerai',
+                    })
+                    ->color(fn ($state): string => match ($state) {
+                        'single' => 'info',
+                        'married' => 'success',
+                        'divorced' => 'danger',
+                    }),
+
                 Tables\Columns\TextColumn::make('monthly_income')
                     ->money('IDR')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('is_active')
                     ->badge()
+                    ->formatStateUsing(fn ($state): string => match ($state) {
+                        1 => 'Aktif',
+                        0 => 'Pasif',
+                    })
                     ->color(fn ($state): string => match ($state) {
                         1 => 'success',
                         0 => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('type_member')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn ($state): string => match ($state) {
+                        'regular' => 'Regular',
+                        'premium' => 'Premium',
+                    })
+                    ->color(fn ($state): string => match ($state) {
+                        'regular' => 'info',
+                        'premium' => 'success',
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
