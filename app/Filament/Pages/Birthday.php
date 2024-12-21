@@ -4,6 +4,9 @@ namespace App\Filament\Pages;
 
 use Filament\Pages\Page;
 use Filament\Tables\Contracts\HasTable;
+use App\Models\Profile;
+use Carbon\Carbon;
+use Filament\Navigation\NavigationItem;
 
 class Birthday extends Page
 {
@@ -14,5 +17,24 @@ class Birthday extends Page
     public static function getNavigationGroup(): ?string
     {
         return 'Promotion';
+    }
+
+    public static function getNavigationItems(): array
+    {
+        $today = Carbon::now()->timezone('Asia/Jakarta');
+
+        $birthdayCount = Profile::query()
+            ->whereMonth('birthday', $today->month)
+            ->whereDay('birthday', $today->day)
+            ->count();
+
+        return [
+            NavigationItem::make(static::getNavigationLabel())
+                ->icon(static::getNavigationIcon())
+                ->group(static::getNavigationGroup())
+                ->badge($birthdayCount)
+                ->sort(static::getNavigationSort())
+                ->url(static::getNavigationUrl()),
+        ];
     }
 }

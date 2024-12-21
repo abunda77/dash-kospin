@@ -33,48 +33,47 @@
 </head>
 <body>
     <div class="header">
-        <h2>Laporan Keterlambatan Pembayaran</h2>
+        <h2>Laporan Keterlambatan Angsuran Bulan Ini</h2>
         <p>Tanggal: {{ $today->format('d/m/Y') }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>No Pinjaman</th>
-                <th>Angsuran Pokok</th>
-                <th>Total Bayar</th>
-                <th>Hari Terlambat</th>
-                <th>WhatsApp</th>
+                <th style="text-align: center;">No</th>
+                <th style="text-align: center;">Nama</th>
+                <th style="text-align: center;">No Pinjaman</th>
+                <th style="text-align: center;">Angsuran Pokok</th>
+                <th style="text-align: center;">Denda</th>
+                <th style="text-align: center;">Total Bayar</th>
+                <th style="text-align: center;">Hari Terlambat</th>
+                <th style="text-align: center;">WhatsApp</th>
             </tr>
         </thead>
         <tbody>
             @foreach($data as $index => $item)
+            @php
+                $angsuranPokok = $item->jumlah_pinjaman / $item->jangka_waktu;
+                $tanggalJatuhTempo = Carbon\Carbon::create(
+                    $today->year,
+                    $today->month,
+                    Carbon\Carbon::parse($item->tanggal_jatuh_tempo)->day
+                )->startOfDay();
+
+                $hariTerlambat = $today->gt($tanggalJatuhTempo) ?
+                    $today->diffInDays($tanggalJatuhTempo) : 0;
+
+                $denda = ($item->denda->rate_denda/100 * $angsuranPokok / 30) * $hariTerlambat;
+                $totalBayar = $angsuranPokok + $denda;
+            @endphp
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $item->profile->first_name }} {{ $item->profile->last_name }}</td>
+                <td>{{ trim($item->profile->first_name . ' ' . $item->profile->last_name) }}</td>
                 <td>{{ $item->no_pinjaman }}</td>
-                <td>Rp.{{ number_format($item->jumlah_pinjaman / $item->jangka_waktu, 2, ',', '.') }}</td>
-                <td>@php
-                    $angsuranPokok = $item->jumlah_pinjaman / $item->jangka_waktu;
-                    $tanggalJatuhTempo = Carbon\Carbon::create(
-                        $today->year,
-                        $today->month,
-                        Carbon\Carbon::parse($item->tanggal_jatuh_tempo)->day
-                    )->startOfDay();
-
-                    $hariTerlambat = 0;
-                    if ($today->gt($tanggalJatuhTempo)) {
-                        $hariTerlambat = abs($tanggalJatuhTempo->diffInDays($today));
-                    }
-
-                    $denda = ($item->denda->rate_denda/100 * $angsuranPokok / 30) * $hariTerlambat;
-                    $totalBayar = $angsuranPokok + $denda;
-                    @endphp
-                    Rp.{{ number_format($totalBayar, 2, ',', '.') }}
-                </td>
-                <td>{{ $hariTerlambat }} hari</td>
+                <td>Rp.{{ number_format($angsuranPokok, 2, ',', '.') }}</td>
+                <td>Rp.{{ number_format(abs($denda), 2, ',', '.') }}</td>
+                <td>Rp.{{ number_format($totalBayar, 2, ',', '.') }}</td>
+                <td>{{ abs($hariTerlambat) }} hari</td>
                 <td>{{ $item->profile->whatsapp }}</td>
             </tr>
             @endforeach

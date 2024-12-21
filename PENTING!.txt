@@ -20,3 +20,14 @@ https://filamentphp.com/plugins/3x1io-tomato-menus
 https://filamentphp.com/plugins/3x1io-tomato-artisan --done
 https://filamentphp.com/plugins/3x1io-tomato-logger --done
 https://filamentphp.com/plugins/rmsramos-activitylog -- done
+
+
+php artisan octane:frankenphp --host=46.102.156.214  --port=8005
+
+wget https://github.com/dunglas/frankenphp/releases/download/v1.3.3/frankenphp-linux-x86_64
+wget https://github.com/dunglas/frankenphp/releases/download/vX.X.X/frankenphp-linux-x86_64
+mv frankenphp-linux-x86_64 /usr/local/bin/frankenphp
+chmod +x /usr/local/bin/frankenphp
+
+wrk -c100 -d5 -t12 http://46.102.156.214:8111
+wrk -c100 -d5 -t12 http://dash.kospinsinaraartha.co.id/admin/login

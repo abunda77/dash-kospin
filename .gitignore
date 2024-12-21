@@ -33,3 +33,7 @@ storage/framework/views/.gitignore
 storage/logs/.gitignore
 PENTING!.txt
 
+
+**/caddy
+frankenphp
+frankenphp-worker.php

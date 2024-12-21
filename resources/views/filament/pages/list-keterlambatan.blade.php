@@ -2,10 +2,10 @@
     {{-- Judul halaman --}}
     <div class="mb-6">
         <h2 class="text-2xl font-bold tracking-tight">
-            Daftar Keterlambatan Pembayaran
+            Daftar Keterlambatan Pembayaran Angsuran Bulan Ini
         </h2>
         <p class="mt-1 text-sm text-gray-500">
-            Menampilkan daftar anggota yang terlambat melakukan pembayaran pinjaman
+            Menampilkan daftar anggota yang terlambat melakukan pembayaran angsuran bulan ini
         </p>
     </div>
 
