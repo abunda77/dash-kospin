@@ -203,6 +203,7 @@ return [
             'queue:retry',
             'queue:retry-batch',
             'queue:table',
+            'queue:work',
         ],
         'route' => [
             'route:cache',

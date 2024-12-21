@@ -23,6 +23,7 @@ use App\Filament\Widgets\StatistikNasabahWidget;
 use Rmsramos\Activitylog\ActivitylogPlugin;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 // use Mvenghaus\FilamentScheduleMonitor\FilamentPlugin;
+use Filament\Navigation\NavigationItem;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -49,6 +50,12 @@ class AdminPanelProvider extends PanelProvider
                 'Deposito',
                 'Pinjaman',
                 'Settings'
+            ])
+            ->navigationItems([
+                NavigationItem::make('Whatsapp Gateway')
+                    ->group('Settings')
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->url('http://46.102.156.214:3001/', shouldOpenInNewTab: true)
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
