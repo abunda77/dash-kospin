@@ -22,6 +22,7 @@ class QueueJob extends Page implements HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static string $view = 'filament.pages.queue-job';
+    protected static ?string $navigationGroup = 'Settings';
 
     public bool $isProcessing = false;
     public $output = '';

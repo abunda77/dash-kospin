@@ -21,7 +21,8 @@ class BirthdayGreetingResource extends Resource
     protected static ?string $model = BirthdayGreeting::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    protected static ?string $navigationGroup = 'Promotion';
+    protected static ?string $navigationLabel = 'Ucapan Ulang Tahun';
     public static function form(Form $form): Form
     {
         return $form

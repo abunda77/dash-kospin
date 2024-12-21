@@ -13,6 +13,6 @@ class Birthday extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Data Nasabah';
+        return 'Promotion';
     }
 }
