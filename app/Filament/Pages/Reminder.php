@@ -16,6 +16,8 @@ use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\Action;
+use App\Jobs\ReminderJob;
 
 class Reminder extends Page implements HasTable, HasForms
 {
@@ -193,6 +195,26 @@ class Reminder extends Page implements HasTable, HasForms
                     })
                     ->searchable()
                     ->sortable(),
+            ])
+            ->actions([
+                Action::make('send_reminder')
+                    ->label('Kirim Reminder')
+                    ->icon('heroicon-o-paper-airplane')
+                    ->action(function (Pinjaman $record) {
+                        try {
+                            dispatch(new ReminderJob($record));
+
+                            Notification::make()
+                                ->title('Reminder telah dijadwalkan')
+                                ->success()
+                                ->send();
+                        } catch (\Exception $e) {
+                            Notification::make()
+                                ->title('Gagal menjadwalkan reminder')
+                                ->danger()
+                                ->send();
+                        }
+                    })
             ]);
     }
 
