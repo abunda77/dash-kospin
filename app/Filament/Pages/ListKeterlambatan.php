@@ -239,7 +239,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                         $totalBayar = $angsuranPokok + $bunga + $denda;
 
                         $message = "Halo {$nama},\n\n"
-                            . "Ini adalah pengingat untuk pembayaran angsuran pinjaman Anda bulan ini:\n"
+                            . "Ini adalah pengingat untuk pembayaran angsuran pinjaman Anda bulan ini:\n\n"
                             . "No Pinjaman: {$record->no_pinjaman}\n"
                             . "Angsuran Pokok: Rp." . number_format($angsuranPokok, 2, ',', '.') . "\n"
                             . "Bunga: Rp." . number_format($bunga, 2, ',', '.') . "\n"
