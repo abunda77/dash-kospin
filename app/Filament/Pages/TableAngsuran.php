@@ -201,8 +201,8 @@ class TableAngsuran extends Page implements HasForms, HasTable
                     ->view('filament.tables.columns.invoice'),
 
             ])
-            ->defaultSort('angsuran_ke', 'desc')
-            ->poll('5s');
+            ->defaultSort('angsuran_ke', 'asc')
+            ->poll('2s');
     }
 
     public function bayarAngsuran($periode)
