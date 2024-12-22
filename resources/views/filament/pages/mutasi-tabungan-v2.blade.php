@@ -47,9 +47,23 @@
             {{ $this->table }}
 
             @php
-                $records = $this->getTableRecords();
-                $totalDebit = $records->where('jenis_transaksi', 'debit')->sum('jumlah');
-                $totalKredit = $records->where('jenis_transaksi', 'kredit')->sum('jumlah');
+                $query = TransaksiTabungan::where('id_tabungan', $tabungan->id);
+
+                if ($this->periode && $this->periode !== 'all') {
+                    $startDate = $this->calculateStartDate();
+                    if ($startDate) {
+                        $query->where('tanggal_transaksi', '>=', $startDate);
+                    }
+                }
+
+                $totalDebit = (clone $query)
+                    ->where('jenis_transaksi', 'debit')
+                    ->sum('jumlah');
+
+                $totalKredit = (clone $query)
+                    ->where('jenis_transaksi', 'kredit')
+                    ->sum('jumlah');
+
                 $saldoAkhir = $this->calculateFinalBalance();
             @endphp
 
