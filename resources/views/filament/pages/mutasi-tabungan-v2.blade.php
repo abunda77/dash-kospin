@@ -27,7 +27,8 @@
                             </div>
                             <div>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">Saldo Awal</p>
-                                <p class="font-semibold text-gray-900 dark:text-white">Rp {{ number_format($saldo_berjalan, 0, ',', '.') }}</p>
+                                {{-- <p class="font-semibold text-gray-900 dark:text-white">Rp {{ number_format($saldo_berjalan, 0, ',', '.') }}</p> --}}
+                                <p class="font-semibold text-gray-900 dark:text-white">Rp {{ number_format($tabungan->saldo ?? 0, 0, ',', '.') }}</p>
                             </div>
                         </div>
                     </div>
@@ -49,7 +50,7 @@
                 $records = $this->getTableRecords();
                 $totalDebit = $records->where('jenis_transaksi', 'debit')->sum('jumlah');
                 $totalKredit = $records->where('jenis_transaksi', 'kredit')->sum('jumlah');
-                $saldoAkhir = $this->saldo_berjalan;
+                $saldoAkhir = $this->calculateFinalBalance();
             @endphp
 
             <div class="p-4 mt-4 bg-white rounded-lg shadow dark:bg-gray-800">

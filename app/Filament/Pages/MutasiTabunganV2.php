@@ -123,7 +123,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
 
     protected function handleTabunganFound(): void
     {
-        $this->saldo_berjalan = $this->tabungan->saldo;
+        $this->saldo_berjalan = $this->calculateFinalBalance();
         $this->isSearchSubmitted = true;
         $this->dispatch('refresh');
     }
@@ -267,7 +267,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
             : $saldo - $transaction->jumlah;
     }
 
-    public function print()
+    public function print() // untuk print pdf mutasi tabungan
     {
         try {
             if (!$this->tabungan) {
@@ -313,7 +313,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
         }
     }
 
-    public function printTable()
+    public function printTable() // untuk print tabel mutasi tabungan
     {
         try {
             if (!$this->tabungan) {
@@ -359,7 +359,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
         }
     }
 
-    private function getFilteredTransactionQuery()
+    private function getFilteredTransactionQuery() // untuk filter transaksi
     {
         try {
             $query = TransaksiTabungan::query()
@@ -426,6 +426,42 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
     private function generateTablePdfFilename()
     {
         return 'tabel_mutasi_' . $this->no_rekening . '_' . date('Y-m-d_H-i-s') . '.pdf';
+    }
+
+    public function calculateFinalBalance(): float
+    {
+        try {
+            if (!$this->tabungan) {
+                return 0;
+            }
+
+            // Ambil transaksi terakhir berdasarkan filter periode
+            $query = TransaksiTabungan::where('id_tabungan', $this->tabungan->id);
+
+            if ($this->periode && $this->periode !== 'all') {
+                $startDate = $this->calculateStartDate();
+                if ($startDate) {
+                    $query->where('tanggal_transaksi', '>=', $startDate);
+                }
+            }
+
+            // Ambil transaksi terakhir berdasarkan tanggal dan ID
+            $lastTransaction = $query->orderBy('tanggal_transaksi', 'DESC')
+                                   ->orderBy('id', 'DESC')
+                                   ->first();
+
+            // Jika ada transaksi terakhir, gunakan saldo berjalan dari transaksi tersebut
+            if ($lastTransaction) {
+                return $this->calculateSaldoBerjalan($lastTransaction);
+            }
+
+            // Jika tidak ada transaksi, kembalikan saldo awal tabungan
+            return $this->tabungan->saldo;
+
+        } catch (\Exception $e) {
+            Log::error('Error menghitung saldo akhir: ' . $e->getMessage());
+            return 0;
+        }
     }
 
     // ... rest of the code remains the same ...
