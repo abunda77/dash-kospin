@@ -15,12 +15,26 @@ use function Laravel\Prompts\progress;
 
 class HitungBungaTabungan extends Command
 {
-    protected $signature = 'tabungan:hitung-bunga';
+    protected $signature = 'tabungan:hitung-bunga
+                            {--hapus-duplikat : Hapus duplikat perhitungan bunga}
+                            {--all : Hitung bunga untuk semua rekening aktif pada bulan berjalan}';
 
     protected $description = 'Menghitung bunga tabungan berdasarkan saldo harian.';
 
     public function handle()
     {
+        // Tambahkan pengecekan opsi hapus-duplikat di awal
+        if ($this->option('hapus-duplikat')) {
+            $this->hapusDuplikatBunga();
+            return;
+        }
+
+        // Tambahkan pengecekan opsi all
+        if ($this->option('all')) {
+            $this->hitungBungaSemuaRekening();
+            return;
+        }
+
         // Pilihan no_tabungan atau all
         $pilihan = select(
             'Pilih rekening tabungan yang akan dihitung bunganya:',
@@ -178,5 +192,72 @@ class HitungBungaTabungan extends Command
                 ELSE -jumlah
             END) as saldo', [TransaksiTabungan::JENIS_SETORAN])
             ->value('saldo') ?? 0;
+    }
+
+    private function hapusDuplikatBunga()
+    {
+        $this->info('Mencari duplikat perhitungan bunga...');
+
+        // Ambil data duplikat berdasarkan id_tabungan dan bulan yang sama
+        $duplikats = DB::table('transaksi_tabungans')
+            ->select('id_tabungan',
+                    DB::raw('DATE_FORMAT(tanggal_transaksi, "%Y-%m") as bulan'),
+                    DB::raw('COUNT(*) as jumlah'))
+            ->where('kode_transaksi', '6')
+            ->groupBy('id_tabungan', DB::raw('DATE_FORMAT(tanggal_transaksi, "%Y-%m")'))
+            ->having('jumlah', '>', 1)
+            ->get();
+
+        if ($duplikats->isEmpty()) {
+            $this->info('Tidak ditemukan duplikat perhitungan bunga.');
+            return;
+        }
+
+        $this->info('Ditemukan ' . $duplikats->count() . ' duplikat perhitungan bunga.');
+
+        foreach ($duplikats as $duplikat) {
+            $transaksis = TransaksiTabungan::where('id_tabungan', $duplikat->id_tabungan)
+                ->where('kode_transaksi', '6')
+                ->whereRaw('DATE_FORMAT(tanggal_transaksi, "%Y-%m") = ?', [$duplikat->bulan])
+                ->orderBy('tanggal_transaksi', 'desc')
+                ->get();
+
+            // Simpan transaksi pertama (terbaru), hapus sisanya
+            $transaksis->skip(1)->each(function ($transaksi) use ($duplikat) {
+                $tabungan = Tabungan::find($duplikat->id_tabungan);
+                $this->info("Menghapus duplikat bunga untuk rekening {$tabungan->no_tabungan} pada bulan {$duplikat->bulan}");
+                $transaksi->delete();
+            });
+        }
+
+        $this->info('Proses penghapusan duplikat selesai.');
+    }
+
+    private function hitungBungaSemuaRekening()
+    {
+        // Hapus konfirmasi jika dijalankan dengan opsi --all
+        if (!$this->option('all')) {
+            if (!confirm('Apakah Anda yakin akan menghitung bunga untuk semua rekening aktif?')) {
+                info('Perhitungan bunga dibatalkan.');
+                return;
+            }
+        }
+
+        $this->newLine();
+        info('Memulai perhitungan bunga untuk semua rekening aktif...');
+
+        $tabungans = Tabungan::where('status_rekening', 'aktif')->get();
+
+        progress(
+            label: 'Menghitung bunga tabungan',
+            steps: $tabungans,
+            callback: function ($tabungan) {
+                $this->hitungBungaPerTabungan($tabungan);
+            },
+            hint: 'Proses ini mungkin membutuhkan beberapa waktu.'
+        );
+
+        $this->newLine(2);
+        info('Perhitungan bunga selesai');
     }
 }

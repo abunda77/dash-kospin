@@ -9,6 +9,17 @@ protected $signature = 'tabungan:hitung-bunga
                           {--check-duplikat : Cek dan koreksi bunga duplikat}';
 
 
+php artisan tabungan:hitung-bunga --all
+0 0 1 * * cd /path/to/project && php artisan tabungan:hitung-bunga --all
+* * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
+
+# Untuk menghapus duplikat perhitungan bunga
+php artisan tabungan:hitung-bunga --hapus-duplikat
+
+# Untuk mode interaktif (pilihan manual)
+php artisan tabungan:hitung-bunga
+
+
 mysql -u kosp_kospin -pkospin123123 kosp_kospin < mysql-kospin.sql
 
 composer install --no-dev --optimize-autoloader --ignore-platform-reqs
@@ -32,7 +43,7 @@ mv frankenphp-linux-x86_64 /usr/local/bin/frankenphp
 chmod +x /usr/local/bin/frankenphp
 
 wrk -c100 -d5 -t12 http://46.102.156.214:8111
-wrk -c100 -d5 -t12 http://dash.kospinsinaraartha.co.id/admin/login
+wrk -c100 -d5 -t12 http://dashboard.kospinsinaraartha.co.id/admin/login
 
 
 sudo chown -R dashk8300:dashk8300 /home/dash.kospinsinaraartha.co.id/public_html/storage
