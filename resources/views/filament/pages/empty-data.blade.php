@@ -79,5 +79,17 @@
             </div>
         </x-filament::card>
 
+        <x-filament::card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Sessions</h2>
+                    <p class="text-sm text-gray-600">
+                        Total Data: {{ \App\Models\Session::count() }}
+                    </p>
+                </div>
+                {{ $this->emptySessions() }}
+            </div>
+        </x-filament::card>
+
     </div>
 </x-filament-panels::page>

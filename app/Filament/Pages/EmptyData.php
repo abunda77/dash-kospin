@@ -2,19 +2,20 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Activity;
+use App\Models\Pinjaman;
+use App\Models\Tabungan;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
-use Filament\Support\Exceptions\Halt;
-use Filament\Notifications\Notification;
-use App\Models\TransaksiTabungan;
 use App\Models\TransaksiPinjaman;
-use App\Models\Tabungan;
-use App\Models\Pinjaman;
-use App\Models\Activity;
-use Spatie\Activitylog\Models\Activity as SpatieActivity;
-
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use App\Models\TransaksiTabungan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Filament\Support\Exceptions\Halt;
+
+use Filament\Notifications\Notification;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Spatie\Activitylog\Models\Activity as SpatieActivity;
 
 class EmptyData extends Page
 {
@@ -132,6 +133,38 @@ class EmptyData extends Page
 
                     Notification::make()
                         ->title('Gagal menghapus data log aktivitas')
+                        ->danger()
+                        ->send();
+
+                    throw new Halt($e->getMessage());
+                }
+            });
+    }
+
+    public function emptySessions(): Action
+    {
+        return Action::make('emptySessions')
+            ->label('Hapus Semua Sessions')
+            ->requiresConfirmation()
+            ->color('danger')
+            ->action(function () {
+                try {
+                    Log::info("Mencoba menghapus data sessions");
+
+                    DB::table('sessions')->truncate();
+
+                    Log::info("Berhasil menghapus data sessions");
+
+                    Notification::make()
+                        ->title('Data sessions berhasil dihapus')
+                        ->success()
+                        ->send();
+
+                } catch (\Exception $e) {
+                    Log::error("Gagal menghapus data sessions: " . $e->getMessage());
+
+                    Notification::make()
+                        ->title('Gagal menghapus data sessions')
                         ->danger()
                         ->send();
 
