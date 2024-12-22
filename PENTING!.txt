@@ -23,6 +23,8 @@ https://filamentphp.com/plugins/rmsramos-activitylog -- done
 
 
 php artisan octane:frankenphp --host=46.102.156.214  --port=8005
+php artisan octane:frankenphp --host=46.102.156.214  --port=8111
+
 
 wget https://github.com/dunglas/frankenphp/releases/download/v1.3.3/frankenphp-linux-x86_64
 wget https://github.com/dunglas/frankenphp/releases/download/vX.X.X/frankenphp-linux-x86_64
@@ -31,3 +33,9 @@ chmod +x /usr/local/bin/frankenphp
 
 wrk -c100 -d5 -t12 http://46.102.156.214:8111
 wrk -c100 -d5 -t12 http://dash.kospinsinaraartha.co.id/admin/login
+
+
+sudo chown -R dashk8300:dashk8300 /home/dash.kospinsinaraartha.co.id/public_html/storage
+sudo chown -R dashk8300:dashk8300 /home/dash.kospinsinaraartha.co.id/public_html/bootstrap/cache
+sudo chmod -R 775 /home/dash.kospinsinaraartha.co.id/public_html/storage
+sudo chmod -R 775 /home/dash.kospinsinaraartha.co.id/public_html/bootstrap/cache

@@ -169,7 +169,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
                     ->money('IDR')
                     ->getStateUsing(fn ($record) => $this->calculateSaldoBerjalan($record)),
                 TextColumn::make('kode_teller')
-                    ->label('Kode Teller')
+                    ->label('Kode Teller'),
             ])
             ->defaultSort('tanggal_transaksi', 'ASC');
     }
@@ -225,6 +225,17 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
 
             foreach ($previousTransactions as $transaction) {
                 $saldo = $this->updateSaldo($saldo, $transaction);
+            }
+
+            // Cek apakah ini transaksi terakhir
+            $lastTransaction = TransaksiTabungan::where('id_tabungan', $this->tabungan->id)
+                ->orderBy('tanggal_transaksi', 'DESC')
+                ->orderBy('id', 'DESC')
+                ->first();
+
+            if ($lastTransaction && $record->id === $lastTransaction->id) {
+                // Jika ini transaksi terakhir, simpan saldo berjalan
+                $this->saldo_berjalan = $saldo;
             }
 
             return $saldo;

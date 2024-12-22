@@ -91,5 +91,24 @@
             @endforeach
         </tbody>
     </table>
+
+    <div style="margin-top: 20px; padding: 10px; border: 1px solid #000;">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="border: none; width: 33%;">
+                    <strong>Total Debit:</strong><br>
+                    Rp {{ number_format($transaksi->where('jenis_transaksi', 'debit')->sum('jumlah'), 0, ',', '.') }}
+                </td>
+                <td style="border: none; width: 33%;">
+                    <strong>Total Kredit:</strong><br>
+                    Rp {{ number_format($transaksi->where('jenis_transaksi', 'kredit')->sum('jumlah'), 0, ',', '.') }}
+                </td>
+                <td style="border: none; width: 33%;">
+                    <strong>Saldo Akhir:</strong><br>
+                    Rp {{ number_format($transaksi->last()->saldo_berjalan, 2, ',', '.') }}
+                </td>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>
