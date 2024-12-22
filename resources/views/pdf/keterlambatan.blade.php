@@ -64,7 +64,7 @@
                     $today->diffInDays($tanggalJatuhTempo) : 0;
 
                 $denda = ($item->denda->rate_denda/100 * $angsuranPokok / 30) * $hariTerlambat;
-                $totalBayar = $angsuranPokok + $denda;
+                $totalBayar = $angsuranPokok + abs($denda);
             @endphp
             <tr>
                 <td>{{ $index + 1 }}</td>

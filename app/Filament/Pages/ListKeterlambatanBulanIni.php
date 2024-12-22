@@ -2,51 +2,60 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
-use App\Models\Pinjaman;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use App\Models\Pinjaman;
+use Filament\Pages\Page;
+use Filament\Tables\Table;
+use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\Log;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Notifications\Notification;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Tables\Concerns\InteractsWithTable;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Illuminate\Support\Facades\Http;
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Filament\Notifications\Notification;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use Filament\Tables\Actions\Action;
-use Illuminate\Support\Facades\Http;
 
-class ListKeterlambatan extends Page implements HasTable, HasForms
+class ListKeterlambatanBulanIni extends Page implements HasTable, HasForms
 {
     use InteractsWithTable;
     use InteractsWithForms;
     use HasPageShield;
 
-    protected static ?string $navigationIcon = 'heroicon-o-exclamation-triangle';
-    protected static ?string $navigationLabel = 'List Telat Bulan Ini';
-    protected static ?string $title = 'List Telat Bulan Ini';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationLabel = 'List Telat > 30 Hari';
+    protected static ?string $title = 'List Telat Lebih Dari 30 Hari';
+
+    protected static string $view = 'filament.pages.list-keterlambatan-bulan-ini';
 
     public static function getNavigationGroup(): ?string
-            {
-                return 'Pinjaman';
-            }
+    {
+        return 'Pinjaman';
+    }
 
     public static function getNavigationBadge(): ?string
     {
         $today = Carbon::today();
+        $thirtyDaysAgo = $today->copy()->subDays(30);
 
         return Pinjaman::query()
             ->where('status_pinjaman', 'approved')
+            ->where(function ($query) use ($today) {
+                // Cek pinjaman yang memiliki transaksi
+                $query->whereHas('transaksiPinjaman', function ($q) use ($today) {
+                    $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 30', [$today]);
+                })
+                // ATAU pinjaman yang belum pernah bayar sama sekali
+                ->orWhereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
+                    $q->whereRaw('DATEDIFF(?, tanggal_pinjaman) > 30', [$today]);
+                });
+            })
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
                   ->whereYear('tanggal_pembayaran', $today->year);
-            })
-            ->where(function ($query) use ($today) {
-                $query->whereRaw('DAY(tanggal_jatuh_tempo) < ?', [$today->day]);
             })
             ->count();
     }
@@ -56,24 +65,31 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
         return 'danger';
     }
 
-    protected static string $view = 'filament.pages.list-keterlambatan';
-
     private function getBaseQuery()
     {
         $today = Carbon::today();
 
         return Pinjaman::query()
-            ->with(['profile', 'biayaBungaPinjaman', 'denda'])
+            ->with(['profile', 'biayaBungaPinjaman', 'denda', 'transaksiPinjaman'])
             ->where('status_pinjaman', 'approved')
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
                   ->whereYear('tanggal_pembayaran', $today->year);
             })
             ->where(function ($query) use ($today) {
-                $query->whereRaw('DAY(tanggal_jatuh_tempo) < ?', [$today->day]);
+                // Ambil pinjaman yang tanggal jatuh temponya lebih dari 30 hari yang lalu
+                $query->whereHas('transaksiPinjaman', function ($q) use ($today) {
+                    $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 30', [$today]);
+                })
+                ->orWhereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
+                    // Untuk pinjaman yang belum pernah bayar sama sekali
+                    $q->whereRaw('DATEDIFF(?, tanggal_pinjaman) > 30', [$today]);
+                });
             });
     }
 
+    // ... sisanya sama seperti ListKeterlambatan.php ...
+    // Tambahkan method calculateAngsuranPokok, calculateHariTerlambat, calculateDenda, dll.
     public function getData()
     {
         return $this->getBaseQuery()->get();
@@ -86,13 +102,22 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
 
     private function calculateHariTerlambat($record, $today)
     {
-        $tanggalPembayaran = Carbon::parse($record->tanggal_jatuh_tempo)->day;
+        // Ambil tanggal jatuh tempo dari transaksi terakhir atau tanggal pinjaman
+        $lastTransaction = $record->transaksiPinjaman()
+            ->orderBy('angsuran_ke', 'desc')
+            ->first();
 
-        $tanggalJatuhTempo = Carbon::create(
-            $today->year,
-            $today->month,
-            $tanggalPembayaran
-        )->startOfDay();
+        if ($lastTransaction) {
+            // Jika ada transaksi sebelumnya, gunakan tanggal jatuh tempo berikutnya
+            $tanggalJatuhTempo = Carbon::parse($lastTransaction->tanggal_pembayaran)
+                ->addMonth()
+                ->startOfDay();
+        } else {
+            // Jika belum ada transaksi, gunakan tanggal pinjaman + 1 bulan
+            $tanggalJatuhTempo = Carbon::parse($record->tanggal_pinjaman)
+                ->addMonth()
+                ->startOfDay();
+        }
 
         return $today->gt($tanggalJatuhTempo) ?
             $today->diffInDays($tanggalJatuhTempo) : 0;
@@ -231,6 +256,10 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                     ->action(function ($record) {
                         $this->dispatch('spin-start');
 
+                        $lastTransaction = $record->transaksiPinjaman()
+                            ->orderBy('angsuran_ke', 'desc')
+                            ->first();
+
                         $nama = trim("{$record->profile->first_name} {$record->profile->last_name}");
                         $angsuranPokok = $this->calculateAngsuranPokok($record);
                         $bunga = $this->calculateBungaPerBulan($record);
@@ -239,8 +268,9 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                         $totalBayar = $angsuranPokok + $bunga + $denda;
 
                         $message = "Halo {$nama},\n\n"
-                            . "Ini adalah pengingat untuk pembayaran angsuran pinjaman Anda bulan ini:\n"
+                            . "Ini adalah pengingat untuk pembayaran angsuran pinjaman Anda yang belum dibayar:\n"
                             . "No Pinjaman: {$record->no_pinjaman}\n"
+                            . "Angsuran ke-" . ($lastTransaction ? ($lastTransaction->angsuran_ke + 1) : '1') . "\n"
                             . "Angsuran Pokok: Rp." . number_format($angsuranPokok, 2, ',', '.') . "\n"
                             . "Bunga: Rp." . number_format($bunga, 2, ',', '.') . "\n"
                             . "Denda: Rp." . number_format($denda, 2, ',', '.') . "\n"
@@ -302,9 +332,9 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
             ]);
 
             $dompdf = new Dompdf($options);
-            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->setPaper('A4', 'landscape');
 
-            $html = view('pdf.keterlambatan', [
+            $html = view('pdf.keterlambatan-30-hari', [
                 'data' => $data,
                 'today' => Carbon::today()
             ])->render();
@@ -330,6 +360,6 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
 
     private function generatePdfFilename()
     {
-        return 'laporan_keterlambatan_' . date('Y-m-d_H-i-s') . '.pdf';
+        return 'laporan_keterlambatan_30_hari_' . date('Y-m-d_H-i-s') . '.pdf';
     }
 }

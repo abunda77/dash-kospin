@@ -36,4 +36,9 @@
     <div class="space-y-4">
         {{ $this->table }}
     </div>
+
+    {{-- Tambahkan informasi tambahan jika diperlukan --}}
+    <div class="mt-4 text-sm text-gray-500">
+        <p>* Total Bayar = Angsuran Pokok + Bunga + Denda</p>
+    </div>
 </x-filament-panels::page>
