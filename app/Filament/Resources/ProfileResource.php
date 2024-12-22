@@ -190,7 +190,7 @@ class ProfileResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('image_identity')
+                Tables\Columns\ImageColumn::make('avatar')
                     ->circular(),
                 Tables\Columns\TextColumn::make('first_name')
                     ->searchable()
