@@ -37,7 +37,8 @@ class Profile extends Model
         'type_member',
         'avatar',
         'remote_url',
-        'notes'
+        'notes',
+        'ibu_kandung'
     ];
 
     protected $casts = [
@@ -88,7 +89,8 @@ class Profile extends Model
                 'type_member',
                 'avatar',
                 'remote_url',
-                'notes'
+                'notes',
+                'ibu_kandung'
             ]);
     }
 }

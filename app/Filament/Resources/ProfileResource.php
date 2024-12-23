@@ -18,6 +18,10 @@ use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use Ysfkaya\FilamentPhoneInput\Tables\PhoneColumn;
 use Ysfkaya\FilamentPhoneInput\Infolists\PhoneEntry;
 use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Section;
 
 class ProfileResource extends Resource
 {
@@ -179,7 +183,11 @@ class ProfileResource extends Resource
                     ->url()
                     ->maxLength(255),
                 Forms\Components\Textarea::make('notes')
-                    ->maxLength(65535)
+                    ->maxLength(65535),
+                Forms\Components\TextInput::make('ibu_kandung')
+                    ->label('Nama Ibu Kandung')
+                    ->required()
+                    ->maxLength(255),
             ]);
     }
 
@@ -257,13 +265,21 @@ class ProfileResource extends Resource
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('ibu_kandung')
+                    ->label('Nama Ibu Kandung')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
+
+
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -284,7 +300,133 @@ class ProfileResource extends Resource
         return [
             'index' => Pages\ListProfiles::route('/'),
             'create' => Pages\CreateProfile::route('/create'),
+            'view' => Pages\ViewProfile::route('/{record}'),
             'edit' => Pages\EditProfile::route('/{record}/edit'),
         ];
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make('Informasi Pribadi')
+                    ->schema([
+                        ImageEntry::make('avatar')
+                            ->circular(),
+                        TextEntry::make('user.name')
+                            ->label('Nama Pengguna'),
+                        TextEntry::make('first_name')
+                            ->label('Nama Depan'),
+                        TextEntry::make('last_name')
+                            ->label('Nama Belakang'),
+                        TextEntry::make('gender')
+                            ->badge()
+                            ->formatStateUsing(fn ($state): string => match ($state) {
+                                'L' => 'Laki-laki',
+                                'P' => 'Perempuan',
+                                default => $state,
+                            }),
+                        TextEntry::make('birthday')
+                            ->label('Tanggal Lahir')
+                            ->date(),
+                        TextEntry::make('mariage')
+                            ->label('Status Pernikahan')
+                            ->badge()
+                            ->formatStateUsing(fn ($state): string => match ($state) {
+                                'single' => 'Single',
+                                'married' => 'Menikah',
+                                'divorced' => 'Cerai',
+                                default => $state,
+                            }),
+                        TextEntry::make('job')
+                            ->label('Pekerjaan'),
+                        TextEntry::make('ibu_kandung')
+                            ->label('Nama Ibu Kandung'),
+                    ])->columns(2),
+
+                Section::make('Identitas')
+                    ->schema([
+                        TextEntry::make('sign_identity')
+                            ->label('Tanda Pengenal')
+                            ->formatStateUsing(fn ($state): string => match ($state) {
+                                'ktp' => 'KTP',
+                                'paspor' => 'Paspor',
+                                'sim' => 'SIM',
+                                'kartu_pelajar' => 'Kartu Pelajar/Mahasiswa',
+                                'kartu_keluarga' => 'Kartu Keluarga',
+                                'lainnya' => 'Lainnya',
+                                default => $state,
+                            }),
+                        TextEntry::make('no_identity')
+                            ->label('No. Identitas'),
+                        ImageEntry::make('image_identity')
+                            ->label('Foto Identitas'),
+                    ])->columns(2),
+
+                Section::make('Kontak')
+                    ->schema([
+                        TextEntry::make('phone')
+                            ->label('No. Telepon'),
+                        TextEntry::make('whatsapp')
+                            ->label('WhatsApp'),
+                        TextEntry::make('email'),
+                        TextEntry::make('address')
+                            ->label('Alamat')
+                            ->markdown(),
+                    ])->columns(2),
+
+                Section::make('Alamat Lengkap')
+                    ->schema([
+                        TextEntry::make('province_id')
+                            ->label('Provinsi')
+                            ->formatStateUsing(fn ($state) => DB::table('regions')
+                                ->where('code', $state)
+                                ->value('name')),
+                        TextEntry::make('district_id')
+                            ->label('Kabupaten/Kota')
+                            ->formatStateUsing(fn ($state) => DB::table('regions')
+                                ->where('code', $state)
+                                ->value('name')),
+                        TextEntry::make('city_id')
+                            ->label('Kecamatan')
+                            ->formatStateUsing(fn ($state) => DB::table('regions')
+                                ->where('code', $state)
+                                ->value('name')),
+                        TextEntry::make('village_id')
+                            ->label('Desa/Kelurahan')
+                            ->formatStateUsing(fn ($state) => DB::table('regions')
+                                ->where('code', $state)
+                                ->value('name')),
+                    ])->columns(2),
+
+                Section::make('Informasi Tambahan')
+                    ->schema([
+                        TextEntry::make('monthly_income')
+                            ->label('Pendapatan Bulanan')
+                            ->money('IDR'),
+                        TextEntry::make('type_member')
+                            ->label('Tipe Member')
+                            ->badge()
+                            ->formatStateUsing(fn ($state): string => match ($state) {
+                                'regular' => 'Regular',
+                                'premium' => 'Premium',
+                                default => $state,
+                            }),
+                        TextEntry::make('is_active')
+                            ->label('Status')
+                            ->badge()
+                            ->formatStateUsing(fn ($state): string => match ($state) {
+                                1 => 'Aktif',
+                                0 => 'Pasif',
+                                default => $state,
+                            }),
+                        TextEntry::make('remote_url')
+                            ->label('URL Remote')
+                            ->url(fn ($record) => $record->remote_url),
+                        TextEntry::make('notes')
+                            ->label('Catatan')
+                            ->markdown(),
+                    ])->columns(2),
+            ]);
     }
 }
