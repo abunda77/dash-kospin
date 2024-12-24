@@ -42,6 +42,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
     public $isSearchSubmitted = false;
     public $no_rekening = '';
     public $periode = '';
+    public $tanggal_mulai = '';
     public $saldo_berjalan = 0;
     public $tabungan = null;
     public $filterDate = [];
@@ -68,6 +69,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
                         Select::make('periode')
                             ->label('Pilih Periode')
                             ->options([
+                                'custom' => 'Rentang Waktu Kustom',
                                 '7_weeks' => '7 Minggu Terakhir',
                                 '1_month' => '1 Bulan Terakhir',
                                 '3_months' => '3 Bulan Terakhir',
@@ -75,7 +77,14 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
                                 '1_year' => '1 Tahun Terakhir',
                                 'all' => 'Semua',
                             ])
+                            ->live()
                             ->required(),
+
+                        TextInput::make('tanggal_mulai')
+                            ->type('date')
+                            ->label('Dari Tanggal')
+                            ->required(fn (callable $get) => $get('periode') === 'custom')
+                            ->visible(fn (callable $get) => $get('periode') === 'custom'),
                     ]),
             ])
             ->nextAction(fn (Action $action) => $action->label('Lanjut'))
@@ -204,6 +213,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
     protected function calculateStartDate(): ?Carbon
     {
         return match($this->periode) {
+            'custom' => Carbon::parse($this->form->getState()['tanggal_mulai']),
             '7_weeks' => now()->subWeeks(7),
             '1_month' => now()->subMonth(),
             '3_months' => now()->subMonths(3),

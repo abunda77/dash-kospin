@@ -88,6 +88,27 @@
                         </p>
                     </div>
                 </div>
+
+            </div>
+            <div class="p-4 mt-8 bg-white rounded-lg shadow dark:bg-gray-900">
+                <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">Keterangan Kode Transaksi:</p>
+                <div class="grid grid-cols-2 gap-2 text-sm dark:text-gray-400">
+                    <div>
+                        <p>000 - DB Bunga Deposito</p>
+                        <p>001 - Penyetoran</p>
+                        <p>002 - Penarikan di Teller</p>
+                        <p>003 - Pengambilan di ATM</p>
+                        <p>004 - Pemindahbukuan (DK), Biaya Adm</p>
+                    </div>
+                    <div>
+                        <p>005 - Setoran/Tolakan Kliring</p>
+                        <p>006 - Bunga</p>
+                        <p>00K - Koreksi</p>
+                        <p>00S - Saldo Penutupan</p>
+                        <p>00P - Pajak</p>
+                        <p>00G - Gabungan Transaksi</p>
+                    </div>
+                </div>
             </div>
         </div>
     @endif

@@ -76,7 +76,8 @@ class TransaksiTabunganResource extends Resource
                         '6' => '006 Bunga',
                         'K' => '00K Koreksi',
                         'S' => '00S Saldo Penutupan',
-                        'P' => '00P Pajak'
+                        'P' => '00P Pajak',
+                        'G' => '00G Gabungan Transaksi'
                     ])
                     ->required(),
 
