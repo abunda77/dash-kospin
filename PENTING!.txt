@@ -50,3 +50,8 @@ sudo chown -R dashk8300:dashk8300 /home/dash.kospinsinaraartha.co.id/public_html
 sudo chown -R dashk8300:dashk8300 /home/dash.kospinsinaraartha.co.id/public_html/bootstrap/cache
 sudo chmod -R 775 /home/dash.kospinsinaraartha.co.id/public_html/storage
 sudo chmod -R 775 /home/dash.kospinsinaraartha.co.id/public_html/bootstrap/cache
+
+bERSIHAKAN CACHE REDIS :
+redis-cli FLUSHALL
+redis-cli FLUSHDB
+

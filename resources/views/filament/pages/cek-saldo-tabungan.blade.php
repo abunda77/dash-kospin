@@ -4,9 +4,18 @@
             <form wire:submit="cekSaldo">
                 {{ $this->form }}
 
-                <div class="mt-4">
-                    <x-filament::button type="submit">
-                        Cek Saldo
+                <div class="mt-6 text-right">
+                    <x-filament::button type="submit" color="success" wire:loading.attr="disabled">
+                        <span wire:loading.remove>
+                            Cek Saldo Akhir
+                        </span>
+                        <span wire:loading>
+                            <svg class="inline w-5 h-5 mr-3 -ml-1 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Memproses...
+                        </span>
                     </x-filament::button>
                 </div>
             </form>
@@ -16,7 +25,7 @@
             <div class="p-6 bg-white shadow rounded-xl dark:bg-gray-800">
                 <div class="space-y-4">
                     <div>
-                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-200">
                             Saldo Awal
                         </h3>
                         <p class="text-lg font-semibold text-gray-700 dark:text-gray-300">
