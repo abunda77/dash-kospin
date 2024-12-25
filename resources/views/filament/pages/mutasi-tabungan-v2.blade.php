@@ -36,6 +36,13 @@
             </div>
 
             <div class="flex justify-end gap-4 mt-4 mb-4 space-x-2">
+                <x-filament::button
+                    tag="a"
+                    href="{{ route('filament.admin.pages.merge-old-transactions', ['id_tabungan' => $tabungan?->id]) }}"
+                    color="warning"
+                >
+                    Gabung Transaksi Lama
+                </x-filament::button>
                 <x-filament::button wire:click="print" color="success">
                     Cetak Buku
                 </x-filament::button>
@@ -112,4 +119,51 @@
             </div>
         </div>
     @endif
+
+    <x-filament::modal
+        id="merge-confirmation"
+        icon="heroicon-o-exclamation-triangle"
+        icon-color="warning"
+        wire:model="showMergeConfirmation"
+    >
+        <x-slot name="title">
+            Konfirmasi Penggabungan Transaksi
+        </x-slot>
+
+        <div class="py-4">
+            <p>Apakah Anda yakin ingin menggabungkan semua transaksi yang lebih dari 1 tahun?</p>
+            <p class="mt-2 text-sm text-gray-500">
+                Tindakan ini akan menggabungkan semua transaksi sebelum tahun {{ now()->subYear()->startOfYear()->format('Y') }} menjadi satu transaksi pembuka.
+                Proses ini tidak dapat dibatalkan.
+            </p>
+        </div>
+
+        <x-slot name="footer">
+            <div class="flex justify-end gap-x-4">
+                <x-filament::button
+                    wire:click="$set('showMergeConfirmation', false)"
+                    color="gray"
+                >
+                    Batal
+                </x-filament::button>
+
+                <x-filament::button
+                    wire:click="mergeOldTransactions"
+                    color="warning"
+                >
+                    Ya, Gabungkan Transaksi
+                </x-filament::button>
+            </div>
+        </x-slot>
+    </x-filament::modal>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('notify', (data) => {
+                @this.showNotification(data[0])
+            })
+        })
+    </script>
+    @endpush
 </x-filament-panels::page>

@@ -2,28 +2,30 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
-use App\Models\TransaksiTabungan;
-use App\Models\Tabungan;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Wizard;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
-use Filament\Forms\Components\Actions\Action;
-use Illuminate\Support\HtmlString;
-use Illuminate\Support\Facades\Blade;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Concerns\InteractsWithForms;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Models\Tabungan;
+use Filament\Forms\Form;
+use Filament\Pages\Page;
+use Filament\Tables\Table;
+use App\Models\TransaksiTabungan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Wizard;
+use Illuminate\Support\Facades\Blade;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Tables\Concerns\InteractsWithTable;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class MutasiTabunganV2 extends Page implements HasTable, HasForms
 {
@@ -51,6 +53,28 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
     public function mount(): void
     {
         $this->form->fill();
+
+        // Check for merge success notification from session
+        if (session()->has('merge_success')) {
+            Notification::make()
+                ->title(session('merge_success.title'))
+                ->body(session('merge_success.message'))
+                ->success()
+                ->send();
+
+            session()->forget('merge_success');
+        }
+
+        // Check for merge error notification from session
+        if (session()->has('merge_error')) {
+            Notification::make()
+                ->title(session('merge_error.title'))
+                ->body(session('merge_error.message'))
+                ->danger()
+                ->send();
+
+            session()->forget('merge_error');
+        }
     }
 
     protected function getFormSchema(): array
@@ -88,10 +112,21 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
                     ]),
             ])
             ->nextAction(fn (Action $action) => $action->label('Lanjut'))
-            ->submitAction(new HtmlString(
-                '<button type="submit" wire:click="search()" wire:loading.class="animate-spin" class="filament-button filament-button-size-md inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-primary-600 hover:bg-primary-500 focus:bg-primary-700 focus:ring-offset-primary-700">Cari Data</button>'
-            ))
-            ->live()
+            ->submitAction(
+                Action::make('submit')
+                    ->label('Cari Data')
+                    ->action('search')
+                    ->extraAttributes(['class' => 'filament-button-primary'])
+            ),
+
+            \Filament\Forms\Components\Actions::make([
+                \Filament\Forms\Components\Actions\Action::make('navigateToMerge')
+                    ->label('Gabung Transaksi Lama')
+                    ->url(fn () => $this->tabungan ? route('filament.admin.pages.merge-old-transactions', ['id_tabungan' => $this->tabungan->id]) : null)
+                    ->color('warning')
+                    ->icon('heroicon-o-document-text')
+                    ->visible(fn () => $this->isSearchSubmitted && $this->tabungan)
+            ])
         ];
     }
 
@@ -190,7 +225,15 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
                 return TransaksiTabungan::query()->whereNull('id');
             }
 
-            return $this->buildTransactionQuery();
+            $query = $this->buildTransactionQuery();
+
+            // Refresh data setelah merge
+            if (session()->has('merge_completed')) {
+                session()->forget('merge_completed');
+                $query->getModel()->flushEventListeners();
+            }
+
+            return $query;
         };
     }
 
@@ -473,6 +516,4 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
             return 0;
         }
     }
-
-    // ... rest of the code remains the same ...
 }

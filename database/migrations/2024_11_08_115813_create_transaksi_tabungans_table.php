@@ -19,7 +19,7 @@ return new class extends Migration
             $table->dateTime('tanggal_transaksi');
             $table->string('keterangan')->nullable();
             $table->string('kode_transaksi');
-            $table->unsignedBigInteger('kode_teller')->nullable()->default(null);
+            $table->string('kode_teller')->nullable()->default(null);
             $table->timestamps();
         });
     }

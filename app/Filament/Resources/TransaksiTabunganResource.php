@@ -67,17 +67,17 @@ class TransaksiTabunganResource extends Resource
                 Forms\Components\Select::make('kode_transaksi')
                     ->label('Kode Transaksi')
                     ->options([
-                        '0' => '000 DB Bunga Deposito',
-                        '1' => '001 Penyetoran',
-                        '2' => '002 Penarikan di Teller',
-                        '3' => '003 Pengambilan di ATM',
-                        '4' => '004 Pemindahbukuan (DK), Biaya Adm',
-                        '5' => '005 Setoran/Tolakan Kliring',
-                        '6' => '006 Bunga',
-                        'K' => '00K Koreksi',
-                        'S' => '00S Saldo Penutupan',
-                        'P' => '00P Pajak',
-                        'G' => '00G Gabungan Transaksi'
+                        '000' => '000 - DB Bunga Deposito',
+                        '001' => '001 - Penyetoran',
+                        '002' => '002 - Penarikan di Teller',
+                        '003' => '003 - Pengambilan di ATM',
+                        '004' => '004 - Pemindahbukuan (DK), Biaya Adm',
+                        '005' => '005 - Setoran/Tolakan Kliring',
+                        '006' => '006 - Bunga',
+                        '00K' => '00K - Koreksi',
+                        '00S' => '00S - Saldo Penutupan',
+                        '00P' => '00P - Pajak',
+                        '00G' => '00G - Gabungan Transaksi'
                     ])
                     ->required(),
 
