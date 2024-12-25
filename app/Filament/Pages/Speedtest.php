@@ -28,7 +28,7 @@ class Speedtest extends Page
         // Contoh update progress
         for ($i = 0; $i <= 100; $i += 10) {
             $this->progress = $i;
-            $this->emit('progressUpdated');
+            $this->dispatch('progressUpdated');
             usleep(500000); // Delay 0.5 detik
         }
     }
