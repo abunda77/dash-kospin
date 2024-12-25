@@ -24,30 +24,12 @@ class Speedtest extends Page
     public function testSpeed()
     {
         $this->isTestingSpeed = true;
-        $this->progress = 0;
-        $this->results = [];
 
-        // Test response time
-        $startTime = microtime(true);
-        $response = Http::get(config('app.url'));
-        $endTime = microtime(true);
-
-        $this->results['responseTime'] = round(($endTime - $startTime) * 1000, 2); // dalam milliseconds
-        $this->progress = 50;
-
-        // Test requests per second
-        $startTime = microtime(true);
-        $requests = 0;
-        $duration = 5; // durasi test dalam detik
-
-        while (microtime(true) - $startTime < $duration) {
-            Http::get(config('app.url'));
-            $requests++;
-            $this->progress = 50 + (((microtime(true) - $startTime) / $duration) * 50);
+        // Contoh update progress
+        for ($i = 0; $i <= 100; $i += 10) {
+            $this->progress = $i;
+            $this->emit('progressUpdated');
+            usleep(500000); // Delay 0.5 detik
         }
-
-        $this->results['requestsPerSecond'] = round($requests / $duration, 2);
-        $this->progress = 100;
-        $this->isTestingSpeed = false;
     }
 }

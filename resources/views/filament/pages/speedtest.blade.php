@@ -4,14 +4,16 @@
             Mulai Speed Test
         </x-filament::button>
 
-        @if($isTestingSpeed)
-            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                <div class="bg-blue-600 dark:bg-blue-500 h-2.5 rounded-full" style="width: {{ $progress }}%"></div>
-            </div>
-            <div class="text-sm text-gray-600 dark:text-gray-400">
-                Testing... {{ round($progress) }}%
-            </div>
-        @endif
+        <div wire:poll.1s>
+            @if($isTestingSpeed)
+                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                    <div class="bg-blue-600 dark:bg-blue-500 h-2.5 rounded-full" style="width: {{ $progress }}%"></div>
+                </div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">
+                    Testing... {{ round($progress) }}%
+                </div>
+            @endif
+        </div>
 
         @if(!empty($results))
             <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
