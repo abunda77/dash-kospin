@@ -24,12 +24,26 @@ class Speedtest extends Page
     public function testSpeed()
     {
         $this->isTestingSpeed = true;
+        $this->results = []; // Reset hasil sebelumnya
 
-        // Contoh update progress
+        $startTime = microtime(true);
+        $requestCount = 0;
+
         for ($i = 0; $i <= 100; $i += 10) {
             $this->progress = $i;
-            $this->dispatch('progressUpdated');
+            $requestCount++;
             usleep(500000); // Delay 0.5 detik
         }
+
+        $endTime = microtime(true);
+        $totalTime = ($endTime - $startTime) * 1000; // Konversi ke milliseconds
+
+        $this->results = [
+            'responseTime' => round($totalTime, 2),
+            'requestsPerSecond' => round($requestCount / ($totalTime / 1000), 2)
+        ];
+
+        $this->isTestingSpeed = false;
+        $this->dispatch('progressUpdated');
     }
 }
