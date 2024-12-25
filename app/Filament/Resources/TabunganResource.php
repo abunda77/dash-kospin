@@ -150,6 +150,7 @@ class TabunganResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -171,6 +172,7 @@ class TabunganResource extends Resource
         return [
             'index' => Pages\ListTabungans::route('/'),
             'create' => Pages\CreateTabungan::route('/create'),
+            'view' => Pages\ViewTabungan::route('/{record}'),
             'edit' => Pages\EditTabungan::route('/{record}/edit'),
         ];
     }

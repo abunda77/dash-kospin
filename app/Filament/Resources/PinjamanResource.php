@@ -254,6 +254,7 @@ class PinjamanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -274,6 +275,7 @@ class PinjamanResource extends Resource
         return [
             'index' => Pages\ListPinjamen::route('/'),
             'create' => Pages\CreatePinjaman::route('/create'),
+            'view' => Pages\ViewPinjaman::route('/{record}'),
             'edit' => Pages\EditPinjaman::route('/{record}/edit'),
         ];
     }

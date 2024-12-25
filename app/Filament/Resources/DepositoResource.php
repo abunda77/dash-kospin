@@ -249,6 +249,7 @@ class DepositoResource extends Resource
                     ->query(fn ($query) => $query->whereMonth('tanggal_jatuh_tempo', now()->month)),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -270,6 +271,7 @@ class DepositoResource extends Resource
         return [
             'index' => Pages\ListDepositos::route('/'),
             'create' => Pages\CreateDeposito::route('/create'),
+            'view' => Pages\ViewDeposito::route('/{record}'),
             'edit' => Pages\EditDeposito::route('/{record}/edit'),
         ];
     }

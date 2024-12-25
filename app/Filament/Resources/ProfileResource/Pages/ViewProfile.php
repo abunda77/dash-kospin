@@ -28,6 +28,22 @@ class ViewProfile extends ViewRecord
                         echo $pdf->output();
                     }, $filename);
                 }),
+
+            Action::make('printRegistrationForm')
+                ->label('Cetak Form Pendaftaran')
+                ->icon('heroicon-o-document')
+                ->color('success')
+                ->action(function () {
+                    $pdf = Pdf::loadView('pdf.registration-form', [
+                        'profile' => $this->record
+                    ]);
+
+                    $filename = 'form_pendaftaran_' . $this->record->first_name . '_' . $this->record->last_name . '.pdf';
+
+                    return response()->streamDownload(function () use ($pdf) {
+                        echo $pdf->output();
+                    }, $filename);
+                }),
         ];
     }
 }
