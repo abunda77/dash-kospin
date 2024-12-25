@@ -2,14 +2,15 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-use Spatie\Activitylog\Models\Activity;
+use Carbon\Carbon;
 use Spatie\Health\Facades\Health;
-use Spatie\Health\Checks\Checks\OptimizedAppCheck;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Health\Checks\Checks\DebugModeCheck;
 use Spatie\Health\Checks\Checks\EnvironmentCheck;
-use Carbon\Carbon;
+use Spatie\Health\Checks\Checks\OptimizedAppCheck;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +27,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if(request()->server('HTTP_CF_VISITOR') || request()->server('HTTPS')) {
+            URL::forceScheme('https');
+        }
+
         // Filament Logger
         Gate::policy(\TomatoPHP\FilamentLogger\Models\Activity::class, \App\Policies\ActivityPolicy::class);
         Gate::policy(\TomatoPHP\FilamentLogger\Filament\Resources\ActivityResource::class, \App\Policies\ActivityPolicy::class);
@@ -44,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Set locale ke Indonesia
         Carbon::setLocale('id');
-        
+
         // Opsional: Set fallback locale jika terjemahan tidak tersedia
         Carbon::setFallbackLocale('id');
     }
