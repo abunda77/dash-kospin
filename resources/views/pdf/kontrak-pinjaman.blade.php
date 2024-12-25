@@ -87,7 +87,7 @@
         <h1>KOPERASI SINARA ARTHA</h1>
     </div>
 
-    <p>Pada hari ini {{ now()->isoFormat('dddd') }}, {{ now()->isoFormat('D MMMM Y') }} di SURABAYA, kami yang bertanda tangan di bawah ini:</p>
+    <p>Pada hari ini {{ now()->locale('id')->isoFormat('dddd') }}, {{ now()->locale('id')->isoFormat('D MMMM Y') }} di SURABAYA, kami yang bertanda tangan di bawah ini:</p>
 
     <div class="section">
         <div class="section-title">PIHAK PERTAMA</div>
@@ -139,7 +139,7 @@
     <div class="article">
         <h3>Pasal 1<br>OBJEK PERJANJIAN</h3>
         <ol>
-            <li>PIHAK PERTAMA telah menerima uang pinjaman dari PIHAK KEDUA sebesar Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(Terbilang::make($pinjaman->jumlah_pinjaman)) }} Rupiah) dengan tenor: {{ $pinjaman->jangka_waktu }} bulan.</li>
+            <li>PIHAK PERTAMA telah menerima uang pinjaman dari PIHAK KEDUA sebesar Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($pinjaman->jumlah_pinjaman)) }} Rupiah) dengan tenor: {{ $pinjaman->jangka_waktu }} bulan.</li>
             <li>Pinjaman ini diberikan oleh PIHAK KEDUA kepada PIHAK PERTAMA dengan ketentuan sebagaimana diatur dalam pasal-pasal berikutnya dalam perjanjian ini.</li>
         </ol>
     </div>

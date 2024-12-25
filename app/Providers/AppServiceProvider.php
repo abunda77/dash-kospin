@@ -9,6 +9,7 @@ use Spatie\Health\Facades\Health;
 use Spatie\Health\Checks\Checks\OptimizedAppCheck;
 use Spatie\Health\Checks\Checks\DebugModeCheck;
 use Spatie\Health\Checks\Checks\EnvironmentCheck;
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,5 +41,11 @@ class AppServiceProvider extends ServiceProvider
             DebugModeCheck::new(),
             EnvironmentCheck::new(),
         ]);
+
+        // Set locale ke Indonesia
+        Carbon::setLocale('id');
+        
+        // Opsional: Set fallback locale jika terjemahan tidak tersedia
+        Carbon::setFallbackLocale('id');
     }
 }
