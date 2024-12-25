@@ -6,22 +6,22 @@
 
         @if($isTestingSpeed)
             <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                <div class="bg-blue-600 h-2.5 rounded-full" style="width: {{ $progress }}%"></div>
+                <div class="bg-blue-600 dark:bg-blue-500 h-2.5 rounded-full" style="width: {{ $progress }}%"></div>
             </div>
-            <div class="text-sm text-gray-600">
+            <div class="text-sm text-gray-600 dark:text-gray-400">
                 Testing... {{ round($progress) }}%
             </div>
         @endif
 
         @if(!empty($results))
-            <div class="p-4 bg-white rounded-lg shadow">
-                <h3 class="mb-4 text-lg font-medium">Hasil Test</h3>
+            <div class="p-4 bg-white rounded-lg shadow dark:bg-gray-800">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Hasil Test</h3>
                 <div class="space-y-2">
-                    <div>
+                    <div class="text-gray-700 dark:text-gray-300">
                         <span class="font-medium">Response Time:</span>
                         {{ $results['responseTime'] ?? 0 }} ms
                     </div>
-                    <div>
+                    <div class="text-gray-700 dark:text-gray-300">
                         <span class="font-medium">Requests per Second:</span>
                         {{ $results['requestsPerSecond'] ?? 0 }} req/s
                     </div>
