@@ -27,9 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if(request()->server('HTTP_CF_VISITOR') || request()->server('HTTPS')) {
-            URL::forceScheme('https');
-        }
+        // if(request()->server('HTTP_CF_VISITOR') || request()->server('HTTPS')) {
+        //     URL::forceScheme('https');
+        // }
 
         // Filament Logger
         Gate::policy(\TomatoPHP\FilamentLogger\Models\Activity::class, \App\Policies\ActivityPolicy::class);
