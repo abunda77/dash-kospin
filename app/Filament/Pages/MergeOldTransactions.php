@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Notifications\Notification;
 use Filament\Support\Exceptions\Halt;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Illuminate\Database\Eloquent\Model;
 
 class MergeOldTransactions extends Page
 {
@@ -33,24 +34,52 @@ class MergeOldTransactions extends Page
 
     public function mount($id_tabungan = null): void
     {
+        $id_tabungan = $id_tabungan ?? request('id_tabungan');
+
+        Log::info('Mounting MergeOldTransactions', [
+            'id_tabungan' => $id_tabungan,
+            'request_params' => request()->all()
+        ]);
+
         $this->idTabungan = $id_tabungan;
+
+        if (!$this->idTabungan) {
+            Notification::make()
+                ->title('ID Tabungan diperlukan')
+                ->warning()
+                ->persistent()
+                ->send();
+
+            $this->redirectToMutasi();
+            return;
+        }
+
         $this->loadTabungan();
     }
 
     protected function loadTabungan(): void
     {
+        Log::info('Loading tabungan with ID: ' . $this->idTabungan);
+
         $this->tabungan = Tabungan::with(['profile', 'produkTabungan'])
-            ->find($this->idTabungan);
+            ->where('id', $this->idTabungan)
+            ->first();
 
         if (!$this->tabungan) {
+            Log::warning('Tabungan not found with ID: ' . $this->idTabungan);
+
             Notification::make()
                 ->title('Tabungan tidak ditemukan')
+                ->body('ID Tabungan: ' . $this->idTabungan)
                 ->danger()
                 ->persistent()
                 ->send();
 
             $this->redirectToMutasi();
+            return;
         }
+
+        Log::info('Tabungan loaded successfully', ['tabungan' => $this->tabungan->toArray()]);
     }
 
     public function mergeTransactions(): void
@@ -68,14 +97,16 @@ class MergeOldTransactions extends Page
                 $this->createOpeningTransaction($totalBalance, $cutoffDate);
                 $deletedCount = $this->deleteOldTransactions($cutoffDate);
 
-                Notification::make()
-                    ->title('Penggabungan transaksi berhasil')
-                    ->body("Berhasil menggabungkan {$deletedCount} transaksi lama.")
-                    ->success()
-                    ->persistent()
-                    ->send();
+                session()->flash('merge_success', [
+                    'title' => 'Penggabungan transaksi berhasil',
+                    'message' => "Berhasil menggabungkan {$deletedCount} transaksi lama."
+                ]);
 
-                $this->redirectToMutasi();
+                $this->redirect(
+                    route('filament.admin.pages.mutasi-tabungan-v2', [
+                        'record' => $this->tabungan->no_tabungan
+                    ])
+                );
             });
         } catch (Halt $e) {
             Notification::make()
@@ -151,6 +182,29 @@ class MergeOldTransactions extends Page
 
     protected function redirectToMutasi(): void
     {
-        $this->redirect(route('filament.admin.pages.mutasi-tabungan-v2'));
+        Log::info('Redirecting to Mutasi', [
+            'id_tabungan' => $this->idTabungan,
+            'tabungan' => $this->tabungan ? $this->tabungan->toArray() : null
+        ]);
+
+        if ($this->tabungan) {
+            $this->redirect(
+                route('filament.admin.pages.mutasi-tabungan-v2', [
+                    'record' => $this->tabungan->no_tabungan
+                ])
+            );
+        } else {
+            $this->redirect(route('filament.admin.pages.mutasi-tabungan-v2'));
+        }
+    }
+
+    public static function getUrl(array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?Model $tenant = null): string
+    {
+        return parent::getUrl($parameters, $isAbsolute, $panel, $tenant);
+    }
+
+    public static function getUrlWithParams($id_tabungan): string
+    {
+        return static::getUrl(['id_tabungan' => $id_tabungan]);
     }
 }

@@ -50,9 +50,17 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
     public $filterDate = [];
     public ?array $data = [];
 
-    public function mount(): void
+    public function mount($record = null): void
     {
-        $this->form->fill();
+        if ($record) {
+            // Set nilai pencarian berdasarkan record yang diterima
+            $this->form->fill([
+                'no_tabungan' => $record
+            ]);
+
+            // Trigger pencarian otomatis
+            $this->search();
+        }
 
         // Check for merge success notification from session
         if (session()->has('merge_success')) {

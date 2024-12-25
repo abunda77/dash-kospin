@@ -1,5 +1,6 @@
 @php
     use App\Models\TransaksiTabungan;
+    use App\Filament\Pages\MergeOldTransactions;
 @endphp
 
 <x-filament-panels::page>
@@ -36,9 +37,10 @@
             </div>
 
             <div class="flex justify-end gap-4 mt-4 mb-4 space-x-2">
+                // Contoh penggunaan di view atau komponen lain
                 <x-filament::button
                     tag="a"
-                    href="{{ route('filament.admin.pages.merge-old-transactions', ['id_tabungan' => $tabungan?->id]) }}"
+                    :href="MergeOldTransactions::getUrlWithParams($tabungan->id)"
                     color="warning"
                 >
                     Gabung Transaksi Lama
