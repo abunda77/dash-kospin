@@ -61,3 +61,7 @@ PR : api mutasi by range custom
 
 {{-- Gunakan URL absolut --}}
 img src="{{ config('app.url') }}/images/logo_koperasi.jpg" alt="Logo">
+
+<x-mail::header>
+   <img src="{{ asset('images/logo_koperasi.jpg') }}" alt="Logo" style="height: 50px;">
+/x-mail::header>
