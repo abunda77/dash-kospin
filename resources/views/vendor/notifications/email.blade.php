@@ -1,6 +1,9 @@
 <x-mail::message>
 {{-- <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo"> --}}
 
+{{-- Gunakan URL absolut --}}
+<img src="{{ config('app.url') }}/images/logo_koperasi.jpg" alt="Logo">
+
 {{-- Greeting --}}
 @if (! empty($greeting))
 # {{ $greeting }}
