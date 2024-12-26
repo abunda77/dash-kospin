@@ -1,5 +1,5 @@
 <x-mail::message>
-<img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo">
+{{-- <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo"> --}}
 
 {{-- Greeting --}}
 @if (! empty($greeting))
