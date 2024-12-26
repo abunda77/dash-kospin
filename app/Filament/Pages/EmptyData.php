@@ -13,9 +13,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Filament\Support\Exceptions\Halt;
 
+use Illuminate\Support\Facades\Artisan;
 use Filament\Notifications\Notification;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Spatie\Activitylog\Models\Activity as SpatieActivity;
+use Exception;
 
 class EmptyData extends Page
 {
@@ -169,6 +171,46 @@ class EmptyData extends Page
                         ->send();
 
                     throw new Halt($e->getMessage());
+                }
+            });
+    }
+
+    public function optimizeCache(): Action
+    {
+        return Action::make('optimizeCache')
+            ->label('Optimize Cache')
+            ->requiresConfirmation()
+            ->color('warning')
+            ->action(function () {
+                try {
+                    Log::info("Mencoba mengoptimasi cache");
+
+                    // Menjalankan perintah artisan
+                    Artisan::call('optimize:clear');
+                    Artisan::call('optimize');
+
+                    Log::info("Berhasil mengoptimasi cache");
+
+                    // Mengubah cara menampilkan notifikasi
+                    Notification::make()
+                        ->title('Cache berhasil dioptimasi')
+                        ->success()
+                        ->persistent() // Membuat notifikasi tetap ada sampai user menutupnya
+                        ->send();
+
+                    return true; // Menambahkan return value
+
+                } catch (Exception $e) {
+                    Log::error("Gagal mengoptimasi cache: " . $e->getMessage());
+
+                    Notification::make()
+                        ->title('Gagal mengoptimasi cache')
+                        ->body($e->getMessage()) // Menambahkan detail error
+                        ->danger()
+                        ->persistent() // Membuat notifikasi tetap ada sampai user menutupnya
+                        ->send();
+
+                    return false;
                 }
             });
     }
