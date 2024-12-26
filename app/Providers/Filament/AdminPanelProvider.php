@@ -24,6 +24,8 @@ use Rmsramos\Activitylog\ActivitylogPlugin;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 // use Mvenghaus\FilamentScheduleMonitor\FilamentPlugin;
 use Filament\Navigation\NavigationItem;
+use Joaopaulolndev\FilamentEditEnv\FilamentEditEnvPlugin;
+use Illuminate\Support\Facades\Auth;
 
 
 class AdminPanelProvider extends PanelProvider
@@ -91,7 +93,10 @@ class AdminPanelProvider extends PanelProvider
                 \TomatoPHP\FilamentArtisan\FilamentArtisanPlugin::make(),
                 ActivitylogPlugin::make()
                     ->navigationIcon('heroicon-o-shield-check')
-                    ->navigationCountBadge(true)
+                    ->navigationCountBadge(true),
+                FilamentEditEnvPlugin::make()
+                    ->showButton(fn () => Auth::guard('admin')->user()?->id === 1)
+                    ->setIcon('heroicon-o-cog'),
             ])
             ->plugin(FilamentSpatieLaravelHealthPlugin::make())
             ->plugin(\Mvenghaus\FilamentScheduleMonitor\FilamentPlugin::make());
