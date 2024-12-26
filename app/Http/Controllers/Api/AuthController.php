@@ -7,7 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Validation\Rules\Password;
+//use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rules\Password as PasswordRules;
+use Illuminate\Support\Str;
+use Illuminate\Auth\Events\PasswordReset;
 
 class AuthController extends Controller
 {
@@ -163,6 +167,114 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'Gagal memperbarui password',
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'email' => 'required|email|exists:users',
+            ], [
+                'email.required' => 'Email wajib diisi',
+                'email.email' => 'Format email tidak valid',
+                'email.exists' => 'Email tidak terdaftar'
+            ]);
+
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+
+            if ($status === Password::RESET_LINK_SENT) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Link reset password telah dikirim ke email Anda'
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal mengirim link reset password'
+            ], 400);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Gagal memproses permintaan',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function resetPassword(Request $request)
+    {
+        try {
+            $validatedData = $request->validate([
+                'token' => 'required',
+                'email' => 'required|email|exists:users',
+                'password' => ['required', 'confirmed', PasswordRules::min(8)
+                    // ->mixedCase()
+                    ->letters()
+                    ->numbers()],
+                    // ->symbols()],
+                'password_confirmation' => 'required'
+            ], [
+                'token.required' => 'Token tidak valid',
+                'email.required' => 'Email wajib diisi',
+                'email.email' => 'Format email tidak valid',
+                'email.exists' => 'Email tidak terdaftar',
+                'password.required' => 'Password baru wajib diisi',
+                'password.confirmed' => 'Konfirmasi password tidak cocok',
+                'password_confirmation.required' => 'Konfirmasi password wajib diisi'
+            ]);
+
+            $status = Password::reset(
+                $request->only('email', 'password', 'password_confirmation', 'token'),
+                function ($user, $password) {
+                    $user->forceFill([
+                        'password' => Hash::make($password)
+                    ])->setRememberToken(Str::random(60));
+
+                    $user->save();
+
+                    event(new PasswordReset($user));
+                }
+            );
+
+            if ($status === Password::PASSWORD_RESET) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Password berhasil direset'
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => trans($status)
+            ], 400);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan pada server',
+                'error' => [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]
             ], 500);
         }
     }

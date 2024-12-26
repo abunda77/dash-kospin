@@ -27,3 +27,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/deposito/detail', [DepositoController::class, 'getDetailByNoRekening']);
     Route::patch('/update-password', [AuthController::class, 'updatePassword']);
 });
+
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
