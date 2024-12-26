@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rules\Password as PasswordRules;
 use Illuminate\Support\Str;
 use Illuminate\Auth\Events\PasswordReset;
+use App\Jobs\SendResetPasswordEmail;
 
 class AuthController extends Controller
 {
@@ -182,21 +183,13 @@ class AuthController extends Controller
                 'email.exists' => 'Email tidak terdaftar'
             ]);
 
-            $status = Password::sendResetLink(
-                $request->only('email')
-            );
-
-            if ($status === Password::RESET_LINK_SENT) {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Link reset password telah dikirim ke email Anda'
-                ], 200);
-            }
+            // Dispatch job untuk mengirim email
+            SendResetPasswordEmail::dispatch($validatedData['email']);
 
             return response()->json([
-                'status' => false,
-                'message' => 'Gagal mengirim link reset password'
-            ], 400);
+                'status' => true,
+                'message' => 'Link reset password akan dikirim ke email Anda'
+            ], 200);
 
         } catch (ValidationException $e) {
             return response()->json([
