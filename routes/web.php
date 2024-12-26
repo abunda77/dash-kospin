@@ -16,10 +16,6 @@ Route::get('/reset-password/{token}', function (string $token) {
     return view('auth.reset-password', ['token' => $token]);
 })->middleware('guest')->name('password.reset');
 
-Route::post('/reset-password', function (Request $request) {
-    // Redirect ke aplikasi mobile dengan token
-    return redirect()->away('your-mobile-app://reset-password?' . http_build_query([
-        'token' => $request->token,
-        'email' => $request->email
-    ]));
-})->middleware('guest')->name('password.update');
+Route::post('/reset-password', [App\Http\Controllers\Api\AuthController::class, 'resetPassword'])
+    ->middleware('guest')
+    ->name('password.update');
