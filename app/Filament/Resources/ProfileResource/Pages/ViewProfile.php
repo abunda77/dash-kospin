@@ -22,7 +22,7 @@ class ViewProfile extends ViewRecord
                         'profile' => $this->record
                     ]);
 
-                    $filename = $this->record->first_name . '_' . $this->record->last_name . '.pdf';
+                    $filename = 'profile_nasabah_' . $this->record->first_name . '_' . $this->record->last_name . '.pdf';
 
                     return response()->streamDownload(function () use ($pdf) {
                         echo $pdf->output();

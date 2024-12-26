@@ -113,6 +113,31 @@
                     <td>:</td>
                     <td>{{ $pinjaman->profile->address }}</td>
                 </tr>
+                @php
+                    $getRegionName = function($code) {
+                        return DB::table('regions')->where('code', $code)->value('name') ?? '-';
+                    };
+                @endphp
+                <tr>
+                    <td>Provinsi</td>
+                    <td>:</td>
+                    <td>{{ $getRegionName($pinjaman->profile->province_id) }}</td>
+                </tr>
+                <tr>
+                    <td>Kabupaten/Kota</td>
+                    <td>:</td>
+                    <td>{{ $getRegionName($pinjaman->profile->district_id) }}</td>
+                </tr>
+                <tr>
+                    <td>Kecamatan</td>
+                    <td>:</td>
+                    <td>{{ $getRegionName($pinjaman->profile->city_id) }}</td>
+                </tr>
+                <tr>
+                    <td>Desa/Kelurahan</td>
+                    <td>:</td>
+                    <td>{{ $getRegionName($pinjaman->profile->village_id) }}</td>
+                </tr>
             </table>
             <p>Dalam hal ini bertindak untuk dan atas nama diri sendiri, selanjutnya disebut sebagai PIHAK PERTAMA.</p>
         </div>
@@ -191,7 +216,7 @@
         </ol>
     </div>
 
-    <div class="article">
+    <div class="article"><br><br><br><br><br>
         <h3>Pasal 7<br>KEADAAN LUAR BIASA (FORCE MAJEURE)</h3>
         <ol>
             <li>Apabila terjadi keadaan kahar (force majeure) seperti bencana alam, kerusuhan, atau kejadian lain yang di luar kemampuan kedua belah pihak dan mengakibatkan PIHAK PERTAMA tidak dapat melaksanakan kewajibannya, maka PIHAK KEDUA akan memberikan toleransi sesuai kesepakatan bersama.</li>

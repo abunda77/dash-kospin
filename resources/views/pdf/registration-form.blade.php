@@ -105,6 +105,27 @@
             <span class="label">Alamat Lengkap</span>:
             <span class="value">{{ $profile->address }}</span>
         </div>
+        @php
+            $getRegionName = function($code) {
+                return DB::table('regions')->where('code', $code)->value('name') ?? '-';
+            };
+        @endphp
+        <div class="form-group">
+            <span class="label">Provinsi</span>:
+            <span class="value">{{ $getRegionName($profile->province_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Kabupaten/Kota</span>:
+            <span class="value">{{ $getRegionName($profile->district_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Kecamatan</span>:
+            <span class="value">{{ $getRegionName($profile->city_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Desa/Kelurahan</span>:
+            <span class="value">{{ $getRegionName($profile->village_id) }}</span>
+        </div>
         <div class="form-group">
             <span class="label">Nomor Telepon/HP</span>:
             <span class="value">{{ $profile->phone }}</span>

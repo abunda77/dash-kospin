@@ -157,10 +157,45 @@
             </table>
 
             <div class="customer-info">
-                <div class="certificate-number">No. Sertifikat : {{ $deposito->nomor_rekening }}</div>
-                <p>No Anggota : {{ $deposito->profile->no_anggota ?? '-' }}</p>
-                <p>Atas Nama : {{ $deposito->profile->first_name }} {{ $deposito->profile->last_name }}</p>
-                <p>Alamat : {{ $deposito->profile->address }}</p>
+                <table style="border-collapse: collapse; width: 100%;">
+                    <tr>
+                        <td style="width: 150px; border: none;">No. Sertifikat</td>
+                        <td style="border: none;">: {{ $deposito->nomor_rekening }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">No Anggota</td>
+                        <td style="border: none;">: {{ $deposito->profile->no_anggota ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Atas Nama</td>
+                        <td style="border: none;">: {{ $deposito->profile->first_name }} {{ $deposito->profile->last_name }}</td>
+                    </tr>
+                    @php
+                        $getRegionName = function($code) {
+                            return DB::table('regions')->where('code', $code)->value('name') ?? '-';
+                        };
+                    @endphp
+                    <tr>
+                        <td style="border: none;">Alamat</td>
+                        <td style="border: none;">: {{ $deposito->profile->address }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Provinsi</td>
+                        <td style="border: none;">: {{ $getRegionName($deposito->profile->province_id) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Kabupaten/Kota</td>
+                        <td style="border: none;">: {{ $getRegionName($deposito->profile->district_id) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Kecamatan</td>
+                        <td style="border: none;">: {{ $getRegionName($deposito->profile->city_id) }}</td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Desa/Kelurahan</td>
+                        <td style="border: none;">: {{ $getRegionName($deposito->profile->village_id) }}</td>
+                    </tr>
+                </table>
             </div>
 
             <div class="signature">

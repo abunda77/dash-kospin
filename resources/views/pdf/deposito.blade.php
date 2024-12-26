@@ -122,6 +122,27 @@
             <span class="label">7. Alamat KTP</span>:
             <span class="value">{{ $deposito->profile->address }}</span>
         </div>
+        @php
+            $getRegionName = function($code) {
+                return DB::table('regions')->where('code', $code)->value('name') ?? '-';
+            };
+        @endphp
+        <div class="form-group">
+            <span class="label">Provinsi</span>:
+            <span class="value">{{ $getRegionName($deposito->profile->province_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Kabupaten/Kota</span>:
+            <span class="value">{{ $getRegionName($deposito->profile->district_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Kecamatan</span>:
+            <span class="value">{{ $getRegionName($deposito->profile->city_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Desa/Kelurahan</span>:
+            <span class="value">{{ $getRegionName($deposito->profile->village_id) }}</span>
+        </div>
         <div class="form-group">
             <span class="label">8. Nomor Telepon/HP</span>:
             <span class="value">{{ $deposito->profile->phone }}</span>

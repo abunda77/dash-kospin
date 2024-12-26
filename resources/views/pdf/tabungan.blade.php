@@ -117,20 +117,41 @@
             <span class="label">7. Alamat KTP</span>:
             <span class="value">{{ $tabungan->profile->address }}</span>
         </div>
+        @php
+            $getRegionName = function($code) {
+                return DB::table('regions')->where('code', $code)->value('name') ?? '-';
+            };
+        @endphp
         <div class="form-group">
-            <span class="label">9. Nomor Telepon/HP</span>:
+            <span class="label">Provinsi</span>:
+            <span class="value">{{ $getRegionName($tabungan->profile->province_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Kabupaten/Kota</span>:
+            <span class="value">{{ $getRegionName($tabungan->profile->district_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Kecamatan</span>:
+            <span class="value">{{ $getRegionName($tabungan->profile->city_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">Desa/Kelurahan</span>:
+            <span class="value">{{ $getRegionName($tabungan->profile->village_id) }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">8. Nomor Telepon/HP</span>:
             <span class="value">{{ $tabungan->profile->phone }}</span>
         </div>
         <div class="form-group">
-            <span class="label">10. Email</span>:
+            <span class="label">9. Email</span>:
             <span class="value">{{ $tabungan->profile->email }}</span>
         </div>
         <div class="form-group">
-            <span class="label">11. Pekerjaan</span>:
+            <span class="label">10. Pekerjaan</span>:
             <span class="value">{{ $tabungan->profile->job }}</span>
         </div>
         <div class="form-group">
-            <span class="label">14. Penghasilan Per Bulan</span>:
+            <span class="label">11. Penghasilan Per Bulan</span>:
             <span class="value">Rp {{ number_format($tabungan->profile->monthly_income, 0, ',', '.') }}</span>
         </div>
     </div>
