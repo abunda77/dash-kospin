@@ -59,3 +59,5 @@ redis-cli FLUSHDB
 PR : api mutasi by range custom
 
 
+{{-- Gunakan URL absolut --}}
+img src="{{ config('app.url') }}/images/logo_koperasi.jpg" alt="Logo">
