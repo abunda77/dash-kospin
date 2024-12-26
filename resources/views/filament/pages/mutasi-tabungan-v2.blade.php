@@ -37,7 +37,7 @@
             </div>
 
             <div class="flex justify-end gap-4 mt-4 mb-4 space-x-2">
-                // Contoh penggunaan di view atau komponen lain
+
                 <x-filament::button
                     tag="a"
                     :href="MergeOldTransactions::getUrlWithParams($tabungan->id)"
