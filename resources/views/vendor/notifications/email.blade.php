@@ -2,7 +2,9 @@
 {{-- <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo"> --}}
 
 {{-- Gunakan URL absolut --}}
-<img src="{{ config('app.url') }}/images/logo_koperasi.jpg" alt="Logo" width="300" height="auto">
+<div style="text-align: center;">
+    <img src="{{ config('app.url') }}/images/logo_koperasi.jpg" alt="Logo" width="300" height="auto">
+</div>
 
 {{-- Greeting --}}
 @if (! empty($greeting))
