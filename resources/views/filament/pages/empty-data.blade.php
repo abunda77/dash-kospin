@@ -91,5 +91,18 @@
             </div>
         </x-filament::card>
 
+        {{-- Card Cache Optimizer --}}
+        <x-filament::card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-lg font-bold">Cache Optimizer</h2>
+                    <p class="text-sm text-gray-600">
+                        Membersihkan dan mengoptimasi cache aplikasi
+                    </p>
+                </div>
+                {{ $this->optimizeCache() }}
+            </div>
+        </x-filament::card>
+
     </div>
 </x-filament-panels::page>
