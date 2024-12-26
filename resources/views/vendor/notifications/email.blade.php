@@ -2,7 +2,7 @@
 {{-- <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo"> --}}
 
 {{-- Gunakan URL absolut --}}
-<div style="text-align: center;">
+<div style="text-align: center; margin-bottom: 20px;">
     <img src="{{ config('app.url') }}/images/logo_koperasi.jpg" alt="Logo" width="300" height="auto">
 </div>
 
