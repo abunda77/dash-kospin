@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use App\Events\TransaksiTabunganCreated;
 
 class TransaksiTabungan extends Model
 {
@@ -29,6 +30,10 @@ class TransaksiTabungan extends Model
 
     const JENIS_SETORAN = 'debit';
     const JENIS_PENARIKAN = 'kredit';
+
+    protected $dispatchesEvents = [
+        'created' => TransaksiTabunganCreated::class,
+    ];
 
     public function tabungan()
     {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use App\Events\TransaksiPinjamanCreated;
 
 class TransaksiPinjaman extends Model
 {
@@ -23,6 +24,10 @@ class TransaksiPinjaman extends Model
         'status_pembayaran',
         'angsuran_ke',
         'hari_terlambat'
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => TransaksiPinjamanCreated::class,
     ];
 
     protected $casts = [
@@ -46,6 +51,7 @@ class TransaksiPinjaman extends Model
     {
         return LogOptions::defaults()
             ->logOnly([
+                'id',
                 'tanggal_pembayaran',
                 'pinjaman_id',
                 'angsuran_pokok',
@@ -58,4 +64,11 @@ class TransaksiPinjaman extends Model
                 'hari_terlambat'
             ]);
     }
+
+    // protected static function booted()
+    // {
+    //     static::created(function ($transaksi) {
+    //         event(new TransaksiPinjamanCreated($transaksi));
+    //     });
+    // }
 }
