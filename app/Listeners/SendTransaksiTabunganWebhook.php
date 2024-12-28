@@ -26,9 +26,41 @@ class SendTransaksiTabunganWebhook
         ];
 
         try {
-            Http::post(env('WEBHOOK_URL'), $data);
+            $webhookUrl = config('services.webhook.transaksi_tabungan_url');
+
+            if (!$webhookUrl) {
+                Log::warning('URL webhook tidak dikonfigurasi');
+                return;
+            }
+
+            // Tambahkan timeout dan retry
+            $response = Http::timeout(15) // timeout 15 detik
+                ->retry(3, 100) // retry 3x dengan jeda 100ms
+                ->post($webhookUrl, $data);
+
+            // Tambahkan logging lebih detail
+            Log::info('Mencoba mengirim webhook', [
+                'url' => $webhookUrl,
+                'transaksi_id' => $transaksi->id,
+                'response_status' => $response->status(),
+                'response_body' => $response->body()
+            ]);
+
+            if (!$response->successful()) {
+                Log::error('Webhook gagal terkirim', [
+                    'transaksi_id' => $transaksi->id,
+                    'response_status' => $response->status(),
+                    'response_body' => $response->body()
+                ]);
+            }
         } catch (\Exception $e) {
-            Log::error('Webhook error: ' . $e->getMessage());
+            Log::error('Error saat mengirim webhook', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'transaksi_id' => $transaksi->id ?? null
+            ]);
         }
     }
 }

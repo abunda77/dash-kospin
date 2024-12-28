@@ -154,7 +154,7 @@ class MergeOldTransactions extends Page
         $timestamp = date('YmdHis');
         $openingTransaction->kode_transaksi = "00G{$timestamp}";
 
-        $openingTransaction->keterangan = 'Saldo awal dari penggabungan transaksi sebelum ' . $cutoffDate->format('d-m-Y');
+        $openingTransaction->keterangan = 'Gabungan transaksi ' . $cutoffDate->format('d-m-Y');
         $openingTransaction->jenis_transaksi = $totalBalance >= 0 ? 'debit' : 'kredit';
         $openingTransaction->jumlah = abs($totalBalance);
 
