@@ -2,17 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TransaksiPinjamanResource\Pages;
-use App\Filament\Resources\TransaksiPinjamanResource\RelationManagers;
-use App\Models\TransaksiPinjaman;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Pinjaman;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Support\RawJs;
+use Filament\Resources\Resource;
+use App\Models\TransaksiPinjaman;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Support\RawJs;
+use App\Filament\Resources\TransaksiPinjamanResource\Pages;
+use App\Filament\Resources\TransaksiPinjamanResource\RelationManagers;
 
 class TransaksiPinjamanResource extends Resource
 {
@@ -39,8 +40,10 @@ class TransaksiPinjamanResource extends Resource
             Forms\Components\DatePicker::make('tanggal_pembayaran')
                 ->label('Tanggal Pembayaran')
                 ->required(),
-            Forms\Components\TextInput::make('pinjaman.no_pinjaman')
+            Forms\Components\Select::make('pinjaman_id')
                 ->label('Nomor Pinjaman')
+                ->options(fn () => Pinjaman::pluck('no_pinjaman', 'id_pinjaman'))
+                ->searchable()
                 ->required(),
             Forms\Components\TextInput::make('angsuran_pokok')
                 ->label('Angsuran Pokok')

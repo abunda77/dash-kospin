@@ -4,34 +4,40 @@ namespace App\Listeners;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
-use App\Events\TransaksiTabunganCreated;
+use App\Events\TransaksiPinjamanCreated;
 
-class SendTransaksiTabunganWebhook
+class SendTransaksiPinjamanCreateWebhook
 {
-    public function handle(TransaksiTabunganCreated $event): void
+    public function handle(TransaksiPinjamanCreated $event): void
     {
-        $transaksi = $event->transaksi;
-
-        $data = [
-            'id' => $transaksi->id,
-            'id_tabungan' => $transaksi->id_tabungan,
-            'jenis_transaksi' => $transaksi->jenis_transaksi,
-            'jumlah' => $transaksi->jumlah,
-            'tanggal_transaksi' => $transaksi->tanggal_transaksi,
-            'keterangan' => $transaksi->keterangan,
-            'kode_transaksi' => $transaksi->kode_transaksi,
-            'kode_teller' => $transaksi->kode_teller,
-            'created_at' => $transaksi->created_at,
-            'updated_at' => $transaksi->updated_at
-        ];
-
         try {
-            $webhookUrl = config('services.webhook.transaksi_tabungan_url');
+            $transaksi = $event->transaksi;
+            $webhookUrl = config('services.webhook.transaksi_pinjaman_url');
 
             if (!$webhookUrl) {
                 Log::warning('URL webhook tidak dikonfigurasi');
                 return;
             }
+
+            $data = [
+                'status_code' => 200,
+                'mode' => 'create',
+                'data' => [
+                    'id' => $transaksi->id,
+                    'tanggal_pembayaran' => $transaksi->tanggal_pembayaran,
+                    'pinjaman_id' => $transaksi->pinjaman_id,
+                    'angsuran_pokok' => $transaksi->angsuran_pokok,
+                    'angsuran_bunga' => $transaksi->angsuran_bunga,
+                    'denda' => $transaksi->denda,
+                    'total_pembayaran' => $transaksi->total_pembayaran,
+                    'sisa_pinjaman' => $transaksi->sisa_pinjaman,
+                    'status_pembayaran' => $transaksi->status_pembayaran,
+                    'angsuran_ke' => $transaksi->angsuran_ke,
+                    'hari_terlambat' => $transaksi->hari_terlambat,
+                    'created_at' => $transaksi->created_at,
+                    'updated_at' => $transaksi->updated_at
+                ]
+            ];
 
             // Tambahkan timeout dan retry
             $response = Http::timeout(15) // timeout 15 detik

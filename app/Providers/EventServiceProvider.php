@@ -2,6 +2,18 @@
 
 namespace App\Providers;
 
+use App\Events\TransaksiPinjamanCreated;
+use App\Events\TransaksiPinjamanDeleted;
+use App\Events\TransaksiPinjamanUpdated;
+use App\Events\TransaksiTabunganCreated;
+use App\Events\TransaksiTabunganDeleted;
+use App\Events\TransaksiTabunganUpdated;
+use App\Listeners\SendTransaksiPinjamanCreateWebhook;
+use App\Listeners\SendTransaksiPinjamanDeleteWebhook;
+use App\Listeners\SendTransaksiPinjamanUpdateWebhook;
+use App\Listeners\SendTransaksiTabunganCreateWebhook;
+use App\Listeners\SendTransaksiTabunganDeleteWebhook;
+use App\Listeners\SendTransaksiTabunganUpdateWebhook;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -14,12 +26,24 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         // ... event lainnya ...
 
-        \App\Events\TransaksiTabunganCreated::class => [
-            \App\Listeners\SendTransaksiTabunganWebhook::class,
+        TransaksiTabunganCreated::class => [
+            SendTransaksiTabunganCreateWebhook::class,
+        ],
+        TransaksiTabunganDeleted::class => [
+            SendTransaksiTabunganDeleteWebhook::class,
+        ],
+        TransaksiTabunganUpdated::class => [
+            SendTransaksiTabunganUpdateWebhook::class,
         ],
 
-        \App\Events\TransaksiPinjamanCreated::class => [
-            \App\Listeners\SendTransaksiPinjamanWebhook::class,
+        TransaksiPinjamanCreated::class => [
+            SendTransaksiPinjamanCreateWebhook::class,
+        ],
+        TransaksiPinjamanDeleted::class => [
+            SendTransaksiPinjamanDeleteWebhook::class,
+        ],
+        TransaksiPinjamanUpdated::class => [
+            SendTransaksiPinjamanUpdateWebhook::class,
         ],
     ];
 }

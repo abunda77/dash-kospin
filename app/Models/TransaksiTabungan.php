@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
 use App\Events\TransaksiTabunganCreated;
+use App\Events\TransaksiTabunganDeleted;
+use App\Events\TransaksiTabunganUpdated;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class TransaksiTabungan extends Model
 {
@@ -33,6 +35,8 @@ class TransaksiTabungan extends Model
 
     protected $dispatchesEvents = [
         'created' => TransaksiTabunganCreated::class,
+        'updated' => TransaksiTabunganUpdated::class,
+        'deleted' => TransaksiTabunganDeleted::class,
     ];
 
     public function tabungan()

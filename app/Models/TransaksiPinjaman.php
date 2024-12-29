@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Illuminate\Database\Eloquent\Model;
 use App\Events\TransaksiPinjamanCreated;
+use App\Events\TransaksiPinjamanDeleted;
+use App\Events\TransaksiPinjamanUpdated;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class TransaksiPinjaman extends Model
 {
@@ -28,6 +30,8 @@ class TransaksiPinjaman extends Model
 
     protected $dispatchesEvents = [
         'created' => TransaksiPinjamanCreated::class,
+        'deleted' => TransaksiPinjamanDeleted::class,
+        'updated' => TransaksiPinjamanUpdated::class,
     ];
 
     protected $casts = [
