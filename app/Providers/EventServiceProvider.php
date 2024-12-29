@@ -2,12 +2,18 @@
 
 namespace App\Providers;
 
+use App\Events\DepositoCreated;
+use App\Events\DepositoDeleted;
+use App\Events\DepositoUpdated;
 use App\Events\TransaksiPinjamanCreated;
 use App\Events\TransaksiPinjamanDeleted;
 use App\Events\TransaksiPinjamanUpdated;
 use App\Events\TransaksiTabunganCreated;
 use App\Events\TransaksiTabunganDeleted;
 use App\Events\TransaksiTabunganUpdated;
+use App\Listeners\HandleDepositoCreated;
+use App\Listeners\HandleDepositoDeleted;
+use App\Listeners\HandleDepositoUpdated;
 use App\Listeners\SendTransaksiPinjamanCreateWebhook;
 use App\Listeners\SendTransaksiPinjamanDeleteWebhook;
 use App\Listeners\SendTransaksiPinjamanUpdateWebhook;
@@ -44,6 +50,16 @@ class EventServiceProvider extends ServiceProvider
         ],
         TransaksiPinjamanUpdated::class => [
             SendTransaksiPinjamanUpdateWebhook::class,
+        ],
+
+        DepositoCreated::class => [
+            HandleDepositoCreated::class,
+        ],
+        DepositoUpdated::class => [
+            HandleDepositoUpdated::class,
+        ],
+        DepositoDeleted::class => [
+            HandleDepositoDeleted::class,
         ],
     ];
 }

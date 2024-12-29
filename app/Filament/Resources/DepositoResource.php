@@ -48,7 +48,8 @@ class DepositoResource extends Resource
                         } while (Deposito::where('nomor_rekening', $number)->exists());
                         return $number;
                     })
-                    ->disabled(),
+                    ->disabled()
+                    ->dehydrated(true), // Pastikan nilai field ini disimpan ke database
 
                 Forms\Components\TextInput::make('nominal_penempatan')
                     ->label('Nominal Penempatan')

@@ -6,10 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use App\Events\DepositoCreated;
+use App\Events\DepositoUpdated;
+use App\Events\DepositoDeleted;
 
 class Deposito extends Model
 {
     use LogsActivity;
+
+    protected $dispatchesEvents = [
+        'created' => DepositoCreated::class,
+        'updated' => DepositoUpdated::class,
+        'deleted' => DepositoDeleted::class,
+    ];
 
     protected $fillable = [
         'id_user',
