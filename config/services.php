@@ -36,9 +36,9 @@ return [
     ],
 
     'webhook' => [
-        'transaksi_pinjaman_url' => env('WEBHOOK_URL'),
-        'transaksi_tabungan_url' => env('WEBHOOK_URL'),
-        'deposito_url' => env('WEBHOOK_URL'),
+        'transaksi_pinjaman_url' => env('WEBHOOK_URL_TRANSAKSI_PINJAMAN'),
+        'transaksi_tabungan_url' => env('WEBHOOK_URL_TRANSAKSI_TABUNGAN'),
+        'deposito_url' => env('WEBHOOK_URL_DEPOSITO'),
     ],
 
 ];
