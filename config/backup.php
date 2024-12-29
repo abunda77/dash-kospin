@@ -339,4 +339,11 @@ return [
         'retry_delay' => 0,
     ],
 
+
+    'mysql' => [
+        'dump' => [
+            'dump_binary_path' => '/usr/bin', // Path ke mysqldump di Linux
+        ],
+    ],
+
 ];
