@@ -340,10 +340,14 @@ return [
     ],
 
 
-    'mysql' => [
-        'dump' => [
-            'dump_binary_path' => '/usr/bin', // Path ke mysqldump di Linux
-        ],
+    'connections' => [
+        'mysql' => [
+            'driver' => 'mysql',
+            'dump' => [
+                'dump_binary_path' => '/usr/bin',
+
+            ]
+        ]
     ],
 
 ];
