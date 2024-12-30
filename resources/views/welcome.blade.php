@@ -1,49 +1,32 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Koperasi Sinarartha</title>
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body class="min-h-screen antialiased bg-gradient-to-br from-slate-900 to-slate-800">
-        <div class="relative min-h-screen sm:flex sm:justify-center sm:items-center">
-            <!-- Navigation -->
-            @if (Route::has('login'))
-                <div class="z-10 p-6 text-right sm:fixed sm:top-0 sm:right-0">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="font-semibold text-white hover:text-slate-300 focus:outline focus:outline-2 focus:rounded-sm focus:outline-slate-500">Dashboard</a>
-                    @else
-                        <a href="{{ route('login') }}" class="font-semibold text-white hover:text-slate-300 focus:outline focus:outline-2 focus:rounded-sm focus:outline-slate-500">Log in</a>
-
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="ml-4 font-semibold text-white hover:text-slate-300 focus:outline focus:outline-2 focus:rounded-sm focus:outline-slate-500">Register</a>
-                        @endif
-                    @endauth
-                </div>
-            @endif
-
-            <!-- Main Content -->
-            <div class="p-6 mx-auto max-w-7xl lg:p-8">
-                <div class="flex justify-center">
-                    <img src="/images/logo_sinarartha_dark.png" alt="Logo Sinarartha Light" class="block w-auto h-auto dark:hidden">
-                    <img src="/images/logo_sinarartha_light.png" alt="Logo Sinarartha Dark" class="hidden w-auto h-auto dark:block">
-                </div>
-
-                <div class="mt-16">
-                    <div class="grid grid-cols-1 gap-6 lg:gap-8">
-                        <div class="scale-100 p-6 bg-gray-300 dark:bg-slate-800/50 dark:bg-gradient-to-bl from-slate-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250">
-                            <div class="flex items-center justify-center">
-                                <div class="flex flex-col items-center justify-center py-8">
-                                    <p class="max-w-2xl font-serif text-2xl italic leading-relaxed text-center text-slate-600 dark:text-slate-200">
-                                        "{{ $quote }}"
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koperasi Sinarartha</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="flex items-center justify-center min-h-screen font-sans text-white bg-gradient-to-br from-blue-950 to-blue-900">
+    @if (Route::has('login'))
+        <div class="fixed top-4 right-4">
+            @auth
+                <a href="{{ url('/dashboard') }}" class="ml-4 font-semibold text-white transition-opacity hover:opacity-80">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}" class="ml-4 font-semibold text-white transition-opacity hover:opacity-80">Log in</a>
+                @if (Route::has('register'))
+                    <a href="{{ route('register') }}" class="ml-4 font-semibold text-white transition-opacity hover:opacity-80">Register</a>
+                @endif
+            @endauth
         </div>
-    </body>
+    @endif
+
+    <div class="p-4 text-center md:p-6 lg:p-8">
+        <div class="mb-4 md:mb-6 lg:mb-8">
+            <img src="/images/logo_sinarartha_dark.png" alt="Logo Sinarartha" class="w-full max-w-[300px] md:max-w-[450px] lg:max-w-[600px] h-auto mx-auto">
+        </div>
+        <div class="max-w-[90%] md:max-w-2xl lg:max-w-3xl mx-auto text-lg md:text-2xl lg:text-2xl italic leading-relaxed text-slate-300">
+            "{{ $quote }}"
+        </div>
+    </div>
+</body>
 </html>
