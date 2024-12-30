@@ -33,30 +33,11 @@
                 <div class="mt-16">
                     <div class="grid grid-cols-1 gap-6 lg:gap-8">
                         <div class="scale-100 p-6 bg-gray-300 dark:bg-slate-800/50 dark:bg-gradient-to-bl from-slate-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250">
-                            <div>
+                            <div class="flex items-center justify-center">
                                 <div class="flex flex-col items-center justify-center py-8">
                                     <p class="max-w-2xl font-serif text-2xl italic leading-relaxed text-center text-slate-600 dark:text-slate-200">
                                         "{{ $quote }}"
                                     </p>
-                                </div>
-
-
-
-                                <div class="flex gap-4 mt-8">
-                                    <button class="inline-flex items-center justify-center h-10 px-4 py-2 text-sm font-medium transition-colors rounded-md ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90">
-                                        Primary Button
-                                    </button>
-
-                                    <button class="inline-flex items-center justify-center h-10 px-4 py-2 text-sm font-medium transition-colors bg-white border rounded-md ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 border-slate-200 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50">
-                                        Secondary Button
-                                    </button>
-
-                                    <button class="inline-flex items-center justify-center h-10 px-4 py-2 text-sm font-medium transition-colors border rounded-md ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300 border-slate-200 text-slate-900 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:text-slate-50 dark:hover:bg-slate-800 dark:hover:text-slate-50">
-                                        Outline Button
-                                    </button>
-                                    <button variant="destructive">
-                                        Destructive
-                                    </button>
                                 </div>
                             </div>
                         </div>
