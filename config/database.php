@@ -61,7 +61,8 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
             'dump' => [
-                'dump_binary_path' => 'C:\\laragon\\bin\\mysql\\mysql-8.0.30-winx64\\bin\\',
+                //'dump_binary_path' => 'C:\\laragon\\bin\\mysql\\mysql-8.0.30-winx64\\bin\\', // For Windows
+                'dump_binary_path' => '/usr/bin', // For Linux
                 'use_single_transaction' => true,
                 'timeout' => 300,
                 'add_extra_option' => '--protocol=TCP --host=127.0.0.1 --port=3306 --force --skip-lock-tables --quick',

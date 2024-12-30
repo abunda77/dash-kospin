@@ -340,15 +340,6 @@ return [
     ],
 
 
-    'connections' => [
-        'mysql' => [
-            'driver' => 'mysql',
-            'dump' => [
-                'dump_binary_path' => '/usr/bin',
-            'dump_command_path' => '/usr/bin/mysqldump',
 
-            ]
-        ]
-    ],
 
 ];
