@@ -31,7 +31,7 @@ storage/framework/sessions/.gitignore
 storage/framework/testing/.gitignore
 storage/framework/views/.gitignore
 storage/logs/.gitignore
-PENTING!.txt
+PENTING.txt
 
 
 **/caddy
