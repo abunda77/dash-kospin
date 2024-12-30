@@ -16,11 +16,21 @@ php artisan tabungan:hitung-bunga --all
 # Untuk menghapus duplikat perhitungan bunga
 php artisan tabungan:hitung-bunga --hapus-duplikat
 
-# Untuk mode interaktif (pilihan manual)
+# Untuk mode interactives (pilihan manual)
 php artisan tabungan:hitung-bunga
 
-
+mysqldump -u kosp_kospin –pkospin123123 kosp_kospin > backup_kosp_kospin.sql
+mysqldump -u kosp_kospin –p kosp_kospin -h localhost > backup_kosp_kospin.sql
 mysql -u kosp_kospin -pkospin123123 kosp_kospin < mysql-kospin.sql
+mysql -u prod_kospin -pkospin123123 prod_kospin < mysql-kospin.sql
+mysql -u prod_kospin -pkospin123123 prod_kospin < kosp_kospin.sql
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kosp_kospin
+DB_USERNAME=kosp_kospin
+DB_PASSWORD=kospin123123
 
 composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 git config --global alias.graph "log --graph --oneline --decorate --all"
@@ -36,6 +46,8 @@ https://filamentphp.com/plugins/rmsramos-activitylog -- done
 
 php artisan octane:frankenphp --host=46.102.156.214  --port=8005
 php artisan octane:frankenphp --host=46.102.156.214  --port=8111
+php artisan octane:frankenphp --host=46.102.156.214  --port=8112
+
 
 php artisan octane:frankenphp --host=193.219.97.148  --port=8001
 
@@ -72,3 +84,68 @@ img src="{{ config('app.url') }}/images/logo_koperasi.jpg" alt="Logo">
 <x-mail::header>
    <img src="{{ asset('images/logo_koperasi.jpg') }}" alt="Logo" style="height: 50px;">
 /x-mail::header>
+
+
+
+
+[Unit]
+Description=Laravel Queue Worker Production
+After=network.target
+
+[Service]
+Environment="APP_ENV=local"
+Environment="DB_CONNECTION=mysql"
+EnvironmentFile=/home/production.kospinsinaraartha.co.id/dash-kospin/.env
+ExecStart=/usr/local/lsws/lsphp83/bin/php /home/production.kospinsinaraartha.co.id/dash-kospin/artisan queue:work --tries=3
+
+[Install]
+WantedBy=multi-user.target
+
+===
+
+
+[Unit]
+Description=Laravel Queue Worker Production
+After=network.target
+
+[Service]
+Environment="APP_ENV=local"
+Environment="DB_CONNECTION=mysql"
+EnvironmentFile=/home/production.kospinsinaraartha.co.id/dash-kospin/.env
+ExecStart=/usr/local/lsws/lsphp83/bin/php /home/production.kospinsinaraartha.co.id/dash-kospin/artisan queue:work --tries=3
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+=== Laravel Schedule Production ===
+
+[Unit]
+Description=Laravel Schedule Worker Production
+After=network.target
+
+[Service]
+Environment="APP_ENV=local"
+Environment="DB_CONNECTION=mysql"
+EnvironmentFile=/home/production.kospinsinaraartha.co.id/dash-kospin/.env
+ExecStart=/usr/local/lsws/lsphp83/bin/php /home/production.kospinsinaraartha.co.id/dash-kospin/artisan schedule:work
+
+[Install]
+WantedBy=multi-user.target
+
+
+=== Laravel Schedule Staging ===
+[Unit]
+Description=Laravel Schedule Worker Staging
+After=network.target
+
+[Service]
+Environment="APP_ENV=local"
+Environment="DB_CONNECTION=mysql"
+EnvironmentFile=/home/dash.kospinsinaraartha.co.id/public_html/.env
+ExecStart=/usr/local/lsws/lsphp83/bin/php /home/dash.kospinsinaraartha.co.id/public_html/artisan schedule:work
+
+[Install]
+WantedBy=multi-user.target
+
