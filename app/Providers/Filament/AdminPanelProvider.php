@@ -48,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 'Data Nasabah',
+                'Data Karyawan',
                 'Tabungan',
                 'Deposito',
                 'Pinjaman',
