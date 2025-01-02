@@ -45,10 +45,12 @@ class KirimEmail extends Page
                 TextInput::make('subject')
                     ->label('Subjek Email')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->hint('Variabel yang tersedia: {first_name}, {last_name}'),
                 RichEditor::make('message')
                     ->label('Isi Pesan')
                     ->required()
+                    ->hint('Variabel yang tersedia: {first_name}, {last_name}')
                     ->toolbarButtons([
                         'bold',
                         'italic',
@@ -87,7 +89,7 @@ class KirimEmail extends Page
         try {
             DB::beginTransaction();
 
-            SendProfileEmail::dispatch($mailData, $profile->email);
+            SendProfileEmail::dispatch($mailData, $profile->email, $profile->id_user);
 
             DB::commit();
 
