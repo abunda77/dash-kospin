@@ -125,7 +125,15 @@ class ListKeterlambatanBulanIni extends Page implements HasTable, HasForms
 
     private function calculateDenda($record, $angsuranPokok, $hariTerlambat)
     {
-        return ($record->denda->rate_denda/100 * $angsuranPokok / 30) * $hariTerlambat;
+        // Hitung angsuran total per bulan (pokok + bunga)
+        $angsuranBunga = $this->calculateBungaPerBulan($record);
+        $angsuranTotal = $angsuranPokok + $angsuranBunga;
+
+        // Hitung denda per hari (5% x Angsuran Total / 30)
+        $dendaPerHari = (0.05 * $angsuranTotal) / 30;
+
+        // Total denda = denda per hari x jumlah hari terlambat
+        return $dendaPerHari * $hariTerlambat;
     }
 
     private function formatWhatsAppNumber($whatsapp)
@@ -147,6 +155,25 @@ class ListKeterlambatanBulanIni extends Page implements HasTable, HasForms
 
         // Hitung bunga per bulan (total bunga setahun dibagi jangka waktu)
         return ($pokok * ($bungaPerTahun/100)) / $jangkaWaktu;
+    }
+
+    private function calculateJumlahBulanTerlambat($record, $today)
+    {
+        $lastTransaction = $record->transaksiPinjaman()
+            ->orderBy('angsuran_ke', 'desc')
+            ->first();
+
+        if ($lastTransaction) {
+            $tanggalJatuhTempo = Carbon::parse($lastTransaction->tanggal_pembayaran)
+                ->addMonth()
+                ->startOfDay();
+        } else {
+            $tanggalJatuhTempo = Carbon::parse($record->tanggal_pinjaman)
+                ->addMonth()
+                ->startOfDay();
+        }
+
+        return ceil($today->diffInDays($tanggalJatuhTempo) / 30);
     }
 
     public function table(Table $table): Table
@@ -206,11 +233,40 @@ class ListKeterlambatanBulanIni extends Page implements HasTable, HasForms
                     ->label('Total Bayar')
                     ->formatStateUsing(function ($record) use ($today) {
                         try {
-                            $angsuranPokok = $this->calculateAngsuranPokok($record);
-                            $bunga = $this->calculateBungaPerBulan($record);
-                            $hariTerlambat = $this->calculateHariTerlambat($record, $today);
-                            $denda = abs($this->calculateDenda($record, $angsuranPokok, $hariTerlambat));
-                            $totalBayar = $angsuranPokok + $bunga + $denda;
+                            // 1. Hitung jumlah bulan terlambat (pembulatan ke atas)
+                            $hariTerlambat = abs($this->calculateHariTerlambat($record, $today));
+                            $jumlahBulanTerlambat = ceil($hariTerlambat / 30);
+
+                            // 2. Hitung angsuran pokok dan bunga per bulan
+                            $angsuranPokok = abs($this->calculateAngsuranPokok($record));
+                            $bungaPerBulan = abs($this->calculateBungaPerBulan($record));
+
+                            // 3. Hitung total pokok untuk periode keterlambatan
+                            $totalPokok = $angsuranPokok * $jumlahBulanTerlambat;
+
+                            // 4. Hitung total bunga untuk periode keterlambatan
+                            $totalBunga = $bungaPerBulan * $jumlahBulanTerlambat;
+
+                            // 5. Hitung total denda
+                            $angsuranTotal = $angsuranPokok + $bungaPerBulan;
+                            $dendaPerHari = (0.05 * $angsuranTotal) / 30;
+                            $totalDenda = $dendaPerHari * $hariTerlambat;
+
+                            // 6. Total keseluruhan (pokok + bunga + denda)
+                            $totalBayar = $totalPokok + $totalBunga + $totalDenda;
+
+                            // Debug log untuk memverifikasi perhitungan
+                            Log::info("Perhitungan Total Bayar:", [
+                                'hari_terlambat' => $hariTerlambat,
+                                'jumlah_bulan' => $jumlahBulanTerlambat,
+                                'angsuran_pokok' => $angsuranPokok,
+                                'bunga_per_bulan' => $bungaPerBulan,
+                                'total_pokok' => $totalPokok,
+                                'total_bunga' => $totalBunga,
+                                'denda_per_hari' => $dendaPerHari,
+                                'total_denda' => $totalDenda,
+                                'total_bayar' => $totalBayar
+                            ]);
 
                             return 'Rp.' . number_format($totalBayar, 2, ',', '.');
                         } catch (\Exception $e) {
@@ -256,49 +312,69 @@ class ListKeterlambatanBulanIni extends Page implements HasTable, HasForms
                     ->action(function ($record) {
                         $this->dispatch('spin-start');
 
-                        $lastTransaction = $record->transaksiPinjaman()
-                            ->orderBy('angsuran_ke', 'desc')
-                            ->first();
+                        try {
+                            $nama = trim("{$record->profile->first_name} {$record->profile->last_name}");
 
-                        $nama = trim("{$record->profile->first_name} {$record->profile->last_name}");
-                        $angsuranPokok = $this->calculateAngsuranPokok($record);
-                        $bunga = $this->calculateBungaPerBulan($record);
-                        $hariTerlambat = $this->calculateHariTerlambat($record, Carbon::today());
-                        $denda = abs($this->calculateDenda($record, $angsuranPokok, $hariTerlambat));
-                        $totalBayar = $angsuranPokok + $bunga + $denda;
+                            // Hitung komponen-komponen
+                            $hariTerlambat = abs($this->calculateHariTerlambat($record, Carbon::today()));
+                            $jumlahBulanTerlambat = ceil($hariTerlambat / 30);
 
-                        $message = "Halo {$nama},\n\n"
-                            . "Ini adalah pengingat untuk pembayaran angsuran pinjaman Anda yang belum dibayar:\n\n"
-                            . "No Pinjaman: {$record->no_pinjaman}\n"
-                            . "Angsuran ke-" . ($lastTransaction ? ($lastTransaction->angsuran_ke + 1) : '1') . "\n"
-                            . "Angsuran Pokok: Rp." . number_format($angsuranPokok, 2, ',', '.') . "\n"
-                            . "Bunga: Rp." . number_format($bunga, 2, ',', '.') . "\n"
-                            . "Denda: Rp." . number_format($denda, 2, ',', '.') . "\n"
-                            . "Total Bayar: Rp." . number_format($totalBayar, 2, ',', '.') . "\n"
-                            . "Keterlambatan: " . abs($hariTerlambat) . " hari\n\n"
-                            . "Mohon segera melakukan pembayaran. Terima kasih.\n\n"
-                            . "Salam,\n"
-                            . "Koperasi SinaraArtha";
+                            $angsuranPokok = abs($this->calculateAngsuranPokok($record));
+                            $bungaPerBulan = abs($this->calculateBungaPerBulan($record));
 
-                        $whatsapp = $this->formatWhatsAppNumber($record->profile->whatsapp);
+                            // Total pokok untuk periode keterlambatan
+                            $totalPokok = $angsuranPokok * $jumlahBulanTerlambat;
 
-                        $response = Http::withHeaders([
-                            'Authorization' => 'Bearer u489f486268ed444.f51e76d509f94b93855bb8bc61521f93'
-                        ])->post('http://46.102.156.214:3001/api/v1/messages', [
-                            'recipient_type' => 'individual',
-                            'to' => $whatsapp,
-                            'type' => 'text',
-                            'text' => [
-                                'body' => $message
-                            ]
-                        ]);
+                            // Total bunga untuk periode keterlambatan
+                            $totalBunga = $bungaPerBulan * $jumlahBulanTerlambat;
 
-                        Notification::make()
-                            ->title($response->status() === 200 ?
-                                'Pengingat telah terkirim' :
-                                'Gagal mengirim pengingat')
-                            ->status($response->status() === 200 ? 'success' : 'danger')
-                            ->send();
+                            // Hitung denda
+                            $angsuranTotal = $angsuranPokok + $bungaPerBulan;
+                            $dendaPerHari = (0.05 * $angsuranTotal) / 30;
+                            $totalDenda = $dendaPerHari * $hariTerlambat;
+
+                            // Total keseluruhan
+                            $totalBayar = $totalPokok + $totalBunga + $totalDenda;
+
+                            $message = "Halo *{$nama}*,\n\n"
+                                . "Ini adalah pengingat untuk pembayaran angsuran pinjaman Anda yang belum dibayar:\n\n"
+                                . "No Pinjaman: *{$record->no_pinjaman}*\n"
+                                . "Angsuran Pokok Belum Dibayar: *Rp." . number_format($totalPokok, 2, ',', '.') . "*\n"
+                                . "Bunga Belum Dibayar: *Rp." . number_format($totalBunga, 2, ',', '.') . "*\n"
+                                . "Denda Belum Dibayar: *Rp." . number_format($totalDenda, 2, ',', '.') . "*\n"
+                                . "Total Belum Dibayar: *Rp." . number_format($totalBayar, 2, ',', '.') . "*\n"
+                                . "Keterlambatan: *" . abs($hariTerlambat) . " hari*\n\n"
+                                . "Mohon segera melakukan pembayaran. Terima kasih.\n\n"
+                                . "Salam,\n"
+                                . "Koperasi SinaraArtha";
+
+                            $whatsapp = $this->formatWhatsAppNumber($record->profile->whatsapp);
+
+                            $response = Http::withHeaders([
+                                'Authorization' => 'Bearer u489f486268ed444.f51e76d509f94b93855bb8bc61521f93'
+                            ])->post('http://46.102.156.214:3001/api/v1/messages', [
+                                'recipient_type' => 'individual',
+                                'to' => $whatsapp,
+                                'type' => 'text',
+                                'text' => [
+                                    'body' => $message
+                                ]
+                            ]);
+
+                            Notification::make()
+                                ->title($response->status() === 200 ?
+                                    'Pengingat telah terkirim' :
+                                    'Gagal mengirim pengingat')
+                                ->status($response->status() === 200 ? 'success' : 'danger')
+                                ->send();
+
+                        } catch (\Exception $e) {
+                            Log::error('Error sending reminder: ' . $e->getMessage());
+                            Notification::make()
+                                ->title('Gagal mengirim pengingat')
+                                ->danger()
+                                ->send();
+                        }
 
                         $this->dispatch('spin-stop');
                     })
