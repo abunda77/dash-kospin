@@ -98,9 +98,18 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
             $today->diffInDays($tanggalJatuhTempo) : 0;
     }
 
-    private function calculateDenda($record, $angsuranPokok, $hariTerlambat)
+    private function calculateDenda($record, $hariTerlambat)
     {
-        return ($record->denda->rate_denda/100 * $angsuranPokok / 30) * $hariTerlambat;
+        // Hitung total angsuran per bulan (pokok + bunga)
+        $angsuranPokok = $this->calculateAngsuranPokok($record);
+        $bungaPerBulan = $this->calculateBungaPerBulan($record);
+        $totalAngsuranPerBulan = $angsuranPokok + $bungaPerBulan;
+
+        // Hitung denda per hari (5% dari total angsuran dibagi 30)
+        $dendaPerHari = (0.05 * $totalAngsuranPerBulan) / 30;
+
+        // Total denda
+        return $dendaPerHari * $hariTerlambat;
     }
 
     private function formatWhatsAppNumber($whatsapp)
@@ -167,9 +176,8 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                     ->money('IDR')
                     ->formatStateUsing(function ($record) use ($today) {
                         try {
-                            $angsuranPokok = $this->calculateAngsuranPokok($record);
                             $hariTerlambat = $this->calculateHariTerlambat($record, $today);
-                            $denda = abs($this->calculateDenda($record, $angsuranPokok, $hariTerlambat));
+                            $denda = abs($this->calculateDenda($record, $hariTerlambat));
                             return 'Rp.' . number_format($denda, 2, ',', '.');
                         } catch (\Exception $e) {
                             Log::error('Error calculating denda: ' . $e->getMessage());
@@ -184,7 +192,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                             $angsuranPokok = $this->calculateAngsuranPokok($record);
                             $bunga = $this->calculateBungaPerBulan($record);
                             $hariTerlambat = $this->calculateHariTerlambat($record, $today);
-                            $denda = abs($this->calculateDenda($record, $angsuranPokok, $hariTerlambat));
+                            $denda = abs($this->calculateDenda($record, $hariTerlambat));
                             $totalBayar = $angsuranPokok + $bunga + $denda;
 
                             return 'Rp.' . number_format($totalBayar, 2, ',', '.');
@@ -235,7 +243,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                         $angsuranPokok = $this->calculateAngsuranPokok($record);
                         $bunga = $this->calculateBungaPerBulan($record);
                         $hariTerlambat = $this->calculateHariTerlambat($record, Carbon::today());
-                        $denda = abs($this->calculateDenda($record, $angsuranPokok, $hariTerlambat));
+                        $denda = abs($this->calculateDenda($record, $hariTerlambat));
                         $totalBayar = $angsuranPokok + $bunga + $denda;
 
                         $message = "Halo {$nama},\n\n"
