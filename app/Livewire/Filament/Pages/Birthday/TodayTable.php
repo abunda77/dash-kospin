@@ -17,6 +17,18 @@ class TodayTable extends \Filament\Tables\TableComponent
 {
     use InteractsWithTable;
 
+    private function formatWhatsAppNumber(string $number): string
+    {
+        // Hapus karakter non-digit
+        $number = preg_replace('/[^0-9]/', '', $number);
+
+        // Hapus awalan 0, +62, atau 62
+        $number = preg_replace('/^(\+62|62|0)/', '', $number);
+
+        // Pastikan nomor dimulai dengan 62
+        return '62' . $number;
+    }
+
     public function table(Table $table): Table
     {
         $today = Carbon::now()->timezone('Asia/Jakarta');
@@ -56,11 +68,13 @@ class TodayTable extends \Filament\Tables\TableComponent
                             $greeting->message
                         );
 
+                        $whatsapp = $this->formatWhatsAppNumber($record->whatsapp);
+
                         $response = Http::withHeaders([
                             'Authorization' => 'Bearer u489f486268ed444.f51e76d509f94b93855bb8bc61521f93'
                         ])->post('http://46.102.156.214:3001/api/v1/messages', [
                             'recipient_type' => 'individual',
-                            'to' => $record->whatsapp,
+                            'to' => $whatsapp,
                             'type' => 'text',
                             'text' => [
                                 'body' => $message
