@@ -40,6 +40,10 @@ class JatuhTempo extends Page implements HasTable
                 Carbon::now()->addMonth()->startOfMonth(),
                 Carbon::now()->addMonth()->endOfMonth()
             ],
+            'tahun-ini' => [
+                Carbon::now()->startOfYear(),
+                Carbon::now()->endOfYear()
+            ],
             'tahun-depan' => [
                 Carbon::now()->addYear()->startOfYear(),
                 Carbon::now()->addYear()->endOfYear()
@@ -117,6 +121,7 @@ class JatuhTempo extends Page implements HasTable
                 ->options([
                     'bulan-ini' => 'Bulan Ini',
                     'bulan-depan' => 'Bulan Depan',
+                    'tahun-ini' => 'Tahun Ini',
                     'tahun-depan' => 'Tahun Depan'
                 ])
                 ->default('bulan-ini')

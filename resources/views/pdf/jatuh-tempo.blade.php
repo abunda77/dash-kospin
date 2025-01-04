@@ -42,6 +42,9 @@
                 @case('bulan-depan')
                     Bulan Depan
                     @break
+                @case('tahun-ini')
+                    Tahun Ini
+                    @break
                 @case('tahun-depan')
                     Tahun Depan
                     @break
