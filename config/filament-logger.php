@@ -22,7 +22,7 @@ return [
          * Log to file
          */
 
-        'log_file' => true,
+        'log_file' => false,
 
         /*
          * Log to database
