@@ -15,4 +15,4 @@ Schedule::command('tabungan:hitung-bunga --all')
         Artisan::call('tabungan:hitung-bunga --hapus-duplikat');
     });
 // Jalankan backup database setiap hari pukul 00:00
-Schedule::command('backup:run --only-db')->dailyAt('01:00');
+Schedule::command('backup:run --only-db')->everyFourHours();
