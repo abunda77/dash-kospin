@@ -60,7 +60,7 @@ class DepositoResource extends Resource
                     ->placeholder('1,000,000')
                     ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
                         if ($state) {
-                            $component->state(number_format($state, 0, ',', '.'));
+                            $component->state(number_format($state, 0, '.', ','));
                         }
                     })
                     ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
@@ -68,9 +68,10 @@ class DepositoResource extends Resource
                     ->afterStateUpdated(function ($state, callable $set, $get) {
                         $nominal = (int) str_replace(',', '', $state) ?: 0;
                         $rate = (float) $get('rate_bunga') ?: 0;
-                        $jangka = (float) $get('jangka_waktu') ?: 0;
+                        $jangka = (int) $get('jangka_waktu') ?: 0;
 
-                        $bunga = $nominal * ($rate/100/12 * $jangka);
+                        // Perbaikan perhitungan bunga
+                        $bunga = ($nominal * $rate/100 * $jangka) / 12;
                         $set('nominal_bunga', round($bunga));
                     })
                     ->required(),
@@ -95,12 +96,12 @@ class DepositoResource extends Resource
                             $set('tanggal_jatuh_tempo', $tanggalPembukaan->copy()->addMonths($jangkaWaktu)->format('Y-m-d'));
                         }
 
-                        // Hitung ulang nominal bunga
+                        // Perbaikan perhitungan bunga
                         $nominal = (float) str_replace([',', '.'], '', $get('nominal_penempatan')) ?: 0;
                         $rate = (float) $get('rate_bunga') ?: 0;
-                        $jangka = (float) $state ?: 0;
+                        $jangka = (int) $state ?: 0;
 
-                        $bunga = $nominal * ($rate/100/12 * $jangka);
+                        $bunga = ($nominal * $rate/100 * $jangka) / 12;
                         $set('nominal_bunga', round($bunga));
                     }),
 
@@ -156,26 +157,27 @@ class DepositoResource extends Resource
                     ->afterStateUpdated(function ($state, callable $set, $get) {
                         $nominal = (float) str_replace([',', '.'], '', $get('nominal_penempatan')) ?: 0;
                         $rate = (float) $state ?: 0;
-                        $jangka = (float) $get('jangka_waktu') ?: 0;
+                        $jangka = (int) $get('jangka_waktu') ?: 0;
 
-                        $bunga = $nominal * ($rate/100/12 * $jangka);
+                        // Perbaikan perhitungan bunga
+                        $bunga = ($nominal * $rate/100 * $jangka) / 12;
                         $set('nominal_bunga', round($bunga));
                     }),
 
                 Forms\Components\TextInput::make('nominal_bunga')
                     ->label('Nominal Bunga')
-                    ->numeric()
-                    ->prefix('Rp')
                     ->mask(RawJs::make('$money($input)'))
                     ->stripCharacters(',')
+                    ->numeric()
+                    ->prefix('Rp')
                     ->placeholder('1,000,000')
-                    ->disabled()
                     ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
                         if ($state) {
                             $component->state(number_format($state, 0, '.', ','));
                         }
                     })
-                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state)),
+                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
+                    ->disabled(),
 
                 Forms\Components\Toggle::make('perpanjangan_otomatis')
                     ->default(false),
