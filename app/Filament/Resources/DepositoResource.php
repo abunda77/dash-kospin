@@ -193,6 +193,38 @@ class DepositoResource extends Resource
                 Forms\Components\Textarea::make('notes')
                     ->maxLength(65535)
                     ->columnSpanFull(),
+
+                Forms\Components\Select::make('nama_bank')
+                    ->label('Nama Bank')
+                    ->options([
+                        'bca' => 'Bank Central Asia (BCA)',
+                        'bni' => 'Bank Negara Indonesia (BNI)',
+                        'bri' => 'Bank Rakyat Indonesia (BRI)',
+                        'mandiri' => 'Bank Mandiri',
+                        'cimb' => 'CIMB Niaga',
+                        'danamon' => 'Bank Danamon',
+                        'permata' => 'Bank Permata',
+                        'btn' => 'Bank Tabungan Negara (BTN)',
+                        'bsi' => 'Bank Syariah Indonesia (BSI)',
+                        'mega' => 'Bank Mega',
+                        'ocbc' => 'OCBC NISP',
+                        'panin' => 'Panin Bank',
+                        'uob' => 'UOB Indonesia',
+                        'maybank' => 'Maybank Indonesia',
+                        'other' => 'Bank Lainnya'
+                    ])
+                    ->required()
+                    ->searchable(),
+
+                Forms\Components\TextInput::make('nomor_rekening_bank')
+                    ->label('Nomor Rekening Bank')
+                    ->required()
+                    ->maxLength(20),
+
+                Forms\Components\TextInput::make('nama_pemilik_rekening_bank')
+                    ->label('Nama Pemilik Rekening')
+                    ->required()
+                    ->maxLength(255),
             ]);
     }
 
@@ -241,6 +273,18 @@ class DepositoResource extends Resource
                         'success' => 'active',
                         'danger' => 'ended',
                     ]),
+
+                Tables\Columns\TextColumn::make('nama_bank')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('nomor_rekening_bank')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('nama_pemilik_rekening_bank')
+                    ->searchable()
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')

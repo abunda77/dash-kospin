@@ -200,6 +200,37 @@
             <span class="value">{{ $deposito->perpanjangan_otomatis ? 'Ya' : 'Tidak' }}</span>
         </div>
     </div>
+    <div class="section">
+        <div class="section-title">INFORMASI REKENING BANK</div>
+        <div class="form-group">
+            <span class="label">1. Nama Bank</span>:
+            <span class="value">{{ match($deposito->nama_bank) {
+                'bca' => 'Bank Central Asia (BCA)',
+                'bni' => 'Bank Negara Indonesia (BNI)',
+                'bri' => 'Bank Rakyat Indonesia (BRI)',
+                'mandiri' => 'Bank Mandiri',
+                'cimb' => 'CIMB Niaga',
+                'danamon' => 'Bank Danamon',
+                'permata' => 'Bank Permata',
+                'btn' => 'Bank Tabungan Negara (BTN)',
+                'bsi' => 'Bank Syariah Indonesia (BSI)',
+                'mega' => 'Bank Mega',
+                'ocbc' => 'OCBC NISP',
+                'panin' => 'Panin Bank',
+                'uob' => 'UOB Indonesia',
+                'maybank' => 'Maybank Indonesia',
+                'other' => 'Bank Lainnya'
+            } }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">2. Nomor Rekening</span>:
+            <span class="value">{{ $deposito->nomor_rekening_bank }}</span>
+        </div>
+        <div class="form-group">
+            <span class="label">3. Nama Pemilik Rekening</span>:
+            <span class="value">{{ $deposito->nama_pemilik_rekening_bank }}</span>
+        </div>
+    </div>
 
     <div class="section">
         <div class="section-title">KETENTUAN DEPOSITO</div>
@@ -218,6 +249,8 @@
             pencairan sebelum jatuh tempo dan mekanisme perpanjangan deposito.
         </p>
     </div>
+
+
 
     <div class="footer">
         <div class="signature">

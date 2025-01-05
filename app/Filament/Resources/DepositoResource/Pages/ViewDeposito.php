@@ -53,6 +53,16 @@ class ViewDeposito extends ViewRecord
                                 'active' => 'success',
                                 'ended' => 'danger',
                             })
+                    ]),
+
+                Section::make('Informasi Rekening Bank')
+                    ->schema([
+                        TextEntry::make('nama_bank')
+                            ->label('Nama Bank'),
+                        TextEntry::make('nomor_rekening_bank')
+                            ->label('Nomor Rekening'),
+                        TextEntry::make('nama_pemilik_rekening_bank')
+                            ->label('Nama Pemilik Rekening'),
                     ])
             ]);
     }

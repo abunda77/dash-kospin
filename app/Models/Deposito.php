@@ -31,7 +31,10 @@ class Deposito extends Model
         'nominal_bunga',
         'status',
         'perpanjangan_otomatis',
-        'notes'
+        'notes',
+        'nama_bank',
+        'nomor_rekening_bank',
+        'nama_pemilik_rekening_bank'
     ];
 
     protected $casts = [
