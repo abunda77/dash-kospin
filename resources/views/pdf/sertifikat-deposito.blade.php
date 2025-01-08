@@ -198,6 +198,24 @@
                 </table>
             </div>
 
+            <div class="bank-details">
+                <h4>Informasi Rekening Bank</h4>
+                <table>
+                    <tr>
+                        <td>Nama Bank</td>
+                        <td>: {{ $deposito->nama_bank }}</td>
+                    </tr>
+                    <tr>
+                        <td>Nomor Rekening</td>
+                        <td>: {{ $deposito->nomor_rekening_bank }}</td>
+                    </tr>
+                    <tr>
+                        <td>Nama Pemilik Rekening</td>
+                        <td>: {{ $deposito->nama_pemilik_rekening_bank }}</td>
+                    </tr>
+                </table>
+            </div>
+
             <div class="signature">
                 <p>Surabaya, {{ \Carbon\Carbon::parse($deposito->tanggal_pembukaan)->format('d F Y') }}</p>
                 <p>Ketua / Pengurus</p>

@@ -47,15 +47,15 @@ class ReminderJob implements ShouldQueue
             $whatsapp = $this->formatWhatsAppNumber($this->pinjaman->profile->whatsapp);
 
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer u489f486268ed444.f51e76d509f94b93855bb8bc61521f93'
-            ])->post('http://46.102.156.214:3001/api/v1/messages', [
+                'Authorization' => 'Bearer ' . env('WHATSAPP_AUTH_BEARER')
+            ])->post(env('WHATSAPP_API_URL'), [
                 'recipient_type' => 'individual',
-                'to' => $whatsapp,
-                'type' => 'text',
-                'text' => [
-                    'body' => $message
-                ]
-            ]);
+                    'to' => $whatsapp,
+                    'type' => 'text',
+                    'text' => [
+                        'body' => $message
+                    ]
+                ]);
 
             if ($response->status() !== 200) {
                 throw new \Exception('Gagal mengirim pesan WhatsApp: ' . $response->body());
