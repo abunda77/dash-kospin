@@ -49,6 +49,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
     public $tabungan = null;
     public $filterDate = [];
     public ?array $data = [];
+    public $startRow = 1;
 
     public function mount($record = null): void
     {
@@ -134,7 +135,14 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
                     ->color('warning')
                     ->icon('heroicon-o-document-text')
                     ->visible(fn () => $this->isSearchSubmitted && $this->tabungan)
-            ])
+            ]),
+
+            TextInput::make('startRow')
+                ->label('Mulai cetak dari baris ke')
+                ->type('number')
+                ->default(1)
+                ->minValue(1)
+                ->visible(fn () => $this->isSearchSubmitted)
         ];
     }
 
@@ -472,10 +480,22 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
 
     private function generateTablePdfHtml($transaksi)
     {
+        $marginTop = ($this->startRow - 1) * 20;
+
+        $customStyles = "
+            @page {
+                margin-top: {$marginTop}px;
+            }
+            tr {
+                line-height: 1.5em;
+            }
+        ";
+
         return view('pdf.mutasi-tabungan-table-v2', [
             'tabungan' => $this->tabungan,
             'transaksi' => $transaksi,
-            'periode' => $this->periode
+            'periode' => $this->periode,
+            'customStyles' => $customStyles
         ])->render();
     }
 

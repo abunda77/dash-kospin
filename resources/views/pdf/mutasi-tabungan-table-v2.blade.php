@@ -31,6 +31,7 @@
             margin-bottom: 15px;
             font-size: 10px;
         }
+        {!! $customStyles ?? '' !!}
     </style>
 </head>
 <body>

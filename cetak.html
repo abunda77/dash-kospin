@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Table Demo</title>
+    <style>
+        /* CSS Styling untuk tabel */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+
+        /* Styling untuk cetak */
+        @media print {
+            /* Sembunyikan tombol print saat mencetak */
+            button {
+                display: none;
+            }
+            table {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Table</h1>
+    <p>Klik tombol di bawah untuk mencetak tabel.</p>
+
+    <!-- Tabel Data -->
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Posisi</th>
+                <th>Departemen</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>John Doe</td>
+                <td>Manager</td>
+                <td>Keuangan</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Jane Smith</td>
+                <td>Asisten</td>
+                <td>Marketing</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Michael Brown</td>
+                <td>Staf</td>
+                <td>HRD</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Tombol Cetak -->
+    <button onclick="window.print()">Cetak Tabel</button>
+</body>
+</html>
+
