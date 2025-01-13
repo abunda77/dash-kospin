@@ -6,6 +6,7 @@ use Filament\Forms\Form;
 use Filament\Pages\Page;
 use Filament\Support\RawJs;
 use Filament\Actions\Action;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Button;
 use Filament\Forms\Components\TextInput;
@@ -52,7 +53,13 @@ class SimulasiKredit extends Page
         return [
             Action::make('hitung')
                 ->label('Hitung')
-                ->action('calculateAngsuran')
+                ->action('calculateAngsuran'),
+
+            Action::make('cetakPDF')
+                ->label('Cetak PDF')
+                ->action('generatePDF')
+                ->visible(fn () => count($this->angsuranList) > 0)
+                ->icon('heroicon-o-printer'),
         ];
     }
 
@@ -89,5 +96,23 @@ class SimulasiKredit extends Page
             ->title('Simulasi berhasil dihitung')
             ->success()
             ->send();
+    }
+
+    public function generatePDF()
+    {
+        $data = [
+            'angsuranList' => $this->angsuranList,
+            'nominalPinjaman' => $this->nominalPinjaman,
+            'bunga' => $this->bunga,
+            'jangkaWaktu' => $this->jangkaWaktu,
+            'totalBunga' => collect($this->angsuranList)->sum('bunga'),
+            'totalAngsuran' => collect($this->angsuranList)->sum('angsuran'),
+        ];
+
+        $pdf = Pdf::loadView('pdf.simulasi-kredit', $data);
+        return response()->streamDownload(
+            fn () => print($pdf->output()),
+            'simulasi-kredit.pdf'
+        );
     }
 }
