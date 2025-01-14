@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 8px;
+            font-size: 9px;
         }
         .header {
             text-align: center;
