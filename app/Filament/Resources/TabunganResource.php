@@ -2,20 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TabunganResource\Pages;
-use App\Filament\Resources\TabunganResource\RelationManagers;
-use App\Models\Tabungan;
-use App\Models\Profile;
-use App\Models\ProdukTabungan;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Profile;
+use App\Models\Tabungan;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\RawJs;
+use App\Models\ProdukTabungan;
+use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\TabunganResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\TabunganResource\RelationManagers;
 
 class TabunganResource extends Resource
 {
@@ -44,7 +44,7 @@ class TabunganResource extends Resource
                         } while (Tabungan::where('no_tabungan', $number)->exists());
                         return $number;
                     })
-                    ->disabled(),
+                    ->disabled(false),
                 Forms\Components\Select::make('id_profile')
                     ->label('Nasabah')
                     ->relationship('profile', 'first_name')
