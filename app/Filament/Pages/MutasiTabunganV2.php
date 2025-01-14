@@ -485,6 +485,8 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
         $customStyles = "
             @page {
                 margin-top: {$marginTop}px;
+                margin-left: 1px;
+                margin-right: 1px;
             }
             tr {
                 line-height: 1.5em;
