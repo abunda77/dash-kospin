@@ -58,7 +58,7 @@
         <tbody>
             @foreach($transaksi as $t)
             <tr>
-                <td class="text-right" style="width: 13%;">{{ $t->tanggal_transaksi->format('d/m/y') }}</td>
+                <td style="width: 13%;">{{ $t->tanggal_transaksi->format('d/m/y') }}</td>
                 <td style="text-align: left;width: 7.2%;">{{ $t->kode_transaksi }}</td>
                 <td class="text-right" style="width: 15.9%;">{{ $t->jenis_transaksi === 'kredit' ? number_format($t->jumlah, 0, ',', '.') : '' }}</td>
                 <td class="text-right" style="width: 18.1%;">{{ $t->jenis_transaksi === 'debit' ? number_format($t->jumlah, 0, ',', '.') : '' }}</td>
