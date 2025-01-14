@@ -6,7 +6,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            font-size: 9px;
+            font-size: 8px;
         }
         .header {
             text-align: center;
@@ -58,13 +58,13 @@
         <tbody>
             @foreach($transaksi as $t)
             <tr>
-                <td style="width: 13%;">{{ $t->tanggal_transaksi->format('d/m/y') }}</td>
+                <td class="text-right" style="width: 13%;">{{ $t->tanggal_transaksi->format('d/m/y') }}</td>
                 <td style="text-align: left;width: 7.2%;">{{ $t->kode_transaksi }}</td>
                 <td class="text-right" style="width: 15.9%;">{{ $t->jenis_transaksi === 'kredit' ? number_format($t->jumlah, 0, ',', '.') : '' }}</td>
                 <td class="text-right" style="width: 18.1%;">{{ $t->jenis_transaksi === 'debit' ? number_format($t->jumlah, 0, ',', '.') : '' }}</td>
                 <td style="width: 5.1%;"></td>
                 <td class="text-right" style="width: 24.6%;">{{ number_format($t->saldo_berjalan, 0, ',', '.') }}</td>
-                <td style="text-align: center;width: 15.9%;">{{ $t->kode_teller }}</td>
+                <td style="text-align: right;width: 15.9%;">{{ $t->kode_teller }}</td>
             </tr>
             @endforeach
         </tbody>
