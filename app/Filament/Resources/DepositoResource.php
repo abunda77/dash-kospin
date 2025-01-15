@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DepositoResource\Pages;
-use App\Filament\Resources\DepositoResource\RelationManagers;
-use App\Models\Deposito;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Deposito;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\RawJs;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\DepositoResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\DepositoResource\RelationManagers;
 
 class DepositoResource extends Resource
 {
@@ -48,7 +48,7 @@ class DepositoResource extends Resource
                         } while (Deposito::where('nomor_rekening', $number)->exists());
                         return $number;
                     })
-                    ->disabled()
+                    ->disabled(false)
                     ->dehydrated(true), // Pastikan nilai field ini disimpan ke database
 
                 Forms\Components\TextInput::make('nominal_penempatan')

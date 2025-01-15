@@ -63,7 +63,7 @@ class PinjamanResource extends Resource
                                         } while (Pinjaman::where('no_pinjaman', $number)->exists());
                                         return $number;
                                     })
-                                    ->disabled()
+                                    ->disabled(false)
                                     ->dehydrated(true),
                                 Forms\Components\TextInput::make('jumlah_pinjaman')
                                     ->label('Jumlah Pinjaman')
