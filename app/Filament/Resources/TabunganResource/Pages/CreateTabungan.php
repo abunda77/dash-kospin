@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\TabunganResource\Pages;
 
-use App\Filament\Resources\TabunganResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use App\Filament\Resources\TabunganResource;
 
 class CreateTabungan extends CreateRecord
 {

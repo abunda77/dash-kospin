@@ -78,7 +78,16 @@ class TabunganResource extends Resource
                         'tidak_aktif' => 'Tidak Aktif',
                         'blokir' => 'Blokir'
                     ])
-                    ->required()
+                    ->required(),
+                Forms\Components\Fieldset::make('Kode Teller')
+                        ->schema([
+                            Forms\Components\TextInput::make('kode_teller')
+                                ->label('Kode Teller')
+                                ->default(auth('admin')->user()->id)
+                                ->disabled()
+                                ->dehydrated(fn ($state) => filled($state))
+                                ->required(),
+                        ]),
             ]);
     }
 

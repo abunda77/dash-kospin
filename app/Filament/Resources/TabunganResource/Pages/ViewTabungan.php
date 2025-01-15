@@ -2,13 +2,18 @@
 
 namespace App\Filament\Resources\TabunganResource\Pages;
 
-use App\Filament\Resources\TabunganResource;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Filament\Actions\Action;
-use Filament\Resources\Pages\ViewRecord;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Section;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Infolists\Infolist;
+use App\Models\TransaksiTabungan;
+use Illuminate\Support\Facades\Log;
+use Filament\Notifications\Notification;
+use Filament\Resources\Pages\ViewRecord;
+use Filament\Infolists\Components\Section;
+use App\Filament\Resources\TabunganResource;
+use Filament\Infolists\Components\TextEntry;
 
 class ViewTabungan extends ViewRecord
 {
@@ -48,8 +53,16 @@ class ViewTabungan extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('printSlip')
+                ->label('Cetak Slip Setoran Awal')
+                ->icon('heroicon-o-document-text')
+                ->color('success')
+                ->action(function () {
+                    return $this->printSlipTabungan();
+                }),
+
             Action::make('print')
-                ->label('Cetak Formuli Pembukaan Rekening Tabungan')
+                ->label('Cetak Formulir Pembukaan Rekening')
                 ->icon('heroicon-o-printer')
                 ->action(function () {
                     $pdf = Pdf::loadView('pdf.tabungan', [
@@ -63,5 +76,63 @@ class ViewTabungan extends ViewRecord
                     }, $filename);
                 }),
         ];
+    }
+
+    public function printSlipTabungan()
+    {
+        try {
+            $options = new Options();
+            $options->set('isHtml5ParserEnabled', true);
+            $options->set('isPhpEnabled', true);
+            $options->set('defaultFont', 'Arial');
+            $options->set('isRemoteEnabled', true);
+            $options->set('chroot', public_path());
+
+            $dompdf = new Dompdf($options);
+            $dompdf->setPaper(array(0, 0, 368.504, 510.236), 'portrait');
+
+            // Ambil transaksi terbaru
+            $transaksi = TransaksiTabungan::where('id_tabungan', $this->record->id)
+                ->orderBy('tanggal_transaksi', 'DESC')
+                ->orderBy('id', 'DESC')
+                ->first();
+
+            $html = view('pdf.slip-tabungan', [
+                'tabungan' => $this->record,
+                'transaksi' => $transaksi,
+            ])->render();
+
+            $dompdf->loadHtml($html);
+            $dompdf->render();
+
+            $filename = 'slip_tabungan_' . $this->record->no_tabungan . '_' . date('Y-m-d_H-i-s') . '.pdf';
+
+            return response()->streamDownload(
+                function() use ($dompdf) {
+                    echo $dompdf->output();
+                },
+                $filename,
+                [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="'.$filename.'"'
+                ]
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Error in printSlipTabungan:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            Notification::make()
+                ->title('Terjadi kesalahan saat mencetak slip')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            return null;
+        }
     }
 }
