@@ -2,18 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PinjamanResource\Pages;
-use App\Filament\Resources\PinjamanResource\RelationManagers;
-use App\Models\Pinjaman;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Pinjaman;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Support\RawJs;
+use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\PinjamanResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\PinjamanResource\RelationManagers;
 
 class PinjamanResource extends Resource
 {
@@ -63,7 +63,8 @@ class PinjamanResource extends Resource
                                         } while (Pinjaman::where('no_pinjaman', $number)->exists());
                                         return $number;
                                     })
-                                    ->disabled(),
+                                    ->disabled()
+                                    ->dehydrated(true),
                                 Forms\Components\TextInput::make('jumlah_pinjaman')
                                     ->label('Jumlah Pinjaman')
                                     ->mask(RawJs::make('$money($input)'))
