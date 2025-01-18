@@ -27,7 +27,7 @@
             line-height: 1.5em;
         }
         @page {
-            margin-top: 50px;
+            margin-top: 80px;
             margin-left: 1px;
             margin-right: 1px;
         }
