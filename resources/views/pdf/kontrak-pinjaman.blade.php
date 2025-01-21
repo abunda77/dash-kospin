@@ -180,6 +180,7 @@
                 $angsuran_per_bulan = $total_pinjaman / $pinjaman->jangka_waktu;
             @endphp
             <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
+            <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 bulan angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran.</li>
         </ol>
     </div>
 
