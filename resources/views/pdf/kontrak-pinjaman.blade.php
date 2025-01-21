@@ -166,6 +166,7 @@
         <ol>
             <li>PIHAK PERTAMA telah menerima uang pinjaman dari PIHAK KEDUA sebesar Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($pinjaman->jumlah_pinjaman)) }} Rupiah) dengan tenor: {{ $pinjaman->jangka_waktu }} bulan.</li>
             <li>Pinjaman ini diberikan oleh PIHAK KEDUA kepada PIHAK PERTAMA dengan ketentuan sebagaimana diatur dalam pasal-pasal berikutnya dalam perjanjian ini.</li>
+            <li>Bunga pinjaman yang dikenakan adalah sebesar {{ $pinjaman->biayaBungaPinjaman->persentase_bunga }}% per tahun atau {{ number_format($pinjaman->biayaBungaPinjaman->persentase_bunga/12, 2) }}% per bulan.</li>
         </ol>
     </div>
 
@@ -173,7 +174,12 @@
         <h3>Pasal 2<br>JANGKA WAKTU PEMBAYARAN</h3>
         <ol>
             <li>PIHAK PERTAMA wajib mengembalikan pinjaman dalam jangka waktu {{ $pinjaman->jangka_waktu }} bulan, terhitung sejak tanggal penandatanganan perjanjian ini.</li>
-            <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($pinjaman->jumlah_pinjaman / $pinjaman->jangka_waktu, 0, ',', '.') }} per bulan pada tanggal {{ $pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
+            @php
+                $bunga_tahunan = $pinjaman->biayaBungaPinjaman->persentase_bunga;
+                $total_pinjaman = $pinjaman->jumlah_pinjaman * (1 + ($bunga_tahunan/100) * ($pinjaman->jangka_waktu/12));
+                $angsuran_per_bulan = $total_pinjaman / $pinjaman->jangka_waktu;
+            @endphp
+            <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
         </ol>
     </div>
 
