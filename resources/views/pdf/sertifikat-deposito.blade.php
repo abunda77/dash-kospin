@@ -221,7 +221,7 @@
                 <p>Ketua / Pengurus</p>
                 <p>KOPERASI SINARA ARTHA</p>
                 <br><br>
-                <p class="name">Jimmy Tandiono</p>
+                <p class="name">WILLY.H</p>
             </div>
         </div>
     </div>

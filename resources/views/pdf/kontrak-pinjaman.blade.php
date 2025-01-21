@@ -254,7 +254,7 @@
             <p>PIHAK KEDUA</p>
             <div class="sign-box"></div>
             <p>KOPERASI SINARA ARTHA</p>
-            <p>[JIMMY TANDIONO]</p>
+            <p>[WILLY .H]</p>
         </div>
     </div>
 </body>
