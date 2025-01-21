@@ -260,7 +260,7 @@
             <p>PIHAK KEDUA</p>
             <div class="sign-box"></div>
             <p>KOPERASI SINARA ARTHA</p>
-            <p>[WILLY .H]</p>
+            <p>[YULIUS CHRISTIAN]</p>
         </div>
     </div>
 </body>
