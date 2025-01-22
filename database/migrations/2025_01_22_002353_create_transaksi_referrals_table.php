@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('transaksi_referral', function (Blueprint $table) {
             $table->id('id_transaksi');
             $table->foreignId('id_referral')->constrained('anggota_referral', 'id_referral');
-            $table->Integer('id_nasabah')->nullable()->change();
+            $table->Integer('id_nasabah')->nullable();
             $table->string('kode_komisi');
             $table->decimal('nominal_transaksi', 15, 2);
             $table->decimal('nilai_komisi', 15, 2)->default(0);
