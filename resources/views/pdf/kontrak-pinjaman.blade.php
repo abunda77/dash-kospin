@@ -175,9 +175,9 @@
         <ol>
             <li>PIHAK PERTAMA wajib mengembalikan pinjaman dalam jangka waktu {{ $pinjaman->jangka_waktu }} bulan, terhitung sejak tanggal penandatanganan perjanjian ini.</li>
             @php
-                $bunga_tahunan = $pinjaman->biayaBungaPinjaman->persentase_bunga;
-                $total_pinjaman = $pinjaman->jumlah_pinjaman * (1 + ($bunga_tahunan/100) * ($pinjaman->jangka_waktu/12));
-                $angsuran_per_bulan = $total_pinjaman / $pinjaman->jangka_waktu;
+                $angsuran_pokok = $pinjaman->jumlah_pinjaman / $pinjaman->jangka_waktu;
+                $bunga_per_bulan = ($pinjaman->jumlah_pinjaman * ($pinjaman->biayaBungaPinjaman->persentase_bunga/100)) / $pinjaman->jangka_waktu;
+                $angsuran_per_bulan = $angsuran_pokok + $bunga_per_bulan;
             @endphp
             <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
             <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 bulan angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran.</li>
