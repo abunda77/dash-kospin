@@ -166,7 +166,7 @@
         <ol>
             <li>PIHAK PERTAMA telah menerima uang pinjaman dari PIHAK KEDUA sebesar Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($pinjaman->jumlah_pinjaman)) }} Rupiah) dengan tenor: {{ $pinjaman->jangka_waktu }} bulan.</li>
             <li>Pinjaman ini diberikan oleh PIHAK KEDUA kepada PIHAK PERTAMA dengan ketentuan sebagaimana diatur dalam pasal-pasal berikutnya dalam perjanjian ini.</li>
-            <li>Bunga pinjaman yang dikenakan adalah sebesar {{ $pinjaman->biayaBungaPinjaman->persentase_bunga }}% per tahun atau {{ number_format($pinjaman->biayaBungaPinjaman->persentase_bunga/12, 2) }}% per bulan.</li>
+            {{-- <li>Bunga pinjaman yang dikenakan adalah sebesar {{ $pinjaman->biayaBungaPinjaman->persentase_bunga }}% per tahun atau {{ number_format($pinjaman->biayaBungaPinjaman->persentase_bunga/12, 2) }}% per bulan.</li> --}}
         </ol>
     </div>
 
@@ -261,7 +261,7 @@
             <p>PIHAK KEDUA</p>
             <div class="sign-box"></div>
             <p>KOPERASI SINARA ARTHA</p>
-            <p>[YULIUS CHRISTIAN]</p>
+            <p>(YULIUS CHRISTIAN)</p>
         </div>
     </div>
 </body>
