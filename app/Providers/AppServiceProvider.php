@@ -3,11 +3,14 @@
 namespace App\Providers;
 
 use Carbon\Carbon;
+use Dedoc\Scramble\Scramble;
 use Spatie\Health\Facades\Health;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Models\Activity;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Spatie\Health\Checks\Checks\DebugModeCheck;
 use Spatie\Health\Checks\Checks\EnvironmentCheck;
 use Spatie\Health\Checks\Checks\OptimizedAppCheck;
@@ -27,6 +30,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Configure Scramble for API documentation
+        Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
+            $openApi->secure(
+                SecurityScheme::http('bearer')
+            );
+        });
+
         // if(request()->server('HTTP_CF_VISITOR') || request()->server('HTTPS')) {
         //     URL::forceScheme('https');
         // }

@@ -9,6 +9,7 @@
         "barryvdh/laravel-debugbar": "^3.14",
         "barryvdh/laravel-dompdf": "^3.0",
         "bezhansalleh/filament-shield": "^3.2",
+        "dedoc/scramble": "^0.11.33",
         "dompdf/dompdf": "^3.0",
         "filament/filament": "^3.2",
         "joaopaulolndev/filament-edit-env": "^1.0",
