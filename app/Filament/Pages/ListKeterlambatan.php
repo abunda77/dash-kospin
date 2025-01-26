@@ -46,7 +46,18 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                   ->whereYear('tanggal_pembayaran', $today->year);
             })
             ->where(function ($query) use ($today) {
-                $query->whereRaw('DAY(tanggal_jatuh_tempo) < ?', [$today->day]);
+                $query->whereHas('transaksiPinjaman', function ($q) use ($today) {
+                    $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 0', [$today])
+                      ->whereRaw('DATE_FORMAT(tanggal_jatuh_tempo, "%Y-%m") < ?',
+                          [$today->format('Y-m')]);
+                })
+                ->orWhere(function ($q) use ($today) {
+                    $q->whereDoesntHave('transaksiPinjaman')
+                      ->whereRaw('DATE_FORMAT(tanggal_pinjaman, "%Y-%m") < ?',
+                          [$today->format('Y-m')])
+                      ->whereRaw('DATEDIFF(?, DATE_ADD(tanggal_pinjaman, INTERVAL 1 MONTH)) > 0',
+                          [$today]);
+                });
             })
             ->count();
     }
@@ -63,14 +74,25 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
         $today = Carbon::today();
 
         return Pinjaman::query()
-            ->with(['profile', 'biayaBungaPinjaman', 'denda'])
+            ->with(['profile', 'biayaBungaPinjaman', 'denda', 'transaksiPinjaman'])
             ->where('status_pinjaman', 'approved')
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
                   ->whereYear('tanggal_pembayaran', $today->year);
             })
             ->where(function ($query) use ($today) {
-                $query->whereRaw('DAY(tanggal_jatuh_tempo) < ?', [$today->day]);
+                $query->whereHas('transaksiPinjaman', function ($q) use ($today) {
+                    $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 0', [$today])
+                      ->whereRaw('DATE_FORMAT(tanggal_jatuh_tempo, "%Y-%m") < ?',
+                          [$today->format('Y-m')]);
+                })
+                ->orWhere(function ($q) use ($today) {
+                    $q->whereDoesntHave('transaksiPinjaman')
+                      ->whereRaw('DATE_FORMAT(tanggal_pinjaman, "%Y-%m") < ?',
+                          [$today->format('Y-m')])
+                      ->whereRaw('DATEDIFF(?, DATE_ADD(tanggal_pinjaman, INTERVAL 1 MONTH)) > 0',
+                          [$today]);
+                });
             });
     }
 
@@ -86,16 +108,36 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
 
     private function calculateHariTerlambat($record, $today)
     {
-        $tanggalPembayaran = Carbon::parse($record->tanggal_jatuh_tempo)->day;
+        // Ambil tanggal jatuh tempo dari transaksi terakhir atau tanggal pinjaman
+        $lastTransaction = $record->transaksiPinjaman()
+            ->orderBy('angsuran_ke', 'desc')
+            ->first();
 
-        $tanggalJatuhTempo = Carbon::create(
-            $today->year,
-            $today->month,
-            $tanggalPembayaran
-        )->startOfDay();
+        if ($lastTransaction) {
+            // Jika ada transaksi sebelumnya, gunakan tanggal jatuh tempo berikutnya
+            $tanggalJatuhTempo = Carbon::parse($lastTransaction->tanggal_pembayaran)
+                ->addMonth()
+                ->startOfDay();
+        } else {
+            // Jika belum ada transaksi, gunakan tanggal pinjaman + 1 bulan
+            $tanggalJatuhTempo = Carbon::parse($record->tanggal_pinjaman)
+                ->addMonth()
+                ->startOfDay();
+        }
 
-        return $today->gt($tanggalJatuhTempo) ?
-            $today->diffInDays($tanggalJatuhTempo) : 0;
+        // Jika masih dalam bulan yang sama dengan tanggal pinjaman, return 0
+        if ($today->format('Y-m') === Carbon::parse($record->tanggal_pinjaman)->format('Y-m')) {
+            return 0;
+        }
+
+        // Hitung keterlambatan hanya jika sudah melewati tanggal jatuh tempo
+        // dan berada di bulan yang berbeda
+        if ($today->gt($tanggalJatuhTempo) &&
+            $today->format('Y-m') !== $tanggalJatuhTempo->format('Y-m')) {
+            return $today->diffInDays($tanggalJatuhTempo);
+        }
+
+        return 0;
     }
 
     private function calculateDenda($record, $hariTerlambat)
@@ -201,6 +243,11 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                             return 'Rp.0,00';
                         }
                     })
+                    ->sortable(),
+
+                TextColumn::make('tanggal_pinjaman')
+                    ->label('Tanggal Pinjaman')
+                    ->date()
                     ->sortable(),
 
                 TextColumn::make('tanggal_jatuh_tempo')

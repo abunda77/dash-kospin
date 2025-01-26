@@ -72,18 +72,27 @@ class ListKeterlambatanBulanIni extends Page implements HasTable, HasForms
         return Pinjaman::query()
             ->with(['profile', 'biayaBungaPinjaman', 'denda', 'transaksiPinjaman'])
             ->where('status_pinjaman', 'approved')
+            // Filter pinjaman yang belum dibayar bulan ini
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
                   ->whereYear('tanggal_pembayaran', $today->year);
             })
             ->where(function ($query) use ($today) {
-                // Ambil pinjaman yang tanggal jatuh temponya lebih dari 30 hari yang lalu
                 $query->whereHas('transaksiPinjaman', function ($q) use ($today) {
-                    $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 30', [$today]);
+                    // Cek keterlambatan untuk transaksi yang sudah jatuh tempo
+                    // dan berada di bulan yang berbeda
+                    $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 0', [$today])
+                      ->whereRaw('DATE_FORMAT(tanggal_jatuh_tempo, "%Y-%m") < ?',
+                          [$today->format('Y-m')]);
                 })
-                ->orWhereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
-                    // Untuk pinjaman yang belum pernah bayar sama sekali
-                    $q->whereRaw('DATEDIFF(?, tanggal_pinjaman) > 30', [$today]);
+                ->orWhere(function ($q) use ($today) {
+                    // Untuk pinjaman yang belum pernah bayar
+                    // Hanya tampilkan jika sudah melewati bulan pertama
+                    $q->whereDoesntHave('transaksiPinjaman')
+                      ->whereRaw('DATE_FORMAT(tanggal_pinjaman, "%Y-%m") < ?',
+                          [$today->format('Y-m')])
+                      ->whereRaw('DATEDIFF(?, DATE_ADD(tanggal_pinjaman, INTERVAL 1 MONTH)) > 0',
+                          [$today]);
                 });
             });
     }
@@ -119,8 +128,19 @@ class ListKeterlambatanBulanIni extends Page implements HasTable, HasForms
                 ->startOfDay();
         }
 
-        return $today->gt($tanggalJatuhTempo) ?
-            $today->diffInDays($tanggalJatuhTempo) : 0;
+        // Jika masih dalam bulan yang sama dengan tanggal pinjaman, return 0
+        if ($today->format('Y-m') === Carbon::parse($record->tanggal_pinjaman)->format('Y-m')) {
+            return 0;
+        }
+
+        // Hitung keterlambatan hanya jika sudah melewati tanggal jatuh tempo
+        // dan berada di bulan yang berbeda
+        if ($today->gt($tanggalJatuhTempo) &&
+            $today->format('Y-m') !== $tanggalJatuhTempo->format('Y-m')) {
+            return $today->diffInDays($tanggalJatuhTempo);
+        }
+
+        return 0;
     }
 
     private function calculateDenda($record, $angsuranPokok, $hariTerlambat)
@@ -274,6 +294,11 @@ class ListKeterlambatanBulanIni extends Page implements HasTable, HasForms
                             return 'Rp.0,00';
                         }
                     })
+                    ->sortable(),
+
+                TextColumn::make('tanggal_pinjaman')
+                    ->label('Tanggal Pinjaman')
+                    ->date()
                     ->sortable(),
 
                 TextColumn::make('tanggal_jatuh_tempo')
