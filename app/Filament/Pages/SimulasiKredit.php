@@ -60,6 +60,12 @@ class SimulasiKredit extends Page
                 ->action('generatePDF')
                 ->visible(fn () => count($this->angsuranList) > 0)
                 ->icon('heroicon-o-printer'),
+
+            Action::make('cetakFormPengajuan')
+                ->label('Cetak Form Pengajuan')
+                ->action('generateFormPengajuan')
+                ->icon('heroicon-o-document')
+                ->color('danger'),
         ];
     }
 
@@ -113,6 +119,21 @@ class SimulasiKredit extends Page
         return response()->streamDownload(
             fn () => print($pdf->output()),
             'simulasi-kredit.pdf'
+        );
+    }
+
+    public function generateFormPengajuan()
+    {
+        $data = [
+            'nominalPinjaman' => (float) str_replace(['Rp', '.', ' '], '', $this->nominalPinjaman),
+            'bunga' => $this->bunga,
+            'jangkaWaktu' => $this->jangkaWaktu,
+        ];
+
+        $pdf = Pdf::loadView('pdf.form-pengajuan-kredit', $data);
+        return response()->streamDownload(
+            fn () => print($pdf->output()),
+            'form-pengajuan-kredit.pdf'
         );
     }
 }
