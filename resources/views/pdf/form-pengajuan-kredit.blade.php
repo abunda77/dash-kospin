@@ -124,7 +124,13 @@
         </tr>
         <tr>
             <td class="label">Nama Akun Media Sosial</td>
-            <td><div class="input-field"></div></td>
+            <td>
+                <div class="input-field"></div>
+                <div class="info-text">
+                    Wajib follow akun media sosial Koperasi:
+                    Instagram & Facebook @koperasisinaraartha
+                </div>
+            </td>
         </tr>
         <tr>
             <td class="label">Nama Saudara Serumah + Nomor HP/Whatsapp</td>
@@ -172,11 +178,11 @@
         </tr>
     </table>
 
-    <div style="text-align: right; margin-top: 30px; margin-bottom: 20px;">
+    <div style="text-align: right; margin-top: 10px; margin-bottom: 10px;">
         <p>........................., ...............................</p>
     </div>
 
-    <table style="width: 100%; margin-top: 20px;">
+    <table style="width: 100%; margin-top: 5px;">
         <tr>
             <td style="width: 50%; text-align: center;">
                 <p>Marketing/Referral</p>
