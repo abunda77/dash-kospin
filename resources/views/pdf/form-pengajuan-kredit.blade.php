@@ -56,6 +56,14 @@
         .input-field {
             border-bottom: 1px solid #ccc;
             min-height: 16px;
+            position: relative;
+            padding-left: 10px;
+        }
+        .input-field::before {
+            content: ':';
+            position: absolute;
+            left: 0;
+            top: 0;
         }
         .signature-section {
             margin-top: 20px;
@@ -164,12 +172,25 @@
         </tr>
     </table>
 
-    <div class="signature-section">
+    <div style="text-align: right; margin-top: 30px; margin-bottom: 20px;">
         <p>........................., ...............................</p>
-        <p>Yang mengajukan,</p>
-        <div class="signature-box"></div>
-        <p>(............................................)</p>
-        <p class="info-text">Tanda tangan dan nama lengkap</p>
     </div>
+
+    <table style="width: 100%; margin-top: 20px;">
+        <tr>
+            <td style="width: 50%; text-align: center;">
+                <p>Marketing/Referral</p>
+                <div class="signature-box" style="margin: 0 auto;"></div>
+                <p>(............................................)</p>
+                <p class="info-text">Tanda tangan dan nama lengkap</p>
+            </td>
+            <td style="width: 50%; text-align: center;">
+                <p>Yang mengajukan,</p>
+                <div class="signature-box" style="margin: 0 auto;"></div>
+                <p>(............................................)</p>
+                <p class="info-text">Tanda tangan dan nama lengkap</p>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
