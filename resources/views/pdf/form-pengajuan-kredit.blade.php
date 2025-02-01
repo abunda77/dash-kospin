@@ -146,7 +146,7 @@
         </tr>
         <tr>
             <td class="label">Limit Pengajuan Kredit</td>
-            <td><div class="input-field">Rp. {{ $nominalPinjaman ? number_format((float)$nominalPinjaman, 0, ',', '.') : '' }}</div></td>
+            <td><div class="input-field">Rp.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tenor: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cicilan:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></td>
         </tr>
         <tr>
             <td class="label">Jenis Pengajuan</td>
