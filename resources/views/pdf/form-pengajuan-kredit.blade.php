@@ -89,6 +89,13 @@
         }
         .checkbox-option {
             font-size: 11px;
+            display: flex;
+            gap: 8px;
+            margin: 4px 0;
+        }
+        .checkbox-option input[type="checkbox"] {
+            margin-right: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -148,7 +155,18 @@
         </tr>
         <tr>
             <td class="label">Kesediaan untuk Disurvei</td>
-            <td><div class="input-field checkbox-option"> Ya / Tidak</div></td>
+            <td>
+                <div class="checkbox-option">
+                    <label>
+                        <input type="checkbox" name="survey" value="yes">
+                        Ya
+                    </label>
+                    <label>
+                        <input type="checkbox" name="survey" value="no">
+                        Tidak
+                    </label>
+                </div>
+            </td>
         </tr>
         <tr>
             <td class="label">Limit Pengajuan Kredit</td>
@@ -156,7 +174,18 @@
         </tr>
         <tr>
             <td class="label">Jenis Pengajuan</td>
-            <td><div class="input-field checkbox-option">Dengan Jaminan / Tanpa Jaminan</div></td>
+            <td>
+                <div class="checkbox-option">
+                    <label>
+                        <input type="checkbox" name="loan_type" value="jaminan">
+                        Dengan Jaminan
+                    </label>
+                    <label>
+                        <input type="checkbox" name="loan_type" value="tanpa_jaminan">
+                        Tanpa Jaminan
+                    </label>
+                </div>
+            </td>
         </tr>
         <tr>
             <td class="label">Pekerjaan</td>
