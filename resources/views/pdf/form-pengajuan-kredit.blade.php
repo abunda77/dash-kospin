@@ -5,64 +5,62 @@
     <title>Form Pengajuan Kredit</title>
     <style>
         @page {
-            margin: 0.5cm;
+            margin: 1cm;
         }
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.5;
+            line-height: 2;
             color: #333;
-            font-size: 11px;
+            font-size: 10px;
             margin: 0;
             padding: 0;
         }
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            margin-top: 10px;
-        }
-        .logo {
-            width: 200px;
-            margin-bottom: 10px;
-        }
-        .title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 12px;
-            margin-bottom: 8px;
-        }
-        .subtitle {
-            font-size: 11px;
-            color: #666;
             margin-bottom: 15px;
         }
+        .logo {
+            width: 300px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .subtitle {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 10px;
+        }
         .form-number {
-            font-size: 11px;
+            font-size: 10px;
             text-align: right;
             font-weight: bold;
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 3px;
+            right: 3px;
         }
         .form-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         .form-table td {
-            padding: 4px 8px;
+            padding: 3px 6px;
             vertical-align: top;
         }
         .label {
             font-weight: bold;
-            width: 45%;
-            font-size: 12px;
+            width: 40%;
+            font-size: 11px;
         }
         .input-field {
             border-bottom: 1px solid #999;
-            min-height: 25px;
+            min-height: 20px;
             position: relative;
-            padding-left: 8px;
-            font-size: 11px;
+            padding-left: 6px;
+            font-size: 10px;
         }
         .input-field::before {
             content: ':';
@@ -71,30 +69,30 @@
             top: 0;
         }
         .signature-section {
-            margin-top: 15px;
+            margin-top: 10px;
             text-align: right;
         }
         .signature-box {
             border: 1px solid #000;
-            width: 150px;
-            height: 60px;
-            margin-top: 8px;
+            width: 120px;
+            height: 50px;
+            margin-top: 5px;
             display: inline-block;
         }
         .info-text {
-            font-size: 9px;
+            font-size: 8px;
             color: #666;
             font-style: italic;
-            margin-top: 2px;
+            margin-top: 1px;
         }
         .checkbox-option {
-            font-size: 11px;
+            font-size: 10px;
             display: flex;
-            gap: 8px;
-            margin: 4px 0;
+            gap: 5px;
+            margin: 2px 0;
         }
         .checkbox-option input[type="checkbox"] {
-            margin-right: 4px;
+            margin-right: 3px;
             cursor: pointer;
         }
     </style>
@@ -105,7 +103,7 @@
     </div>
 
     <div class="header">
-        <img src="{{ public_path('images/logo_koperasi.jpg') }}" class="logo" style="width: 250px; height: auto;">
+        <img src="{{ public_path('images/logo_koperasi.jpg') }}" class="logo">
         <div class="title">FORM PENGAJUAN KREDIT</div>
         <div class="subtitle">Mohon isi form berikut dengan lengkap dan jelas</div>
     </div>
@@ -116,7 +114,7 @@
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Nomor KTP/ID Card</td>
+            <td class="label">Nomor KTP</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
@@ -132,58 +130,45 @@
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Alamat Rumah (jika tidak sesuai KTP)</td>
+            <td class="label">Alamat Rumah</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Nama Akun Media Sosial</td>
+            <td class="label">Media Sosial</td>
             <td>
                 <div class="input-field"></div>
                 <div class="info-text">
-                    Wajib follow akun media sosial Koperasi:
-                    Instagram & Facebook @koperasisinaraartha
+                    Wajib follow: Instagram & Facebook @koperasisinaraartha
                 </div>
             </td>
         </tr>
         <tr>
-            <td class="label">Nama Saudara Serumah + Nomor HP/Whatsapp</td>
+            <td class="label">Saudara Serumah + HP</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Nama Saudara Tidak Serumah + Nomor HP/Whatsapp</td>
+            <td class="label">Saudara Tidak Serumah + HP</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Kesediaan untuk Disurvei</td>
+            <td class="label">Kesediaan Disurvei</td>
             <td>
                 <div class="checkbox-option">
-                    <label>
-                        <input type="checkbox" name="survey" value="yes">
-                        Ya
-                    </label>
-                    <label>
-                        <input type="checkbox" name="survey" value="no">
-                        Tidak
-                    </label>
+                    <label><input type="checkbox" name="survey" value="yes"> Ya</label>
+                    <label><input type="checkbox" name="survey" value="no"> Tidak</label>
                 </div>
             </td>
         </tr>
         <tr>
-            <td class="label">Limit Pengajuan Kredit</td>
-            <td><div class="input-field">Rp.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tenor: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cicilan:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></td>
+            <td class="label">Limit Pengajuan</td>
+            <td><div class="input-field">Rp. __________ Tenor: __________ Cicilan: __________</div></td>
         </tr>
         <tr>
             <td class="label">Jenis Pengajuan</td>
             <td>
                 <div class="checkbox-option">
-                    <label>
-                        <input type="checkbox" name="loan_type" value="jaminan">
-                        Dengan Jaminan
-                    </label>
-                    <label>
-                        <input type="checkbox" name="loan_type" value="tanpa_jaminan">
-                        Tanpa Jaminan
-                    </label>
+                    <label><input type="checkbox" name="loan_type" value="jaminan"> Dengan Jaminan</label>
+                    <label><input type="checkbox" name="loan_type" value="tanpa_jaminan"> Tanpa Jaminan</label>
                 </div>
             </td>
         </tr>
@@ -192,23 +177,23 @@
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Alamat Kantor/Tempat Usaha</td>
+            <td class="label">Alamat Kantor/Usaha</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">No. Telp Kantor/Tempat Usaha</td>
+            <td class="label">No. Telp Kantor/Usaha</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Penghasilan per Bulan</td>
+            <td class="label">Penghasilan/Bulan</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Daftar Hutang/Cicilan Aktif</td>
+            <td class="label">Hutang/Cicilan Aktif</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
-            <td class="label">Jumlah Anggota Keluarga</td>
+            <td class="label">Jumlah Keluarga</td>
             <td><div class="input-field"></div></td>
         </tr>
         <tr>
@@ -217,22 +202,22 @@
         </tr>
     </table>
 
-    <div style="text-align: right; margin-top: 15px; margin-bottom: 10px; font-size: 11px;">
+    <div style="text-align: right; margin: 10px 0; font-size: 10px;">
         <p>........................., ...............................</p>
     </div>
 
-    <table style="width: 100%; margin-top: 10px;">
+    <table style="width: 100%; margin-top: 5px;">
         <tr>
             <td style="width: 50%; text-align: center;">
-                <p style="font-size: 11px; margin-bottom: 5px;">Marketing/Referral</p>
-                <div class="signature-box" style="margin: 0 auto;"></div>
-                <p style="font-size: 11px; margin: 5px 0;">(............................................)</p>
+                <p style="font-size: 10px; margin-bottom: 3px;">Marketing/Referral</p>
+                <div class="signature-box"></div>
+                <p style="font-size: 10px; margin: 3px 0;">(............................................)</p>
                 <p class="info-text">Tanda tangan dan nama lengkap</p>
             </td>
             <td style="width: 50%; text-align: center;">
-                <p style="font-size: 11px; margin-bottom: 5px;">Yang mengajukan,</p>
-                <div class="signature-box" style="margin: 0 auto;"></div>
-                <p style="font-size: 11px; margin: 5px 0;">(............................................)</p>
+                <p style="font-size: 10px; margin-bottom: 3px;">Yang mengajukan,</p>
+                <div class="signature-box"></div>
+                <p style="font-size: 10px; margin: 3px 0;">(............................................)</p>
                 <p class="info-text">Tanda tangan dan nama lengkap</p>
             </td>
         </tr>
