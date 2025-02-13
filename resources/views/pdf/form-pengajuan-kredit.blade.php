@@ -222,5 +222,23 @@
             </td>
         </tr>
     </table>
+
+    <table style="position: absolute; bottom: 100px; left: 10px; font-size: 10px; border-collapse: collapse;">
+        <tr>
+            <td style="border: none; padding: 0;">Kode Reff</td>
+            <td style="border: none; padding: 5;">:</td>
+            <td style="border: none; padding: 5;">.....................</td>
+        </tr>
+        <tr>
+            <td style="border: none; padding: 0;">Nama Reff</td>
+            <td style="border: none; padding: 5;">:</td>
+            <td style="border: none; padding: 5;">.....................</td>
+        </tr>
+        <tr>
+            <td style="border: none; padding: 0;">No.Hp</td>
+            <td style="border: none; padding: 5;">:</td>
+            <td style="border: none; padding: 5;">.....................</td>
+        </tr>
+    </table>
 </body>
 </html>

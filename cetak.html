@@ -1,75 +1,232 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Print Table Demo</title>
+    <meta charset="utf-8">
+    <title>Form Pengajuan Kredit</title>
     <style>
-        /* CSS Styling untuk tabel */
-        table {
-            border-collapse: collapse;
+        @page {
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 2;
+            color: #333;
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .logo {
+            width: 300px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .subtitle {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .form-number {
+            font-size: 10px;
+            text-align: right;
+            font-weight: bold;
+            position: absolute;
+            top: 3px;
+            right: 3px;
+        }
+        .form-table {
             width: 100%;
-            margin: 20px 0;
+            border-collapse: collapse;
+            margin-bottom: 15px;
         }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: left;
+        .form-table td {
+            padding: 3px 6px;
+            vertical-align: top;
         }
-        th {
-            background-color: #f4f4f4;
+        .label {
+            font-weight: bold;
+            width: 40%;
+            font-size: 11px;
         }
-
-        /* Styling untuk cetak */
-        @media print {
-            /* Sembunyikan tombol print saat mencetak */
-            button {
-                display: none;
-            }
-            table {
-                margin-top: 0;
-            }
+        .input-field {
+            border-bottom: 1px solid #999;
+            min-height: 20px;
+            position: relative;
+            padding-left: 6px;
+            font-size: 10px;
+        }
+        .input-field::before {
+            content: ':';
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .signature-section {
+            margin-top: 10px;
+            text-align: right;
+        }
+        .signature-box {
+            border: 1px solid #000;
+            width: 120px;
+            height: 50px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        .info-text {
+            font-size: 8px;
+            color: #666;
+            font-style: italic;
+            margin-top: 1px;
+        }
+        .checkbox-option {
+            font-size: 10px;
+            display: flex;
+            gap: 5px;
+            margin: 2px 0;
+        }
+        .checkbox-option input[type="checkbox"] {
+            margin-right: 3px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>Data Table</h1>
-    <p>Klik tombol di bawah untuk mencetak tabel.</p>
+    <div class="form-number">
+        No: FORM-KR-{{ str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT) }}
+    </div>
 
-    <!-- Tabel Data -->
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Posisi</th>
-                <th>Departemen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>John Doe</td>
-                <td>Manager</td>
-                <td>Keuangan</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Jane Smith</td>
-                <td>Asisten</td>
-                <td>Marketing</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Michael Brown</td>
-                <td>Staf</td>
-                <td>HRD</td>
-            </tr>
-        </tbody>
+    <div class="header">
+        <img src="{{ public_path('images/logo_koperasi.jpg') }}" class="logo">
+        <div class="title">FORM PENGAJUAN KREDIT</div>
+        <div class="subtitle">Mohon isi form berikut dengan lengkap dan jelas</div>
+    </div>
+
+    <table class="form-table">
+        <tr>
+            <td class="label">Nama Lengkap</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Nomor KTP</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Nomor HP/Whatsapp</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Email</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Nama Ibu Kandung</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Alamat Rumah</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Media Sosial</td>
+            <td>
+                <div class="input-field"></div>
+                <div class="info-text">
+                    Wajib follow: Instagram & Facebook @koperasisinaraartha
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Saudara Serumah + HP</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Saudara Tidak Serumah + HP</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Kesediaan Disurvei</td>
+            <td>
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="survey" value="yes"> Ya</label>
+                    <label><input type="checkbox" name="survey" value="no"> Tidak</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Limit Pengajuan</td>
+            <td><div class="input-field">Rp. __________ Tenor: __________ Cicilan: __________</div></td>
+        </tr>
+        <tr>
+            <td class="label">Jenis Pengajuan</td>
+            <td>
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="loan_type" value="jaminan"> Dengan Jaminan</label>
+                    <label><input type="checkbox" name="loan_type" value="tanpa_jaminan"> Tanpa Jaminan</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Pekerjaan</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Alamat Kantor/Usaha</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">No. Telp Kantor/Usaha</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Penghasilan/Bulan</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Hutang/Cicilan Aktif</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Jumlah Keluarga</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Tujuan Pinjaman</td>
+            <td><div class="input-field"></div></td>
+        </tr>
     </table>
 
-    <!-- Tombol Cetak -->
-    <button onclick="window.print()">Cetak Tabel</button>
+    <div style="text-align: right; margin: 10px 0; font-size: 10px;">
+        <p>........................., ...............................</p>
+    </div>
+
+    <table style="width: 100%; margin-top: 5px;">
+        <tr>
+            <td style="width: 50%; text-align: center;">
+                <p style="font-size: 10px; margin-bottom: 3px;">Marketing/Referral</p>
+                <div class="signature-box"></div>
+                <p style="font-size: 10px; margin: 3px 0;">(............................................)</p>
+                <p class="info-text">Tanda tangan dan nama lengkap</p>
+            </td>
+            <td style="width: 50%; text-align: center;">
+                <p style="font-size: 10px; margin-bottom: 3px;">Yang mengajukan,</p>
+                <div class="signature-box"></div>
+                <p style="font-size: 10px; margin: 3px 0;">(............................................)</p>
+                <p class="info-text">Tanda tangan dan nama lengkap</p>
+            </td>
+        </tr>
+    </table>
+
+    <div style="position: absolute; bottom: 10px; left: 10px; font-size: 10px;">
+        Kode Reff:<br>
+        Nama Reff:<br>
+        No.Hp :
+    </div>
 </body>
 </html>
-
