@@ -189,7 +189,7 @@
         </div>
         <div class="form-group">
             <span class="label">2. Suku Bunga</span>:
-            <span class="value">{{ $deposito->rate_bunga }}%</span>
+            <span class="value">{{ $deposito->rate_bunga }}% p.a</span>
         </div>
         <div class="form-group">
             <span class="label">3. Nominal Bunga</span>:
