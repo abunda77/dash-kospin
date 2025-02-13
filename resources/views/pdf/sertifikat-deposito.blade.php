@@ -114,11 +114,15 @@
         .signature p {
             margin: 1px 0;
         }
+        .signature img {
+            width: 120px;
+            margin: 5px 0;
+        }
         .signature .name {
             font-weight: bold;
             border-top: 1px solid #000;
             padding-top: 3px;
-            margin-top: 50px;
+            margin-top: 5px;
             width: 140px;
         }
     </style>
@@ -220,8 +224,8 @@
                 <p>Surabaya, {{ \Carbon\Carbon::parse($deposito->tanggal_pembukaan)->format('d F Y') }}</p>
                 <p>Ketua / Pengurus</p>
                 <p>KOPERASI SINARA ARTHA</p>
-                <br><br>
-                <p class="name">WILLY.H</p>
+                <img src="{{ public_path('images/ttd_andesta_nobg.png') }}" alt="Tanda Tangan">
+                <p class="name">ANDESTA RULLI</p>
             </div>
         </div>
     </div>
