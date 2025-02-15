@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\TabunganController;
 use App\Http\Controllers\Api\DepositoController;
 use App\Http\Controllers\Api\BannerMobileController;
 use App\Http\Controllers\Api\RegionController;
+use App\Http\Controllers\Api\AngsuranController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -28,6 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/deposito/by-profile', [DepositoController::class, 'getDepositoByProfile']);
     Route::get('/deposito/detail', [DepositoController::class, 'getDetailByNoRekening']);
     Route::patch('/update-password', [AuthController::class, 'updatePassword']);
+    
+    // Tambahkan route baru untuk Angsuran
+    Route::get('/angsuran/details', [AngsuranController::class, 'getAngsuranDetails']);
 });
 
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
