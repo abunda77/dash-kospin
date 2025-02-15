@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PinjamanController;
 use App\Http\Controllers\Api\TabunganController;
 use App\Http\Controllers\Api\DepositoController;
 use App\Http\Controllers\Api\BannerMobileController;
+use App\Http\Controllers\Api\RegionController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -33,3 +34,5 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('banner-mobile/type/{type?}', [BannerMobileController::class, 'getByType']);
+
+Route::apiResource('regions', RegionController::class);
