@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use Carbon\Carbon;
+use App\Models\Admin;
 use Dedoc\Scramble\Scramble;
+use App\Policies\ActivityPolicy;
 use Spatie\Health\Facades\Health;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Gate;
@@ -14,6 +16,7 @@ use Dedoc\Scramble\Support\Generator\SecurityScheme;
 use Spatie\Health\Checks\Checks\DebugModeCheck;
 use Spatie\Health\Checks\Checks\EnvironmentCheck;
 use Spatie\Health\Checks\Checks\OptimizedAppCheck;
+use TomatoPHP\FilamentLogger\Filament\Resources\ActivityResource;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-
+        //
     }
 
     /**
@@ -35,6 +38,13 @@ class AppServiceProvider extends ServiceProvider
             $openApi->secure(
                 SecurityScheme::http('bearer')
             );
+        });
+
+        // Mengatur akses ke dokumentasi API
+        Gate::define('viewApiDocs', function () {
+            // Selalu minta password dari env
+            return request()->hasHeader('PHP_AUTH_PW') &&
+                   request()->header('PHP_AUTH_PW') === env('SCRAMBLE_DOCS_PASSWORD');
         });
 
         // if(request()->server('HTTP_CF_VISITOR') || request()->server('HTTPS')) {

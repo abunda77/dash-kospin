@@ -1,6 +1,8 @@
 <?php
 
 use Dedoc\Scramble\Http\Middleware\RestrictedDocsAccess;
+use Illuminate\Auth\Middleware\Authenticate;
+use App\Http\Middleware\SecureDocsAccess;
 
 return [
     /*
@@ -78,9 +80,12 @@ return [
      */
     'servers' => null,
 
+    /*
+     * The middleware to be applied on the documentation endpoints.
+     */
     'middleware' => [
         'web',
-        RestrictedDocsAccess::class,
+        SecureDocsAccess::class,
     ],
 
     'extensions' => [],
