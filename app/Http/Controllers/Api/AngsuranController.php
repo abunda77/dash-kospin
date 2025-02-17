@@ -21,8 +21,8 @@ class AngsuranController extends Controller
 
             // Cari pinjaman berdasarkan nomor pinjaman
             $pinjaman = Pinjaman::with([
-                'profile', 
-                'produkPinjaman', 
+                'profile',
+                'produkPinjaman',
                 'biayaBungaPinjaman',
                 'denda',
                 'transaksiPinjaman'
@@ -70,7 +70,118 @@ class AngsuranController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Terjadi kesalahan saat mengambil data angsuran',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
+
+    public function updateStatusPembayaran(Request $request, $id)
+    {
+        try {
+            // Validasi input
+            $validatedData = $request->validate([
+                'no_pinjaman' => 'required|string'
+            ]);
+
+            // Cari transaksi pinjaman
+            $transaksiPinjaman = TransaksiPinjaman::where('id', $id)
+                ->where('status_pembayaran', 'PENDING')
+                ->first();
+
+            if (!$transaksiPinjaman) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data transaksi pinjaman tidak ditemukan atau status bukan PENDING'
+                ], 404);
+            }
+
+            // Update status pembayaran menjadi LUNAS
+            $transaksiPinjaman->status_pembayaran = 'LUNAS';
+            $transaksiPinjaman->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Status pembayaran berhasil diupdate menjadi LUNAS',
+                'data' => $transaksiPinjaman
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating payment status: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat mengupdate status pembayaran',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
+
+    public function createTransaksiAngsuran(Request $request)
+    {
+        try {
+            // Validasi input
+            $validatedData = $request->validate([
+                'no_pinjaman' => 'required|string',
+                'periode' => 'required|integer',
+                'pokok' => 'required|numeric',
+                'bunga' => 'required|numeric',
+                'total_angsuran' => 'required|numeric',
+                'sisa_pokok' => 'required|numeric',
+                'denda' => 'required|numeric',
+                'hari_terlambat' => 'required|integer',
+                'total_tagihan' => 'required|numeric'
+            ]);
+
+            // Cari pinjaman berdasarkan nomor pinjaman
+            $pinjaman = Pinjaman::where('no_pinjaman', $validatedData['no_pinjaman'])->first();
+
+            if (!$pinjaman) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data pinjaman tidak ditemukan'
+                ], 404);
+            }
+
+            // Cek apakah transaksi untuk periode ini sudah ada
+            $existingTransaksi = TransaksiPinjaman::where('pinjaman_id', $pinjaman->id_pinjaman)
+                ->where('angsuran_ke', $validatedData['periode'])
+                ->first();
+
+            if ($existingTransaksi) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Transaksi untuk periode ini sudah ada'
+                ], 400);
+            }
+
+            // Buat transaksi baru
+            $transaksi = new TransaksiPinjaman();
+            $transaksi->pinjaman_id = $pinjaman->id_pinjaman;
+            $transaksi->angsuran_ke = $validatedData['periode'];
+            $transaksi->angsuran_pokok = $validatedData['pokok'];
+            $transaksi->angsuran_bunga = $validatedData['bunga'];
+            $transaksi->total_pembayaran = $validatedData['total_angsuran'];
+            $transaksi->sisa_pinjaman = $validatedData['sisa_pokok'];
+            $transaksi->denda = $validatedData['denda'];
+            $transaksi->hari_terlambat = $validatedData['hari_terlambat'];
+            $transaksi->status_pembayaran = 'PENDING';
+            $transaksi->tanggal_pembayaran = now();  // Set ke tanggal hari ini
+            $transaksi->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Transaksi angsuran berhasil dibuat',
+                'data' => $transaksi
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error creating payment transaction: ' . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat membuat transaksi angsuran',
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ], 500);
         }
     }
@@ -101,7 +212,7 @@ class AngsuranController extends Controller
         for ($i = 1; $i <= $jangkaWaktu; $i++) {
             // Tambah 1 bulan untuk tanggal jatuh tempo berikutnya
             $tanggalJatuhTempo = $tanggalJatuhTempo->addMonth();
-            
+
             // Cek status pembayaran
             $transaksi = $pinjaman->transaksiPinjaman
                 ->where('angsuran_ke', $i)
@@ -117,7 +228,7 @@ class AngsuranController extends Controller
                 $denda = $transaksi->denda;
                 $hariTerlambat = $transaksi->hari_terlambat;
                 $statusPembayaran = $transaksi->status_pembayaran;
-                $tanggalPembayaran = $transaksi->tanggal_pembayaran ? 
+                $tanggalPembayaran = $transaksi->tanggal_pembayaran ?
                     $transaksi->tanggal_pembayaran->format('d/m/Y') : null;
             } else {
                 // Hitung denda untuk angsuran yang belum dibayar
@@ -129,7 +240,7 @@ class AngsuranController extends Controller
 
             // Hitung sisa hari
             $sisaHari = $today->diffInDays($tanggalJatuhTempo, false);
-            $statusJatuhTempo = $sisaHari < 0 ? 'Telah lewat ' . abs($sisaHari) . ' hari' : 
+            $statusJatuhTempo = $sisaHari < 0 ? 'Telah lewat ' . abs($sisaHari) . ' hari' :
                                ($sisaHari == 0 ? 'Hari ini' : 'Sisa ' . $sisaHari . ' hari');
 
             $angsuranList[] = [

@@ -29,9 +29,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/deposito/by-profile', [DepositoController::class, 'getDepositoByProfile']);
     Route::get('/deposito/detail', [DepositoController::class, 'getDetailByNoRekening']);
     Route::patch('/update-password', [AuthController::class, 'updatePassword']);
-    
+
     // Tambahkan route baru untuk Angsuran
     Route::get('/angsuran/details', [AngsuranController::class, 'getAngsuranDetails']);
+    Route::post('/angsuran/create', [AngsuranController::class, 'createTransaksiAngsuran']);
+    Route::patch('/angsuran/{id}/update-status', [AngsuranController::class, 'updateStatusPembayaran']);
 });
 
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
