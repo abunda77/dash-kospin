@@ -479,4 +479,43 @@ class TableAngsuran extends Page implements HasForms, HasTable
             ->send();
     }
 }
+
+    public function updateStatusLunas($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $transaksi = TransaksiPinjaman::findOrFail($id);
+
+            if ($transaksi->status_pembayaran !== 'PENDING') {
+                Notification::make()
+                    ->title('Error')
+                    ->body('Status pembayaran harus PENDING')
+                    ->danger()
+                    ->send();
+                return;
+            }
+
+            $transaksi->status_pembayaran = 'LUNAS';
+            $transaksi->save();
+
+            DB::commit();
+
+            Notification::make()
+                ->title('Berhasil')
+                ->body('Status pembayaran berhasil diupdate menjadi LUNAS')
+                ->success()
+                ->send();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error updating payment status: ' . $e->getMessage());
+
+            Notification::make()
+                ->title('Error')
+                ->body('Terjadi kesalahan saat mengupdate status pembayaran')
+                ->danger()
+                ->send();
+        }
+    }
 }
