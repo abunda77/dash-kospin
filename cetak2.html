@@ -3,84 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Print Table Demo with Print.js</title>
-    <!-- Tambahkan CDN Print.js -->
+    <title>Table Printing System</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/print-js@1.6.0/dist/print.min.css">
     <script src="https://cdn.jsdelivr.net/npm/print-js@1.6.0/dist/print.min.js"></script>
     <style>
-        /* CSS Styling untuk tabel */
-        table {
+        /* Container styles */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Print configuration panel */
+        .print-config {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .print-config .form-group {
+            margin-bottom: 10px;
+        }
+
+        .print-config label {
+            display: inline-block;
+            width: 200px;
+            margin-right: 10px;
+        }
+
+        .print-config input {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        /* Table styles */
+        .data-table {
             border-collapse: collapse;
             width: 100%;
             margin: 20px 0;
         }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
+
+        .data-table th,
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
         }
-        th {
+
+        .data-table th {
             background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        /* Button styles */
+        .print-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .print-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <h1>Data Table</h1>
-    <p>Klik tombol di bawah untuk mencetak tabel menggunakan Print.js.</p>
+    <div class="container">
+        <header>
+            <h1>Data Table Printing System</h1>
+            <p>Configure and print the table using the options below.</p>
+        </header>
 
-    <!-- Tambahkan input untuk konfigurasi cetak -->
-    <div style="margin-bottom: 15px;">
-        <label for="startRow">Mulai cetak dari baris ke:</label>
-        <input type="number" id="startRow" min="1" value="1" style="margin-right: 15px;">
-        
-        <label for="lineSpacing">Jarak spasi antar baris:</label>
-        <input type="number" id="lineSpacing" min="1" max="3" value="1" step="0.5">
+        <section class="print-config">
+            <div class="form-group">
+                <label for="startRow">Start printing from row:</label>
+                <input type="number" id="startRow" min="1" value="1">
+            </div>
+            
+            <div class="form-group">
+                <label for="lineSpacing">Line spacing (1-3):</label>
+                <input type="number" id="lineSpacing" min="1" max="3" value="1" step="0.5">
+            </div>
+        </section>
+
+        <table id="myTable" class="data-table">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Department</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>John Doe</td>
+                    <td>Manager</td>
+                    <td>Finance</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Jane Smith</td>
+                    <td>Assistant</td>
+                    <td>Marketing</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Michael Brown</td>
+                    <td>Staff</td>
+                    <td>HRD</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="print-button" onclick="handlePrint()">Print Table</button>
     </div>
 
-
-    <!-- Tabel Data -->
-    <table id="myTable">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Posisi</th>
-                <th>Departemen</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>John Doe</td>
-                <td>Manager</td>
-                <td>Keuangan</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Jane Smith</td>
-                <td>Asisten</td>
-                <td>Marketing</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Michael Brown</td>
-                <td>Staf</td>
-                <td>HRD</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- Tombol Cetak -->
-    <button onclick="printTable()">Cetak Tabel</button>
-
     <script>
-        function printTable() {
-            const startRow = document.getElementById('startRow').value;
-            const lineSpacing = document.getElementById('lineSpacing').value;
+        function validatePrintConfig() {
+            const startRow = parseInt(document.getElementById('startRow').value);
+            const lineSpacing = parseFloat(document.getElementById('lineSpacing').value);
             
-            if (confirm(`Tabel akan dicetak mulai dari baris ke-${startRow} dengan jarak spasi ${lineSpacing}. Lanjutkan?`)) {
-                // Hitung margin top berdasarkan nomor baris
-                const marginTop = (startRow - 1) * 20; // 20px per baris
+            if (startRow < 1) {
+                alert('Start row must be greater than 0');
+                return false;
+            }
+            
+            if (lineSpacing < 1 || lineSpacing > 3) {
+                alert('Line spacing must be between 1 and 3');
+                return false;
+            }
+            
+            return { startRow, lineSpacing };
+        }
+
+        function handlePrint() {
+            const config = validatePrintConfig();
+            if (!config) return;
+
+            const { startRow, lineSpacing } = config;
+            
+            if (confirm(`Table will be printed starting from row ${startRow} with ${lineSpacing} line spacing. Continue?`)) {
+                const marginTop = (startRow - 1) * 20;
 
                 printJS({
                     printable: 'myTable',
@@ -88,15 +163,21 @@
                     style: `
                         @page { margin-top: ${marginTop}px; }
                         table { border-collapse: collapse; width: 100%; }
-                        th, td { border: 1px solid black; padding: 8px; text-align: left; }
-                        th { background-color: #f4f4f4; }
+                        th, td { 
+                            border: 1px solid black; 
+                            padding: 12px; 
+                            text-align: left;
+                        }
+                        th { 
+                            background-color: #f4f4f4;
+                            font-weight: bold;
+                        }
                         tr { line-height: ${lineSpacing}em; }
                     `
                 });
             }
         }
     </script>
-
 </body>
 </html>
 
