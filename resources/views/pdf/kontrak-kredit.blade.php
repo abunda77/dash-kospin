@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Surat Perjanjian Gadai</title>
+    <title>Surat Perjanjian Kredit Elektronik</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -82,7 +82,7 @@
 <body>
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
-        <h1>SURAT PERJANJIAN GADAI BARANG ELEKTRONIK</h1>
+        <h1>SURAT PERJANJIAN KREDIT BARANG ELEKTRONIK</h1>
         <h1>KOPERASI SINARA ARTHA</h1>
     </div>
 
@@ -95,22 +95,22 @@
                 <tr>
                     <td style="width: 150px">Nama</td>
                     <td style="width: 10px">:</td>
-                    <td>{{ $gadai->pinjaman->profile->first_name }} {{ $gadai->pinjaman->profile->last_name }}</td>
+                    <td>{{ $kredit->pinjaman->profile->first_name }} {{ $kredit->pinjaman->profile->last_name }}</td>
                 </tr>
                 <tr>
                     <td>NIK</td>
                     <td>:</td>
-                    <td>{{ $gadai->pinjaman->profile->no_identity }}</td>
+                    <td>{{ $kredit->pinjaman->profile->no_identity }}</td>
                 </tr>
                 <tr>
                     <td>Pekerjaan</td>
                     <td>:</td>
-                    <td>{{ $gadai->pinjaman->profile->job }}</td>
+                    <td>{{ $kredit->pinjaman->profile->job }}</td>
                 </tr>
                 <tr>
                     <td>Alamat</td>
                     <td>:</td>
-                    <td>{{ $gadai->pinjaman->profile->address }}</td>
+                    <td>{{ $kredit->pinjaman->profile->address }}</td>
                 </tr>
                 @php
                     $getRegionName = function($code) {
@@ -120,22 +120,22 @@
                 <tr>
                     <td>Provinsi</td>
                     <td>:</td>
-                    <td>{{ $getRegionName($gadai->pinjaman->profile->province_id) }}</td>
+                    <td>{{ $getRegionName($kredit->pinjaman->profile->province_id) }}</td>
                 </tr>
                 <tr>
                     <td>Kabupaten/Kota</td>
                     <td>:</td>
-                    <td>{{ $getRegionName($gadai->pinjaman->profile->district_id) }}</td>
+                    <td>{{ $getRegionName($kredit->pinjaman->profile->district_id) }}</td>
                 </tr>
                 <tr>
                     <td>Kecamatan</td>
                     <td>:</td>
-                    <td>{{ $getRegionName($gadai->pinjaman->profile->city_id) }}</td>
+                    <td>{{ $getRegionName($kredit->pinjaman->profile->city_id) }}</td>
                 </tr>
                 <tr>
                     <td>Desa/Kelurahan</td>
                     <td>:</td>
-                    <td>{{ $getRegionName($gadai->pinjaman->profile->village_id) }}</td>
+                    <td>{{ $getRegionName($kredit->pinjaman->profile->village_id) }}</td>
                 </tr>
             </table>
             <p>Dalam hal ini bertindak untuk dan atas nama diri sendiri, selanjutnya disebut sebagai PIHAK PERTAMA.</p>
@@ -159,75 +159,75 @@
     </div>
 
     <div class="article">
-        <h3>Pasal 1<br>OBJEK GADAI</h3>
+        <h3>Pasal 1<br>OBJEK KREDIT</h3>
         <ol>
-            <li>PIHAK PERTAMA dengan ini menyerahkan barang elektronik dengan spesifikasi sebagai berikut:
+            <li>PIHAK PERTAMA dengan ini membeli barang elektronik dengan spesifikasi sebagai berikut:
                 <table border="0" style="width: 100%; margin-top: 10px;">
                     <tr>
                         <td style="width: 150px">Nama Barang</td>
                         <td style="width: 10px">:</td>
-                        <td>{{ $gadai->nama_barang }}</td>
+                        <td>{{ $kredit->nama_barang }}</td>
                     </tr>
                     <tr>
                         <td>Kode/IMEI</td>
                         <td>:</td>
-                        <td>{{ $gadai->kode_barang }}</td>
+                        <td>{{ $kredit->kode_barang }}</td>
                     </tr>
                     <tr>
                         <td>Jenis</td>
                         <td>:</td>
-                        <td>{{ ucfirst($gadai->jenis_barang) }}</td>
+                        <td>{{ ucfirst($kredit->jenis_barang) }}</td>
                     </tr>
                     <tr>
                         <td>Merk</td>
                         <td>:</td>
-                        <td>{{ ucfirst($gadai->merk) }}</td>
+                        <td>{{ ucfirst($kredit->merk) }}</td>
                     </tr>
                     <tr>
                         <td>Tipe</td>
                         <td>:</td>
-                        <td>{{ ucfirst($gadai->tipe) }}</td>
+                        <td>{{ ucfirst($kredit->tipe) }}</td>
                     </tr>
                     <tr>
                         <td>Tahun Pembuatan</td>
                         <td>:</td>
-                        <td>{{ $gadai->tahun_pembuatan }}</td>
+                        <td>{{ $kredit->tahun_pembuatan }}</td>
                     </tr>
                     <tr>
                         <td>Kondisi</td>
                         <td>:</td>
-                        <td>{{ ucfirst($gadai->kondisi) }}</td>
+                        <td>{{ ucfirst($kredit->kondisi) }}</td>
                     </tr>
                     <tr>
                         <td>Kelengkapan</td>
                         <td>:</td>
-                        <td>{{ $gadai->kelengkapan }}</td>
+                        <td>{{ $kredit->kelengkapan }}</td>
                     </tr>
                 </table>
             </li>
-            <li>Barang tersebut digadaikan sebagai jaminan atas pinjaman sebesar Rp {{ number_format($gadai->nilai_hutang, 0, ',', '.') }} ({{ ucwords(terbilang($gadai->nilai_hutang)) }} Rupiah).</li>
+            <li>Barang tersebut dikreditkan dengan nilai hutang sebesar Rp {{ number_format($kredit->nilai_hutang, 0, ',', '.') }} ({{ ucwords(terbilang($kredit->nilai_hutang)) }} Rupiah).</li>
         </ol>
     </div>
 
     <div class="article">
-        <h3>Pasal 2<br>NILAI GADAI</h3>
+        <h3>Pasal 2<br>NILAI KREDIT</h3>
         <ol>
-            <li>Nilai taksiran barang adalah sebesar Rp {{ number_format($gadai->harga_barang, 0, ',', '.') }} dengan nilai taksasi {{ $gadai->nilai_taksasi }}%.</li>
-            <li>PIHAK KEDUA memberikan pinjaman kepada PIHAK PERTAMA sebesar Rp {{ number_format($gadai->nilai_hutang, 0, ',', '.') }}.</li>
-            <li>Jangka waktu pinjaman adalah {{ $gadai->pinjaman->jangka_waktu }} bulan terhitung sejak tanggal {{ $gadai->pinjaman->tanggal_pinjaman->translatedFormat('d F Y') }}.</li>
+            <li>Harga barang adalah sebesar Rp {{ number_format($kredit->harga_barang, 0, ',', '.') }} dengan uang muka sebesar Rp {{ number_format($kredit->uang_muka, 0, ',', '.') }}.</li>
+            <li>PIHAK KEDUA memberikan kredit kepada PIHAK PERTAMA sebesar Rp {{ number_format($kredit->nilai_hutang, 0, ',', '.') }}.</li>
+            <li>Jangka waktu kredit adalah {{ $kredit->pinjaman->jangka_waktu }} bulan terhitung sejak tanggal {{ $kredit->pinjaman->tanggal_pinjaman->translatedFormat('d F Y') }}.</li>
         </ol>
     </div>
 
     <div class="article">
         <h3>Pasal 3<br>JANGKA WAKTU PEMBAYARAN</h3>
         <ol>
-            <li>PIHAK PERTAMA wajib mengembalikan pinjaman dalam jangka waktu {{ $gadai->pinjaman->jangka_waktu }} bulan, terhitung sejak tanggal penandatanganan perjanjian ini.</li>
+            <li>PIHAK PERTAMA wajib membayar angsuran dalam jangka waktu {{ $kredit->pinjaman->jangka_waktu }} bulan, terhitung sejak tanggal penandatanganan perjanjian ini.</li>
             @php
-                $angsuran_pokok = $gadai->pinjaman->jumlah_pinjaman / $gadai->pinjaman->jangka_waktu;
-                $bunga_per_bulan = ($gadai->pinjaman->jumlah_pinjaman * ($gadai->pinjaman->biayaBungaPinjaman->persentase_bunga/100)) / $gadai->pinjaman->jangka_waktu;
+                $angsuran_pokok = $kredit->pinjaman->jumlah_pinjaman / $kredit->pinjaman->jangka_waktu;
+                $bunga_per_bulan = ($kredit->pinjaman->jumlah_pinjaman * ($kredit->pinjaman->biayaBungaPinjaman->persentase_bunga/100)) / $kredit->pinjaman->jangka_waktu;
                 $angsuran_per_bulan = $angsuran_pokok + $bunga_per_bulan;
             @endphp
-            <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $gadai->pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
+            <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $kredit->pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
             {{-- <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 bulan angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran.</li> --}}
         </ol>
     </div>
@@ -254,8 +254,8 @@
     <div class="article">
         <h3>Pasal 6<br>PELUNASAN</h3>
         <ol>
-            <li>Apabila PIHAK PERTAMA ingin melakukan pelunasan dipercepat sebelum jangka waktu pinjaman berakhir maka akan dikenakan denda sebesar 5% dari sisa pokok pinjaman.</li>
-            <li>Jika PIHAK PERTAMA telah selesai menjalankan kewajiban pembayaran angsuran sesuai jadwal hingga akhir masa pinjaman, maka PIHAK PERTAMA berhak mendapatkan SURAT TANDA LUNAS dari PIHAK KEDUA. Dan PIHAK KEDUA akan mengembalikan BARANG GADAI kepada PIHAK PERTAMA setelah proses admininstrasi selesai.</li>
+            <li>Apabila PIHAK PERTAMA ingin melakukan pelunasan dipercepat sebelum jangka waktu kredit berakhir maka akan dikenakan denda sebesar 5% dari sisa pokok pinjaman.</li>
+            <li>Jika PIHAK PERTAMA telah selesai menjalankan kewajiban pembayaran angsuran sesuai jadwal hingga akhir masa kredit, maka PIHAK PERTAMA berhak mendapatkan SURAT TANDA LUNAS dari PIHAK KEDUA. Dan PIHAK KEDUA akan menyerahkan hak milik atas BARANG ELEKTRONIK kepada PIHAK PERTAMA setelah proses administrasi selesai.</li>
             <li>Segala beaya yang timbul dari proses pelunasan seperti DENDA, BUNGA, dan lain sebagainya ditanggung oleh PIHAK PERTAMA.</li>
         </ol>
     </div>
@@ -265,16 +265,14 @@
         <ol>
             <li>PIHAK PERTAMA berkewajiban:
                 <ul style="list-style-type: disc; padding-left: 20px; margin-top: 5px;">
-                    <li>Menyerahkan barang dalam kondisi baik dan lengkap.</li>
-                    <li>Melunasi pinjaman sesuai dengan kesepakatan.</li>
-                    <li>Menerima kondisi barang apa adanya saat pengembalian setelah pelunasan.</li>
+                    <li>Membayar angsuran sesuai dengan kesepakatan.</li>
                 </ul>
             </li>
             <li>PIHAK KEDUA berkewajiban:
                 <ul style="list-style-type: disc; padding-left: 20px; margin-top: 5px;">
-                    <li>Menjaga dan merawat barang gadai dengan baik.</li>
-                    <li>Mengembalikan barang setelah pinjaman dilunasi.</li>
-                    <li>Memberikan bukti pelunasan setelah pinjaman selesai.</li>
+                    <li>Menerima pembayaran angsuran.</li>
+                    <li>Menyerahkan hak milik atas barang setelah kredit lunas.</li>
+                    <li>Memberikan bukti pelunasan setelah kredit selesai.</li>
                 </ul>
             </li>
         </ol>
@@ -286,8 +284,8 @@
             <li>Apabila PIHAK PERTAMA lalai atau tidak memenuhi kewajibannya sebagaimana diatur dalam perjanjian ini, maka dianggap melakukan wanprestasi.</li>
             <li>Dalam hal terjadi wanprestasi, PIHAK KEDUA berhak untuk:
                 <ul style="list-style-type: disc; padding-left: 20px; margin-top: 5px;">
+                    <li>Menarik barang elektronik yang menjadi objek kredit.</li>
                     <li>Menuntut pelunasan seluruh sisa pinjaman sekaligus beserta bunga dan denda yang berlaku.</li>
-                    <li>Melakukan lelang atas barang gadai untuk melunasi seluruh kewajiban PIHAK PERTAMA.</li>
                 </ul>
             </li>
             <li>Semua biaya yang timbul akibat tindakan hukum tersebut, termasuk biaya pengacara dan pengadilan, akan menjadi tanggung jawab PIHAK PERTAMA.</li>
@@ -326,7 +324,7 @@
         <div class="sign-column">
             <p>PIHAK PERTAMA</p>
             <div class="sign-box"></div>
-            <p>({{ $gadai->pinjaman->profile->first_name }} {{ $gadai->pinjaman->profile->last_name }})</p>
+            <p>({{ $kredit->pinjaman->profile->first_name }} {{ $kredit->pinjaman->profile->last_name }})</p>
         </div>
         <div class="sign-column">
             <p>PIHAK KEDUA</p>
@@ -336,4 +334,4 @@
         </div>
     </div>
 </body>
-</html> 
+</html>

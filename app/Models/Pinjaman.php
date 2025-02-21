@@ -68,6 +68,11 @@ class Pinjaman extends Model
         return $this->hasOne(Gadai::class, 'pinjaman_id', 'id_pinjaman');
     }
 
+    public function kreditElektronik()
+    {
+        return $this->hasOne(KreditElektronik::class, 'pinjaman_id', 'id_pinjaman');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
