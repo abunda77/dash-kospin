@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\DepositoController;
 use App\Http\Controllers\Api\BannerMobileController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\AngsuranController;
+use App\Http\Controllers\Api\MutasiTabunganController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -42,3 +43,6 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('banner-mobile/type/{type?}', [BannerMobileController::class, 'getByType']);
 
 Route::apiResource('regions', RegionController::class);
+
+
+Route::get('/api/mutasi/{no_tabungan}/{periode}', [MutasiTabunganController::class, 'getMutasi']);
