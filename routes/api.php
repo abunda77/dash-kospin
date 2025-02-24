@@ -45,4 +45,4 @@ Route::get('banner-mobile/type/{type?}', [BannerMobileController::class, 'getByT
 Route::apiResource('regions', RegionController::class);
 
 
-Route::get('/api/mutasi/{no_tabungan}/{periode}', [MutasiTabunganController::class, 'getMutasi']);
+Route::get('/mutasi/{no_tabungan}/{periode}', [MutasiTabunganController::class, 'getMutasi']);
