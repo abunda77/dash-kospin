@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\BannerMobileController;
 use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\AngsuranController;
 use App\Http\Controllers\Api\MutasiTabunganController;
+use App\Http\Controllers\Api\ConfigController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -46,3 +47,5 @@ Route::apiResource('regions', RegionController::class);
 
 
 Route::get('/mutasi/{no_tabungan}/{periode}', [MutasiTabunganController::class, 'getMutasi']);
+
+Route::get('/config/api-base-url', [ConfigController::class, 'getApiBaseUrl']);
