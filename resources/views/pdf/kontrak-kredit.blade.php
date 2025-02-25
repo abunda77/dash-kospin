@@ -228,7 +228,7 @@
                 $angsuran_per_bulan = $angsuran_pokok + $bunga_per_bulan;
             @endphp
             <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $kredit->pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
-            {{-- <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 bulan angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran.</li> --}}
+             <li>PIHAK PERTAMA menyetujui bahwa angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 bulan angsuran) akan dibayarkan <b>di awal</b> saat akad kredit sebagai pembayaran pertama angsuran.</li> 
         </ol>
     </div>
 
