@@ -175,7 +175,7 @@
     <div class="section">
         <div class="section-title">KETENTUAN REKENING</div>
         <ol>
-            <li>Simpanan Pokok sebesar Rp 100.000 harus disetor pada saat pembukaan rekening.</li>
+            <li>Simpanan Pokok sebesar Rp 50.000 harus disetor pada saat pembukaan rekening.</li>
             <li>Simpanan Wajib sebesar Rp 50.000 disetorkan setiap bulan.</li>
             <li>Penutupan Rekening akan dikenakan biaya sebesar Rp 50.000,- (lima puluh ribu rupiah).</li>
             <li>Rekening yang tidak aktif selama 6 bulan berturut-turut akan dinyatakan dormant.</li>
