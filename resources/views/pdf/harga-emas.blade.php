@@ -89,7 +89,7 @@
             margin-top: 20px;
             font-size: 10px;
             color: #666;
-            text-align: center;
+            text-align: left;
             border-top: 1px solid #ddd;
             padding-top: 10px;
         }
