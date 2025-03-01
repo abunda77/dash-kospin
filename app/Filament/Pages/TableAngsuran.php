@@ -30,6 +30,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\Log;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Illuminate\Support\Optional; // Add import statement for the optional helper
 
 class TableAngsuran extends Page implements HasForms, HasTable
 {

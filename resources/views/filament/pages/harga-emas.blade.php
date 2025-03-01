@@ -79,7 +79,7 @@
                 </div>
                 <div class="flex items-center">
                     <span class="mr-2 text-lg">•</span>
-                    <span>Bunga: <span class="font-medium">12%</span> per tahun</span>
+                    <span>Bunga: <span class="font-medium">5%</span> p.a</span>
                 </div>
                 <div class="flex items-center">
                     <span class="mr-2 text-lg">•</span>

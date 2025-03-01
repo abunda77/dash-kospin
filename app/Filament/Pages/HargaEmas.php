@@ -15,10 +15,10 @@ class HargaEmas extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Harga Emas';
-    protected static ?string $navigationGroup = 'Tabungan';
+    protected static ?string $navigationGroup = 'Pinjaman';
     public static function getNavigationGroup(): ?string
     {
-        return 'Tabungan';
+        return 'Pinjaman';
     }
 
     protected static string $view = 'filament.pages.harga-emas';
@@ -41,7 +41,7 @@ class HargaEmas extends Page
                 ->color('danger'),
 
             Action::make('pdf')
-                ->label('Cetak PDF')
+                ->label('Cetak Simulasi Angsuran')
                 ->action('generatePDF')
                 ->color('success'),
         ];
@@ -125,7 +125,7 @@ class HargaEmas extends Page
                 'keterangan' => [
                     'setoran_awal' => '5%',
                     'administrasi' => '0.5%',
-                    'bunga_tahunan' => '12%',
+                    'bunga_tahunan' => '5%',
                     'tenor' => ['12', '24', '36', '48', '60'],
                     'info_tambahan' => [
                         'Jika terjadi gagal bayar lebih dari 3 bulan berturut-turut, maka dana yang sudah disetor akan dihitung dan dikembalikan kepada nasabah secara proposional setelah emas dijual sesuai harga yang berlaku pada hari tersebut.',
