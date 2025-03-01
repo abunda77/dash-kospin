@@ -175,15 +175,11 @@
     <div class="section">
         <div class="section-title">KETENTUAN REKENING</div>
         <ol>
-            <li>Simpanan Pokok sebesar Rp 50.000 harus disetor pada saat pembukaan rekening.</li>
-            <li>Simpanan Wajib sebesar Rp 50.000 disetorkan setiap bulan.</li>
             <li>Tabungan Hari Raya dengan setoran wajib minimal Rp 300.000 per bulan.</li>
-            <li>Kontrak berlangsung selama 11 bulan.</li>
-            <li>Rewards sebesar 5% dari total nominal tabungan.</li>
-            <li>Jika macet atau tidak selesai akan dikenakan penalty 5%.</li>
+            <li>Kontrak berlangsung minimal 3 bulan.</li>
+            <li>THR sebesar 5% akan diberikan dari total nominal tabungan.</li>
             <li>Pembukaan rekening maksimal 3 bulan sebelum hari raya.</li>
             <li>Pencairan dana dilakukan 7 hari sebelum hari raya.</li>
-            <li>Minimal waktu menabung 3 bulan sebelum hari raya.</li>
             <li>Penutupan Rekening akan dikenakan biaya sebesar Rp 50.000,- (lima puluh ribu rupiah).</li>
             <li>Rekening yang tidak aktif selama 6 bulan berturut-turut akan dinyatakan dormant.</li>
             <li>Nasabah wajib memberitahukan koperasi jika ada perubahan data pribadi.</li>
