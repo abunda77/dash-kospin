@@ -91,6 +91,22 @@ class ViewTabungan extends ViewRecord
                         echo $pdf->output();
                     }, $filename);
                 }),
+
+            Action::make('printLebaran')
+                ->label('Cetak Form Tabungan Lebaran')
+                ->icon('heroicon-o-printer')
+                ->color('info')
+                ->action(function () {
+                    $pdf = Pdf::loadView('pdf.tabungan-lebaran', [
+                        'tabungan' => $this->record
+                    ]);
+
+                    $filename = 'rekening_lebaran_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
+
+                    return response()->streamDownload(function () use ($pdf) {
+                        echo $pdf->output();
+                    }, $filename);
+                }),
         ];
     }
 
