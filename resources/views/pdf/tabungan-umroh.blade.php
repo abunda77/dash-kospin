@@ -68,7 +68,7 @@
 <body>
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
-        <h1>FORMULIR PEMBUKAAN REKENING TABUNGAN</h1>
+        <h1>FORMULIR PEMBUKAAN REKENING TABUNGAN UMROH</h1>
         <h1>KOPERASI SINARA ARTHA</h1>
     </div>
 

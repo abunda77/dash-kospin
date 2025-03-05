@@ -58,7 +58,12 @@ class ViewCicilanEmas extends ViewRecord
 
                         TextEntry::make('berat_emas')
                             ->label('Berat Emas')
-                            ->suffix(' gram'),
+                            ->suffix(' gram')
+                            ->numeric(
+                                decimalPlaces: 2,
+                                decimalSeparator: ',',
+                                thousandsSeparator: '.'
+                            ),
 
                         TextEntry::make('total_harga')
                             ->label('Total Harga')

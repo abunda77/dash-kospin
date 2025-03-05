@@ -179,7 +179,7 @@
                     <tr>
                         <td>Berat Emas</td>
                         <td>:</td>
-                        <td>{{ $cicilan->berat_emas }} gram</td>
+                        <td>{{ number_format($cicilan->berat_emas, 2, ',', '.') }} gram</td>
                     </tr>
                     <tr>
                         <td>Total Harga</td>

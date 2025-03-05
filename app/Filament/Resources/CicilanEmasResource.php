@@ -137,7 +137,7 @@ class CicilanEmasResource extends Resource
                 TextColumn::make('berat_emas')
                     ->suffix(' gram')
                     ->numeric(
-                        decimalPlaces: 3,
+                        decimalPlaces: 2,
                         decimalSeparator: ',',
                         thousandsSeparator: '.'
                     )
