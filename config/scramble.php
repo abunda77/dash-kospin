@@ -3,6 +3,7 @@
 use Dedoc\Scramble\Http\Middleware\RestrictedDocsAccess;
 use Illuminate\Auth\Middleware\Authenticate;
 use App\Http\Middleware\SecureDocsAccess;
+use Illuminate\Support\Facades\Env;
 
 return [
     /*
