@@ -6,6 +6,7 @@ use App\Filament\Resources\GadaiResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ViewRecord;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Response;
 
 class ViewGadai extends ViewRecord
 {

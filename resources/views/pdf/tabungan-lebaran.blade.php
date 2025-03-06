@@ -176,11 +176,11 @@
         <div class="section-title">KETENTUAN REKENING</div>
         <ol>
             <li>Tabungan Hari Raya dengan setoran wajib minimal Rp 300.000 per bulan.</li>
-            <li>Kontrak berlangsung minimal 3 bulan.</li>
+            <li>Kontrak berlangsung minimal 6 bulan.</li>
             <li>THR sebesar 5% akan diberikan dari total nominal tabungan.</li>
-            <li>Pembukaan rekening maksimal 3 bulan sebelum hari raya.</li>
+            <li>Pembukaan rekening maksimal 6 bulan sebelum hari raya.</li>
             <li>Pencairan dana dilakukan 7 hari sebelum hari raya.</li>
-            <li>Penutupan Rekening akan dikenakan biaya sebesar Rp 50.000,- (lima puluh ribu rupiah).</li>
+            <li>Penutupan Rekening akan dikenakan biaya sebesar 5 % dari saldo yang ditarik.</li>
             <li>Rekening yang tidak aktif selama 6 bulan berturut-turut akan dinyatakan dormant.</li>
             <li>Nasabah wajib memberitahukan koperasi jika ada perubahan data pribadi.</li>
         </ol>
