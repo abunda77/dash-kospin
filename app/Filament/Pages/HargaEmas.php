@@ -118,7 +118,7 @@ class HargaEmas extends Page
             $options->set('chroot', public_path());
 
             $dompdf = new Dompdf($options);
-            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->setPaper('A4', 'landscape');
 
             $data = [
                 'hargaEmas' => $this->hargaEmas,

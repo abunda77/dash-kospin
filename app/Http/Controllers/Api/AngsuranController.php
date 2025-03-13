@@ -8,6 +8,9 @@ use App\Models\Pinjaman;
 use App\Models\TransaksiPinjaman;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
+use function response;
+use function now;
 
 class AngsuranController extends Controller
 {

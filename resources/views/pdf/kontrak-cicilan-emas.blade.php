@@ -228,17 +228,16 @@
     </div>
 
     <div class="article">
-        <h3>Pasal 5<br>DENDA KETERLAMBATAN</h3>
+        <h3>Pasal 5<br>PEMBERHENTIAN KERJASAMA</h3>
         <ol>
-            <li>Apabila PIHAK PERTAMA terlambat melakukan pembayaran angsuran, maka akan dikenakan denda sebesar 5% dari jumlah angsuran yang terlambat untuk setiap hari keterlambatan.</li>
-            <li>Denda keterlambatan ini akan ditambahkan pada total kewajiban yang harus dibayar PIHAK PERTAMA.</li>
+            <li>Apabila PIHAK PERTAMA tidak melakukan pembayaran angsuran selama 3 (tiga) bulan atau lebih, maka PIHAK KEDUA berhak menjual emas sesuai dengan harga pasar yang berlaku pada saat penjualan. Selanjutnya, PIHAK KEDUA akan mengembalikan dana yang telah dibayarkan oleh PIHAK PERTAMA secara proporsional setelah dikurangi biaya-biaya yang timbul akibat penjualan tersebut.</li>
         </ol>
     </div>
 
     <div class="article">
         <h3>Pasal 6<br>PELUNASAN</h3>
         <ol>
-            <li>Apabila PIHAK PERTAMA ingin melakukan pelunasan dipercepat sebelum jangka waktu cicilan berakhir maka akan dikenakan denda sebesar 5% dari sisa pokok pinjaman.</li>
+            <li>Apabila PIHAK PERTAMA ingin melakukan pelunasan dipercepat sebelum jangka waktu cicilan berakhir maka akan dikenakan beaya pinalty 2 x margin dari angsuran.</li>
             <li>Jika PIHAK PERTAMA telah selesai menjalankan kewajiban pembayaran angsuran sesuai jadwal hingga akhir masa cicilan, maka PIHAK PERTAMA berhak mendapatkan SURAT TANDA LUNAS dari PIHAK KEDUA. Dan PIHAK KEDUA akan menyerahkan emas yang telah dicicil kepada PIHAK PERTAMA setelah proses administrasi selesai.</li>
             <li>Segala beaya yang timbul dari proses pelunasan seperti DENDA, BUNGA, dan lain sebagainya ditanggung oleh PIHAK PERTAMA.</li>
         </ol>
@@ -269,10 +268,10 @@
             <li>Dalam hal terjadi wanprestasi, PIHAK KEDUA berhak untuk:
                 <ul style="list-style-type: disc; padding-left: 20px; margin-top: 5px;">
                     <li>Membatalkan perjanjian cicilan emas.</li>
-                    <li>Menuntut pelunasan seluruh sisa pinjaman sekaligus beserta bunga dan denda yang berlaku.</li>
+
                 </ul>
             </li>
-            <li>Semua biaya yang timbul akibat tindakan hukum tersebut, termasuk biaya pengacara dan pengadilan, akan menjadi tanggung jawab PIHAK PERTAMA.</li>
+
         </ol>
     </div>
 

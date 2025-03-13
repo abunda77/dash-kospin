@@ -179,7 +179,6 @@
             <li>Kontrak berlangsung minimal 6 bulan.</li>
             <li>Bonus sebesar 5% akan diberikan dari total nominal tabungan.</li>
             <li>Pembukaan rekening maksimal 6 bulan sebelum jadwal liburan.</li>
-            <li>Pencairan dana dilakukan 7 hari sebelum jadwal liburan.</li>
             <li>Penutupan Rekening akan dikenakan biaya sebesar 5% dari saldo yang ditarik.</li>
             <li>Rekening yang tidak aktif selama 6 bulan berturut-turut akan dinyatakan dormant.</li>
             <li>Nasabah wajib memberitahukan koperasi jika ada perubahan data pribadi.</li>
