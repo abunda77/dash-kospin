@@ -188,7 +188,7 @@
                     </tr>
                 </table>
             </li>
-            <li>Emas tersebut dikreditkan dengan nilai hutang sebesar Rp {{ number_format($cicilan->pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($cicilan->pinjaman->jumlah_pinjaman)) }} Rupiah).</li>
+            <li>Emas tersebut dihitung nilainya  sebesar Rp {{ number_format($cicilan->pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($cicilan->pinjaman->jumlah_pinjaman)) }} Rupiah).</li>
         </ol>
     </div>
 
@@ -205,23 +205,23 @@
     <div class="article">
         <h3>Pasal 3<br>JANGKA WAKTU PEMBAYARAN</h3>
         <ol>
-            <li>PIHAK PERTAMA wajib membayar angsuran dalam jangka waktu {{ $cicilan->pinjaman->jangka_waktu }} bulan, terhitung sejak tanggal penandatanganan perjanjian ini.</li>
+            <li>PIHAK PERTAMA wajib membayar cicilan dalam jangka waktu {{ $cicilan->pinjaman->jangka_waktu }} bulan, terhitung sejak tanggal penandatanganan perjanjian ini.</li>
             @php
                 $angsuran_pokok = $cicilan->pinjaman->jumlah_pinjaman / $cicilan->pinjaman->jangka_waktu;
                 $bunga_per_bulan = ($cicilan->pinjaman->jumlah_pinjaman * ($cicilan->pinjaman->biayaBungaPinjaman->persentase_bunga/100)) / $cicilan->pinjaman->jangka_waktu;
                 $angsuran_per_bulan = $angsuran_pokok + $bunga_per_bulan;
             @endphp
-            <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $cicilan->pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
-            <li>PIHAK PERTAMA menyetujui bahwa angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 bulan angsuran) akan dibayarkan <b>di awal</b> saat akad cicilan sebagai pembayaran pertama angsuran.</li>
+            <li>Pembayaran dapat dilakukan secara cicilan sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $cicilan->pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
+            <li>PIHAK PERTAMA menyetujui bahwa cicilan sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 bulan cicilan) akan dibayarkan <b>di awal</b> saat akad cicilan sebagai pembayaran pertama cicilan.</li>
         </ol>
     </div>
 
     <div class="article">
         <h3>Pasal 4<br>CARA PEMBAYARAN</h3>
         <ol>
-            <li>Pembayaran angsuran dilakukan melalui transfer bank ke rekening PIHAK KEDUA di Bank BCA No. Rekening : 0889333288 atau secara tunai di kantor KOPERASI SINARA ARTHA.</li>
-            <li>PIHAK PERTAMA harus menyertakan bukti pembayaran setiap kali melakukan angsuran sebagai tanda bukti pelunasan sebagian.</li>
-            <li>PIHAK PERTAMA wajib melakukan konfirmasi pembayaran kepada PIHAK KEDUA setiap kali melakukan pembayaran angsuran melalui media komunikasi yang telah ditentukan oleh PIHAK KEDUA.</li>
+            <li>Pembayaran cicilan dilakukan melalui transfer bank ke rekening PIHAK KEDUA di Bank BCA No. Rekening : 0889333288 atau secara tunai di kantor KOPERASI SINARA ARTHA.</li>
+            <li>PIHAK PERTAMA harus menyertakan bukti pembayaran setiap kali melakukan cicilan sebagai tanda bukti pelunasan sebagian.</li>
+            <li>PIHAK PERTAMA wajib melakukan konfirmasi pembayaran kepada PIHAK KEDUA setiap kali melakukan pembayaran cicilan melalui media komunikasi yang telah ditentukan oleh PIHAK KEDUA.</li>
             <li>Kelalaian dalam melakukan konfirmasi pembayaran dapat mengakibatkan pembayaran dianggap belum diterima oleh PIHAK KEDUA dan dapat dikenakan sanksi keterlambatan sebagaimana diatur dalam Pasal 5 perjanjian ini.</li>
             <li>PIHAK KEDUA tidak bertanggung jawab atas segala konsekuensi yang timbul akibat kelalaian PIHAK PERTAMA dalam melakukan konfirmasi pembayaran.</li>
         </ol>
@@ -230,16 +230,16 @@
     <div class="article">
         <h3>Pasal 5<br>PEMBERHENTIAN KERJASAMA</h3>
         <ol>
-            <li>Apabila PIHAK PERTAMA tidak melakukan pembayaran angsuran selama 3 (tiga) bulan atau lebih, maka PIHAK KEDUA berhak menjual emas sesuai dengan harga pasar yang berlaku pada saat penjualan. Selanjutnya, PIHAK KEDUA akan mengembalikan dana yang telah dibayarkan oleh PIHAK PERTAMA secara proporsional setelah dikurangi biaya-biaya yang timbul akibat penjualan tersebut.</li>
+            <li>Apabila PIHAK PERTAMA tidak melakukan pembayaran cicilan selama 3 (tiga) bulan atau lebih, maka PIHAK KEDUA berhak menjual emas sesuai dengan harga pasar yang berlaku pada saat penjualan. Selanjutnya, PIHAK KEDUA akan mengembalikan dana yang telah dibayarkan oleh PIHAK PERTAMA secara proporsional setelah dikurangi biaya-biaya yang timbul akibat penjualan tersebut.</li>
         </ol>
     </div>
 
     <div class="article">
         <h3>Pasal 6<br>PELUNASAN</h3>
         <ol>
-            <li>Apabila PIHAK PERTAMA ingin melakukan pelunasan dipercepat sebelum jangka waktu cicilan berakhir maka akan dikenakan beaya pinalty 2 x margin dari angsuran.</li>
-            <li>Jika PIHAK PERTAMA telah selesai menjalankan kewajiban pembayaran angsuran sesuai jadwal hingga akhir masa cicilan, maka PIHAK PERTAMA berhak mendapatkan SURAT TANDA LUNAS dari PIHAK KEDUA. Dan PIHAK KEDUA akan menyerahkan emas yang telah dicicil kepada PIHAK PERTAMA setelah proses administrasi selesai.</li>
-            <li>Segala beaya yang timbul dari proses pelunasan seperti DENDA, BUNGA, dan lain sebagainya ditanggung oleh PIHAK PERTAMA.</li>
+            <li>Apabila PIHAK PERTAMA ingin melakukan pelunasan dipercepat sebelum jangka waktu cicilan berakhir maka akan dikenakan biaya pinalty 2 x margin dari cicilan.</li>
+            <li>Jika PIHAK PERTAMA telah selesai menjalankan kewajiban pembayaran cicilan sesuai jadwal hingga akhir masa cicilan, maka PIHAK PERTAMA berhak mendapatkan SURAT TANDA LUNAS dari PIHAK KEDUA. Dan PIHAK KEDUA akan menyerahkan emas yang telah dicicil kepada PIHAK PERTAMA setelah proses administrasi selesai.</li>
+            <li>Segala biaya yang timbul dari proses pelunasan seperti DENDA, BUNGA, dan lain sebagainya ditanggung oleh PIHAK PERTAMA.</li>
         </ol>
     </div>
 
@@ -248,12 +248,12 @@
         <ol>
             <li>PIHAK PERTAMA berkewajiban:
                 <ul style="list-style-type: disc; padding-left: 20px; margin-top: 5px;">
-                    <li>Membayar angsuran sesuai dengan kesepakatan.</li>
+                    <li>Membayar cicilan sesuai dengan kesepakatan.</li>
                 </ul>
             </li>
             <li>PIHAK KEDUA berkewajiban:
                 <ul style="list-style-type: disc; padding-left: 20px; margin-top: 5px;">
-                    <li>Menerima pembayaran angsuran.</li>
+                    <li>Menerima pembayaran cicilan.</li>
                     <li>Menyerahkan emas setelah cicilan lunas.</li>
                     <li>Memberikan bukti pelunasan setelah cicilan selesai.</li>
                 </ul>

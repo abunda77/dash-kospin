@@ -177,11 +177,11 @@
         <ol>
             <li>Pendaftaran setoran awal Rp 1.000.000</li>
             <li>Tabungan wajib Rp 500.000 / bulan</li>
-            <li>Setelah tabungan mencapai nominal Rp 20.000.000 nasabah di konfirmasi jadwal keberangkatan dan tanda tangan perjanjian kontrak</li>
+            <li> Setelah nominal tabungan mencapai nominal keberangkatan yang disepakati bersama, maka nasabah akan di konfirmasi jadwal keberangkatan dan tanda tangan perjanjian kontrak</li>
             <li>Harga perjalanan umroh update dengan harga terbaru</li>
             <li>Pembatalan akan dikenakan penalty sebesar 5% dari total tabungan</li>
             <li>Pelunasan dipercepat tidak dikenakan penalty</li>
-            <li>Dua bulan sebelum keberangkatan biaya umrohnya wajib lunas</li>
+            <li>Sebelum keberangkatan biaya umrohnya wajib lunas</li>
         </ol>
     </div>
 

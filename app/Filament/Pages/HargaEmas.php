@@ -128,7 +128,7 @@ class HargaEmas extends Page
                     'bunga_tahunan' => '5%',
                     'tenor' => ['12', '24', '36', '48', '60'],
                     'info_tambahan' => [
-                        'Jika terjadi gagal bayar lebih dari 3 bulan berturut-turut, maka dana yang sudah disetor akan dihitung dan dikembalikan kepada nasabah secara proposional setelah emas dijual sesuai harga yang berlaku pada hari tersebut.',
+                        'Jika terjadi gagal bayar lebih dari 3 bulan maka dana yang sudah disetor akan dihitung dan dikembalikan kepada nasabah secara proposional setelah emas dijual sesuai harga yang berlaku pada hari tersebut.',
                         'Pelunasan dipercepat akan dikenakan penalty 2x margin'
                     ]
                 ]
