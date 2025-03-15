@@ -172,7 +172,7 @@
                 <td>{{ number_format($pembiayaan, 0, ',', '.') }}</td>
                 @foreach($keterangan['tenor'] as $tenor)
                 @php
-                    $bunga = ($pembiayaan * 0.12 * $tenor/12);
+                    $bunga = ($pembiayaan * 0.05 * $tenor/12);
                     $total = $pembiayaan + $bunga;
                     $angsuran = round($total / $tenor);
                 @endphp
