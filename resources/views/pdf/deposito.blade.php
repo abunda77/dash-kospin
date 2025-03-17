@@ -235,7 +235,7 @@
     <div class="section">
         <div class="section-title">KETENTUAN DEPOSITO</div>
         <ol>
-            <li>Pencairan deposito sebelum jatuh tempo akan dikenakan penalti sebesar 0.5% dari nominal deposito.</li>
+            {{-- <li>Pencairan deposito sebelum jatuh tempo akan dikenakan penalti sebesar 0.5% dari nominal deposito.</li> --}}
             <li>Perpanjangan otomatis akan mengikuti suku bunga yang berlaku saat perpanjangan.</li>
             <li>Bunga deposito akan dibayarkan setiap bulan ke rekening tabungan yang ditunjuk.</li>
             <li>Deposito dapat dijadikan jaminan kredit dengan nilai maksimal 80% dari nominal deposito.</li>
