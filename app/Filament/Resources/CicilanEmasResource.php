@@ -57,6 +57,7 @@ class CicilanEmasResource extends Resource
                         '0.5' => '0.5 gram',
                         '1' => '1 gram',
                         '2' => '2 gram',
+                        '3' => '3 gram',
                         '5' => '5 gram',
                         '10' => '10 gram',
                         '25' => '25 gram',
