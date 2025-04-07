@@ -39,7 +39,7 @@ class BiayaBungaPinjamanResource extends Resource
                     ->required()
                     ->numeric()
                     ->minValue(0)
-                    ->maxValue(100)
+                    ->maxValue(500)
                     ->suffix('%'),
                 Forms\Components\TextInput::make('biaya_administrasi')
                     ->label('Biaya Administrasi')

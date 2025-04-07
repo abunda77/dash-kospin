@@ -1,66 +1,128 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<p align="center"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Dash-Kospin
 
-## About Laravel
+Aplikasi dashboard untuk manajemen Koperasi Simpan Pinjam (KoSPIN) berbasis Laravel dengan Filament sebagai admin panel.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Deskripsi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Dash-Kospin adalah aplikasi web yang dirancang untuk membantu pengelolaan koperasi simpan pinjam. Aplikasi ini menangani berbagai aspek operasional koperasi seperti manajemen anggota, tabungan, pinjaman, deposito, dan lainnya.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Fitur Utama
 
-## Learning Laravel
+-   **Manajemen Anggota**: Pengelolaan data profil anggota koperasi
+-   **Tabungan**: Pencatatan dan pengelolaan rekening tabungan anggota
+-   **Pinjaman**: Pengelolaan pinjaman dengan berbagai jenis (Gadai, Kredit Elektronik, dll)
+-   **Deposito**: Pengelolaan deposito anggota dengan perhitungan bunga otomatis
+-   **Referral**: Sistem referensi anggota dan komisi
+-   **Laporan**: Pembuatan laporan dalam format PDF
+-   **Aktivitas Log**: Pencatatan aktivitas untuk audit trail
+-   **API Service**: Layanan API untuk integrasi dengan aplikasi lain
+-   **Dashboard Admin**: Panel admin yang komprehensif dengan Filament
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Teknologi
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Aplikasi ini menggunakan teknologi:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+-   **PHP 8.2+** dengan framework **Laravel 11**
+-   **Filament 3** untuk admin panel
+-   **TailwindCSS** untuk styling
+-   **Shadcn UI** untuk komponen UI
+-   **MySQL/MariaDB** untuk database
+-   **Redis** untuk caching
+-   **Laravel Octane** untuk performa tinggi
+-   **Laravel Sanctum** untuk autentikasi API
+-   **DOMPDF** untuk generasi laporan PDF
 
-## Laravel Sponsors
+## Model Utama
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Aplikasi ini menggunakan model-model berikut:
 
-### Premium Partners
+-   **User**: Model pengguna sistem
+-   **Profile**: Data profil lengkap anggota koperasi
+-   **Tabungan**: Rekening tabungan anggota
+-   **Pinjaman**: Manajemen pinjaman
+-   **Deposito**: Pengelolaan deposito anggota
+-   **Gadai**: Produk pinjaman dengan jaminan
+-   **KreditElektronik**: Produk kredit untuk pembelian elektronik
+-   **CicilanEmas**: Produk cicilan untuk pembelian emas
+-   **TransaksiTabungan**: Rekaman transaksi tabungan
+-   **TransaksiPinjaman**: Rekaman transaksi pinjaman
+-   **ProdukTabungan**: Jenis-jenis produk tabungan
+-   **ProdukPinjaman**: Jenis-jenis produk pinjaman
+-   **AnggotaReferral**: Data referral anggota
+-   **TransaksiReferral**: Rekaman transaksi komisi referral
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## Instalasi
 
-## Contributing
+### Prasyarat
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+-   PHP 8.2 atau lebih tinggi
+-   Composer
+-   Node.js dan NPM
+-   Database MySQL/MariaDB
+-   Redis (opsional, untuk caching)
 
-## Code of Conduct
+### Langkah Instalasi
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. Clone repositori ini
 
-## Security Vulnerabilities
+    ```
+    git clone <repo-url> dash-kospin
+    cd dash-kospin
+    ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. Install dependensi PHP
 
-## License
+    ```
+    composer install
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+3. Install dependensi JavaScript
+
+    ```
+    npm install
+    ```
+
+4. Salin file .env.example ke .env dan sesuaikan konfigurasi
+
+    ```
+    cp .env.example .env
+    ```
+
+5. Generate application key
+
+    ```
+    php artisan key:generate
+    ```
+
+6. Jalankan migrasi database
+
+    ```
+    php artisan migrate
+    ```
+
+7. Kompilasi aset frontend
+
+    ```
+    npm run build
+    ```
+
+8. Jalankan aplikasi
+    ```
+    php artisan serve
+    ```
+
+## Pengembangan
+
+Untuk mode pengembangan, gunakan perintah:
+
+```
+composer dev
+```
+
+Perintah ini akan menjalankan server, antrian, log, dan vite secara bersamaan.
+
+## Lisensi
+
+Aplikasi ini menggunakan lisensi [MIT](https://opensource.org/licenses/MIT).
