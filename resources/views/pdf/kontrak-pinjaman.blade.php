@@ -164,7 +164,7 @@
     <div class="article">
         <h3>Pasal 1<br>OBJEK PERJANJIAN</h3>
         <ol>
-            <li>PIHAK PERTAMA telah menerima uang pinjaman dari PIHAK KEDUA sebesar Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($pinjaman->jumlah_pinjaman)) }} Rupiah) dengan tenor: {{ $pinjaman->jangka_waktu }} bulan.</li>
+            <li>PIHAK PERTAMA telah menerima uang pinjaman dari PIHAK KEDUA sebesar Rp {{ number_format($pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($pinjaman->jumlah_pinjaman)) }} Rupiah) dengan tenor: {{ $pinjaman->jangka_waktu }} {{ $pinjaman->jangka_waktu_satuan }}.</li>
             <li>Pinjaman ini diberikan oleh PIHAK KEDUA kepada PIHAK PERTAMA dengan ketentuan sebagaimana diatur dalam pasal-pasal berikutnya dalam perjanjian ini.</li>
             {{-- <li>Bunga pinjaman yang dikenakan adalah sebesar {{ $pinjaman->biayaBungaPinjaman->persentase_bunga }}% per tahun atau {{ number_format($pinjaman->biayaBungaPinjaman->persentase_bunga/12, 2) }}% per bulan.</li> --}}
         </ol>
@@ -173,14 +173,42 @@
     <div class="article">
         <h3>Pasal 2<br>JANGKA WAKTU PEMBAYARAN</h3>
         <ol>
-            <li>PIHAK PERTAMA wajib mengembalikan pinjaman dalam jangka waktu {{ $pinjaman->jangka_waktu }} bulan, terhitung sejak tanggal penandatanganan perjanjian ini.</li>
+            <li>PIHAK PERTAMA wajib mengembalikan pinjaman dalam jangka waktu {{ $pinjaman->jangka_waktu }} {{ $pinjaman->jangka_waktu_satuan }}, terhitung sejak tanggal penandatanganan perjanjian ini.</li>
             @php
-                $angsuran_pokok = $pinjaman->jumlah_pinjaman / $pinjaman->jangka_waktu;
-                $bunga_per_bulan = ($pinjaman->jumlah_pinjaman * ($pinjaman->biayaBungaPinjaman->persentase_bunga/100)) / $pinjaman->jangka_waktu;
-                $angsuran_per_bulan = $angsuran_pokok + $bunga_per_bulan;
+                if ($pinjaman->jangka_waktu_satuan == 'minggu') {
+                    // Pendekatan baru berdasarkan contoh referensi
+                    // Menghitung persentase bunga per bulan dari persentase bunga tahunan
+                    $bunga_per_bulan_persen = $pinjaman->biayaBungaPinjaman->persentase_bunga / 12;
+
+                    // Periode pinjaman dalam bulan
+                    $periode_bulan = $pinjaman->jangka_waktu / 4; // konversi minggu ke bulan (1 bulan = 4 minggu)
+
+                    // Total bunga dalam bulan
+                    $total_bunga_bulanan = $pinjaman->jumlah_pinjaman * ($bunga_per_bulan_persen/100) * $periode_bulan;
+
+                    // Total bunga pada pinjaman
+                    $total_bunga = $total_bunga_bulanan;
+
+                    // Angsuran pokok per minggu
+                    $angsuran_pokok = $pinjaman->jumlah_pinjaman / $pinjaman->jangka_waktu;
+
+                    // Bunga per minggu
+                    $bunga_per_minggu = $total_bunga / $pinjaman->jangka_waktu;
+
+                    // Total angsuran per minggu (pokok + bunga)
+                    $angsuran_per_bulan = $angsuran_pokok + $bunga_per_minggu;
+                } else {
+                    $angsuran_pokok = $pinjaman->jumlah_pinjaman / $pinjaman->jangka_waktu;
+                    $bunga_per_bulan = ($pinjaman->jumlah_pinjaman * ($pinjaman->biayaBungaPinjaman->persentase_bunga/100)) / $pinjaman->jangka_waktu;
+                    $angsuran_per_bulan = $angsuran_pokok + $bunga_per_bulan;
+                }
             @endphp
-            <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per bulan pada tanggal {{ $pinjaman->tanggal_pinjaman->format('d') }} setiap bulan.</li>
-            <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 bulan angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran.</li>
+            <li>Pembayaran dapat dilakukan secara angsuran sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} per {{ $pinjaman->jangka_waktu_satuan }}
+                @if($pinjaman->jangka_waktu_satuan !== 'minggu')
+                pada tanggal {{ $pinjaman->tanggal_pinjaman->format('d') }}
+                @endif
+                setiap {{ $pinjaman->jangka_waktu_satuan }}.</li>
+            <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 {{ $pinjaman->jangka_waktu_satuan }} angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran.</li>
 
         </ol>
     </div>

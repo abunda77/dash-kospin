@@ -94,11 +94,18 @@
             </tr>
             <tr>
                 <td>Jangka Waktu</td>
-                <td>: {{ $pinjaman->jangka_waktu }} bulan</td>
+                <td>: {{ $pinjaman->jangka_waktu }} {{ $pinjaman->jangka_waktu_satuan }}</td>
             </tr>
             <tr>
                 <td>Bunga</td>
-                <td>: {{ $pinjaman->biayaBungaPinjaman->persentase_bunga }}% per tahun</td>
+                <td>:
+                    @if($pinjaman->jangka_waktu_satuan == 'minggu')
+                        {{ $pinjaman->biayaBungaPinjaman->persentase_bunga }}% per tahun
+                        ({{ number_format($pinjaman->biayaBungaPinjaman->persentase_bunga/12, 2) }}% per bulan)
+                    @else
+                        {{ $pinjaman->biayaBungaPinjaman->persentase_bunga }}% per tahun
+                    @endif
+                </td>
             </tr>
             <tr>
                 <td>Tanggal Pinjaman</td>

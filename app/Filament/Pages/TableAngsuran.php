@@ -117,36 +117,84 @@ class TableAngsuran extends Page implements HasForms, HasTable
         $pokok = $this->pinjaman->jumlah_pinjaman;
         $bungaPerTahun = $this->pinjaman->biayaBungaPinjaman->persentase_bunga;
         $jangkaWaktu = $this->pinjaman->jangka_waktu;
+        $jangkaWaktuSatuan = $this->pinjaman->jangka_waktu_satuan;
 
-        // Hitung bunga per bulan (total bunga setahun dibagi jangka waktu)
-        $bungaPerBulan = ($pokok * ($bungaPerTahun/100)) / $jangkaWaktu;
+        // Periksa jangka waktu dalam satuan minggu
+        if ($jangkaWaktuSatuan === 'minggu') {
+            // Pendekatan baru berdasarkan contoh referensi
+            // Menghitung persentase bunga per bulan dari persentase bunga tahunan
+            $bungaPerBulanPersen = $bungaPerTahun / 12;
 
-        // Hitung angsuran pokok per bulan
-        $angsuranPokok = $pokok / $jangkaWaktu;
+            // Periode pinjaman dalam bulan
+            $periodeBulan = $jangkaWaktu / 4; // konversi minggu ke bulan (1 bulan = 4 minggu)
 
-        // Total angsuran per bulan (tetap)
-        $totalAngsuran = $angsuranPokok + $bungaPerBulan;
+            // Total bunga dalam bulan
+            $totalBungaBulanan = $pokok * ($bungaPerBulanPersen/100) * $periodeBulan;
 
-        $this->angsuranList = [];
-        $sisaPokok = $pokok;
+            // Total bunga pada pinjaman
+            $totalBunga = $totalBungaBulanan;
 
-        // Ambil tanggal awal pinjaman
-        $tanggalJatuhTempo = $this->pinjaman->tanggal_pinjaman->copy();
+            // Angsuran pokok per minggu
+            $angsuranPokok = $pokok / $jangkaWaktu;
 
-        for ($i = 1; $i <= $jangkaWaktu; $i++) {
-            // Tambah 1 bulan untuk tanggal jatuh tempo berikutnya
-            $tanggalJatuhTempo = $tanggalJatuhTempo->addMonth();
+            // Bunga per minggu
+            $bungaPerBulan = $totalBunga / $jangkaWaktu;
 
-            $this->angsuranList[] = [
-                'periode' => $i,
-                'pokok' => $angsuranPokok,
-                'bunga' => $bungaPerBulan,
-                'angsuran' => $totalAngsuran,
-                'sisa_pokok' => $sisaPokok - $angsuranPokok,
-                'tanggal_jatuh_tempo' => $tanggalJatuhTempo->format('d/m/Y')
-            ];
+            // Total angsuran per minggu (pokok + bunga)
+            $totalAngsuran = $angsuranPokok + $bungaPerBulan;
 
-            $sisaPokok -= $angsuranPokok;
+            $this->angsuranList = [];
+            $sisaPokok = $pokok;
+
+            // Ambil tanggal awal pinjaman
+            $tanggalJatuhTempo = $this->pinjaman->tanggal_pinjaman->copy();
+
+            for ($i = 1; $i <= $jangkaWaktu; $i++) {
+                // Tambah 1 minggu untuk tanggal jatuh tempo berikutnya
+                $tanggalJatuhTempo = $tanggalJatuhTempo->addWeek();
+
+                $this->angsuranList[] = [
+                    'periode' => $i,
+                    'pokok' => $angsuranPokok,
+                    'bunga' => $bungaPerBulan,
+                    'angsuran' => $totalAngsuran,
+                    'sisa_pokok' => $sisaPokok - $angsuranPokok,
+                    'tanggal_jatuh_tempo' => $tanggalJatuhTempo->format('d/m/Y')
+                ];
+
+                $sisaPokok -= $angsuranPokok;
+            }
+        } else {
+            // Hitung bunga per bulan (total bunga setahun dibagi jangka waktu)
+            $bungaPerBulan = ($pokok * ($bungaPerTahun/100)) / $jangkaWaktu;
+
+            // Hitung angsuran pokok per bulan
+            $angsuranPokok = $pokok / $jangkaWaktu;
+
+            // Total angsuran per bulan (tetap)
+            $totalAngsuran = $angsuranPokok + $bungaPerBulan;
+
+            $this->angsuranList = [];
+            $sisaPokok = $pokok;
+
+            // Ambil tanggal awal pinjaman
+            $tanggalJatuhTempo = $this->pinjaman->tanggal_pinjaman->copy();
+
+            for ($i = 1; $i <= $jangkaWaktu; $i++) {
+                // Tambah 1 bulan untuk tanggal jatuh tempo berikutnya
+                $tanggalJatuhTempo = $tanggalJatuhTempo->addMonth();
+
+                $this->angsuranList[] = [
+                    'periode' => $i,
+                    'pokok' => $angsuranPokok,
+                    'bunga' => $bungaPerBulan,
+                    'angsuran' => $totalAngsuran,
+                    'sisa_pokok' => $sisaPokok - $angsuranPokok,
+                    'tanggal_jatuh_tempo' => $tanggalJatuhTempo->format('d/m/Y')
+                ];
+
+                $sisaPokok -= $angsuranPokok;
+            }
         }
     }
 

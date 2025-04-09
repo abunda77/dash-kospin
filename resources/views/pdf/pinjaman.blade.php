@@ -189,7 +189,7 @@
         </div>
         <div class="form-group">
             <span class="label">3. Jangka Waktu</span>:
-            <span class="value">{{ $pinjaman->jangka_waktu }} bulan</span>
+            <span class="value">{{ $pinjaman->jangka_waktu }} {{ $pinjaman->jangka_waktu_satuan }}</span>
         </div>
     </div>
 

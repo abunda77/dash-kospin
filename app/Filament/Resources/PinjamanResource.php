@@ -84,7 +84,7 @@ class PinjamanResource extends Resource
                                     ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
                                     ->required(),
                                 Forms\Components\TextInput::make('jangka_waktu')
-                                    ->label('Jangka Waktu (Bulan)')
+                                    ->label('Jangka Waktu (Minggu, Bulan, Tahun)')
                                     ->numeric()
                                     ->required()
                                     ->live()
@@ -148,7 +148,8 @@ class PinjamanResource extends Resource
                                     ->label('Satuan Waktu')
                                     ->options([
                                         'bulan' => 'Bulan',
-                                        'tahun' => 'Tahun'
+                                        'tahun' => 'Tahun',
+                                        'minggu' => 'Mingguan'
                                     ])
                                     ->required()
                                     ->live()
@@ -227,7 +228,9 @@ class PinjamanResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('jangka_waktu')
                     ->label('Jangka Waktu')
-                    ->suffix(' Bulan')
+                    ->formatStateUsing(fn ($record) =>
+                        $record->jangka_waktu . ' ' . ucfirst($record->jangka_waktu_satuan)
+                    )
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tanggal_pinjaman')
                     ->label('Tanggal Pinjaman')

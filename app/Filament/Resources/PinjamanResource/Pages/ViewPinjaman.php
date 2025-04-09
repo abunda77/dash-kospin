@@ -31,7 +31,9 @@ class ViewPinjaman extends ViewRecord
                             ->money('IDR'),
                         TextEntry::make('jangka_waktu')
                             ->label('Jangka Waktu')
-                            ->suffix(' Bulan'),
+                            ->formatStateUsing(fn ($record) =>
+                                $record->jangka_waktu . ' ' . ucfirst($record->jangka_waktu_satuan)
+                            ),
                         TextEntry::make('tanggal_pinjaman')
                             ->label('Tanggal Pinjaman')
                             ->date(),
