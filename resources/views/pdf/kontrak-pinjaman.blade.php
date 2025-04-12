@@ -208,7 +208,7 @@
                 pada tanggal {{ $pinjaman->tanggal_pinjaman->format('d') }}
                 @endif
                 setiap {{ $pinjaman->jangka_waktu_satuan }}.</li>
-            <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 {{ $pinjaman->jangka_waktu_satuan }} angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran.</li>
+            <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 {{ $pinjaman->jangka_waktu_satuan }} angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran ( kecuali <b>PINJAMAN INSTANT</b>).</li>
 
         </ol>
     </div>
