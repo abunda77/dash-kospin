@@ -156,7 +156,11 @@
         <tbody>
             @foreach($hargaEmas as $emas)
             @php
-                $harga = (int) str_replace(['Rp ', ',', '.'], '', $emas['antam']);
+                $hargaStr = $emas['antam'];
+                $hargaStr = preg_replace('/Rp\.?\s?/', '', $hargaStr);
+                $hargaStr = preg_replace('/[^0-9]/', '', $hargaStr);
+                $harga = (int) $hargaStr;
+
                 $dp = $harga * 0.05;
                 $biayaAdmin = $harga * 0.005;
                 $adminMaterai = $biayaAdmin + 10000;
