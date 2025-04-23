@@ -263,6 +263,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
     protected function buildTransactionQuery()
     {
         $query = TransaksiTabungan::query()
+            ->with('admin')
             ->where('id_tabungan', $this->tabungan->id);
 
         if ($this->periode && $this->periode !== 'all') {
@@ -447,6 +448,7 @@ class MutasiTabunganV2 extends Page implements HasTable, HasForms
     {
         try {
             $query = TransaksiTabungan::query()
+                ->with('admin')
                 ->where('id_tabungan', $this->tabungan->id);
 
             if ($this->periode && $this->periode !== 'all') {

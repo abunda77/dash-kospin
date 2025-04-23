@@ -86,7 +86,7 @@
                     {{ $t->jenis_transaksi === 'kredit' ? number_format($t->jumlah, 0, ',', '.') : '' }}
                 </td>
                 <td class="text-right">{{ number_format($t->saldo_berjalan, 0, ',', '.') }}</td>
-                <td>{{ $t->kode_teller }}</td>
+                <td>{{ $t->admin->name ?? $t->kode_teller }}</td>
             </tr>
             @endforeach
         </tbody>
