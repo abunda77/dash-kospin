@@ -34,6 +34,66 @@ Aplikasi ini menggunakan teknologi:
 -   **Laravel Sanctum** untuk autentikasi API
 -   **DOMPDF** untuk generasi laporan PDF
 
+## Detail Teknologi dan Framework
+
+### Laravel 11
+
+Laravel 11 adalah framework PHP modern dengan pendekatan yang lebih ramping dan syntax yang elegan. Beberapa fitur utama yang digunakan dalam aplikasi ini:
+
+-   **Struktur Aplikasi Minimalis**: Laravel 11 menghadirkan struktur aplikasi yang lebih ramping dengan file konfigurasi yang lebih sedikit.
+-   **Health Check Route**: Fitur bawaan untuk pemantauan kesehatan aplikasi di endpoint `/up`.
+-   **Eloquent ORM**: Model relasional yang kuat untuk interaksi dengan database yang intuitif dan ekspresif.
+-   **Middleware**: Untuk filter dan transformasi HTTP request ke aplikasi.
+-   **Blade Templating**: Sistem template yang intuitif dan kuat untuk tampilan.
+-   **Migrasi Database**: Kontrol versi untuk skema database Anda.
+-   **Per-Second Rate Limiting**: Pembatasan rate yang lebih granular dalam hitungan detik.
+-   **Queue & Jobs**: Pemrosesan tugas latar belakang untuk menangani operasi yang membutuhkan waktu.
+-   **Events & Listeners**: Arsitektur event-driven untuk membuat aplikasi yang fleksibel.
+-   **File Storage**: Abstraksi penyimpanan file yang mudah untuk berbagai driver penyimpanan.
+
+### Filament 3
+
+Filament 3 adalah admin panel framework modern untuk Laravel yang kami gunakan untuk membuat antarmuka admin yang kuat dan intuitif:
+
+-   **Panel Builder**: Membuat panel admin yang kaya fitur dengan cepat, dengan CRUD dan operasi lanjutan.
+-   **Form Builder**: Buat formulir yang kuat dengan validasi dan berbagai jenis input.
+-   **Table Builder**: Tabel data interaktif dengan filter, pencarian, dan pagination.
+-   **Actions**: Aksi yang dapat dikonfigurasi untuk menangani operasi umum dan kustom.
+-   **Widgets**: Komponen dashboard modular untuk visualisasi data.
+-   **Navigasi**: Navigasi yang fleksibel dan dapat disesuaikan.
+-   **Notifications**: Notifikasi real-time dalam aplikasi.
+-   **Resources**: Mengelola model CRUD dengan cepat dan mudah.
+-   **Multi-tenancy**: Dukungan untuk aplikasi multi-tenant.
+-   **Globalization**: Dukungan untuk multi-bahasa dan lokalisasi.
+
+### TailwindCSS
+
+TailwindCSS adalah framework CSS utility-first yang kami gunakan untuk styling aplikasi:
+
+-   **Utility-First**: Pendekatan styling langsung di HTML tanpa menulis CSS kustom.
+-   **Just-in-time Engine**: Kompilasi CSS yang sangat cepat dan hanya menghasilkan class yang digunakan.
+-   **Responsive Design**: Desain responsif dengan prefiks breakpoint mudah (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`).
+-   **Dark Mode**: Dukungan dark mode bawaan.
+-   **Customization**: Konfigurasi tema, warna, dan spacing sesuai kebutuhan proyek.
+-   **State Variants**: Styling untuk berbagai state (`hover:`, `focus:`, `active:`, dll).
+-   **Plugins**: Memperluas Tailwind dengan plugin untuk kebutuhan khusus.
+-   **Preflight**: Reset CSS yang elegan untuk konsistensi cross-browser.
+-   **Grid & Flexbox**: Utilitas Layout yang kuat.
+-   **Typography Plugin**: Styling tipografi yang anggun.
+
+### Shadcn UI
+
+Shadcn UI adalah koleksi komponen UI yang dapat digunakan kembali yang dibangun dengan Tailwind CSS:
+
+-   **Komponen Siap Pakai**: Aksesibilitas, responsif, dan dapat disesuaikan.
+-   **Copy & Paste**: Komponen digabungkan langsung ke dalam proyek, bukan sebagai dependensi.
+-   **Kontrol Penuh**: Kode komponen sepenuhnya milik pengembang untuk dikustomisasi.
+-   **Aksesibilitas**: Komponen dirancang dengan aksesibilitas sebagai prioritas.
+-   **Theming**: Dukungan tema yang mudah dikustomisasi.
+-   **Styling yang Konsisten**: Desain dan nuansa visual yang konsisten di seluruh komponen.
+-   **TypeScript Support**: Komponen dengan dukungan TypeScript untuk pengembangan yang lebih aman.
+-   **Primitif Headless**: Menggunakan Radix UI primitives untuk layar aksesibilitas, keyboard, dan fokus.
+
 ## Model Utama
 
 Aplikasi ini menggunakan model-model berikut:
