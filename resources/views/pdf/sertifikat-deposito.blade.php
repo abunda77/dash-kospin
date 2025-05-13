@@ -125,6 +125,37 @@
             margin-top: 5px;
             width: 140px;
         }
+        .bank-details {
+            position: absolute;
+            top: 365px;
+            left: 450px;
+            font-size: 10px;
+            width: 280px;
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+        .bank-details h4 {
+            font-size: 11px;
+            margin: 0 0 6px 0;
+            color: #2B3990;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 3px;
+            text-transform: uppercase;
+        }
+        .bank-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .bank-details table td {
+            padding: 2px 0;
+            line-height: 1.4;
+        }
+        .bank-details table td:first-child {
+            width: 150px;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>

@@ -39,3 +39,5 @@ PENTING.txt
 frankenphp
 frankenphp-worker.php
 .aider*
+
+.cursor/
