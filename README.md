@@ -51,35 +51,82 @@ Laravel 11 adalah framework PHP modern dengan pendekatan yang lebih ramping dan 
 -   **Events & Listeners**: Arsitektur event-driven untuk membuat aplikasi yang fleksibel.
 -   **File Storage**: Abstraksi penyimpanan file yang mudah untuk berbagai driver penyimpanan.
 
+### Resources Laravel 11
+
+Resources di Laravel 11 adalah fitur yang memudahkan pembuatan API dan transformasi model/data ke format JSON. Beberapa hal penting tentang Resources:
+
+-   **Transformasi Model**: Ubah model Eloquent atau koleksi menjadi JSON dengan mudah
+-   **Kontrol Data**: Secara selektif menyertakan atribut dalam respons JSON
+-   **Nesting Resource**: Menyertakan relasi (nested resources) dalam respons
+-   **Resource Collections**: Membuat resource khusus untuk koleksi model
+-   **Data Wrapping**: Membungkus respons dalam struktur data tertentu
+-   **Pagination**: Dukungan bawaan untuk merespons data yang dihalaman
+-   **Conditional Attributes**: Menyertakan atribut berdasarkan kondisi tertentu
+-   **Conditional Relationships**: Menyertakan relasi berdasarkan kondisi
+-   **Metadata Tambahan**: Menambahkan metadata di respons API
+-   **Resource Response**: Mengkustomisasi status kode HTTP dan header
+
+Untuk dokumentasi lengkap tentang Resource Laravel 11, kunjungi [Dokumentasi Resmi Laravel](https://laravel.com/docs/11.x/eloquent-resources).
+
 ### Filament 3
 
 Filament 3 adalah admin panel framework modern untuk Laravel yang kami gunakan untuk membuat antarmuka admin yang kuat dan intuitif:
 
 -   **Panel Builder**: Membuat panel admin yang kaya fitur dengan cepat, dengan CRUD dan operasi lanjutan.
--   **Form Builder**: Buat formulir yang kuat dengan validasi dan berbagai jenis input.
--   **Table Builder**: Tabel data interaktif dengan filter, pencarian, dan pagination.
--   **Actions**: Aksi yang dapat dikonfigurasi untuk menangani operasi umum dan kustom.
--   **Widgets**: Komponen dashboard modular untuk visualisasi data.
--   **Navigasi**: Navigasi yang fleksibel dan dapat disesuaikan.
--   **Notifications**: Notifikasi real-time dalam aplikasi.
--   **Resources**: Mengelola model CRUD dengan cepat dan mudah.
--   **Multi-tenancy**: Dukungan untuk aplikasi multi-tenant.
--   **Globalization**: Dukungan untuk multi-bahasa dan lokalisasi.
+-   **Form Builder**: Buat formulir yang kuat dengan validasi dan berbagai jenis input yang mencakup lebih dari 25 komponen bawaan.
+-   **Table Builder**: Tabel data interaktif dengan filter, pencarian, pagination, dan kemampuan ekspor data.
+-   **Actions**: Aksi yang dapat dikonfigurasi dalam bentuk modal dan slide-over untuk menangani operasi CRUD dan kustom.
+-   **Widgets**: Komponen dashboard modular untuk visualisasi data dengan grafik dan statistik real-time.
+-   **Navigation**: Navigasi yang fleksibel dan dapat disesuaikan dengan dukungan untuk grup, ikon, dan badge.
+-   **Notifications**: Notifikasi real-time dalam aplikasi menggunakan Livewire.
+-   **Resources**: Kelas statis untuk membangun antarmuka CRUD dengan mudah berdasarkan model Eloquent.
+-   **Infolist Builder**: Menampilkan informasi read-only kepada pengguna tentang record tertentu dengan tata letak yang fleksibel.
+-   **Global Search**: Pencarian cepat untuk semua model melalui panel admin.
+-   **Relationship Management**: Mengelola hubungan model yang kompleks dengan antarmuka yang intuitif.
+-   **Authorization**: Terintegrasi dengan kebijakan model Laravel untuk keamanan yang konsisten.
+-   **Soft Deletes**: Dukungan bawaan untuk soft-delete, pemulihan, dan penghapusan permanen.
+-   **Multi-tenancy**: Dukungan untuk aplikasi multi-tenant dengan pemisahan data.
+-   **Globalization**: Dukungan untuk multi-bahasa dan lokalisasi dengan penerjemahan yang mudah.
+-   **Themes & Custom Styling**: Kemampuan untuk mengkustomisasi tampilan dengan tema dan CSS kustom.
+-   **Health Checks**: Monitor kesehatan aplikasi dan dependensinya.
+-   **Testing Utilities**: Alat bawaan untuk menguji komponen Filament.
+-   **Optimizations**: Fitur caching untuk performa yang lebih baik di produksi.
+
+Filament Resources memudahkan pembuatan antarmuka CRUD berdasarkan model Eloquent dengan fitur:
+
+-   **Tipe Halaman**: Mendukung List, Create, Edit, View dan Simple (Modal) Resources.
+-   **Filter Tabs**: Menambahkan tab di atas tabel untuk memfilter data berdasarkan kondisi tertentu.
+-   **Record Title**: Mendefinisikan atribut yang digunakan untuk mengidentifikasi record.
+-   **Custom Forms & Tables**: Antarmuka lengkap untuk membuat formulir dan tabel yang kompleks.
+-   **Relation Managers**: Mengelola hubungan antar model dengan mudah.
+-   **Authorization Integration**: Integrasi dengan kebijakan model Laravel.
+-   **Customizable Navigation**: Menyesuaikan tampilan dan perilaku item navigasi.
+
+Untuk dokumentasi lengkap tentang Filament 3, kunjungi [Dokumentasi Resmi Filament](https://filamentphp.com/docs).
 
 ### TailwindCSS
 
 TailwindCSS adalah framework CSS utility-first yang kami gunakan untuk styling aplikasi:
 
--   **Utility-First**: Pendekatan styling langsung di HTML tanpa menulis CSS kustom.
--   **Just-in-time Engine**: Kompilasi CSS yang sangat cepat dan hanya menghasilkan class yang digunakan.
--   **Responsive Design**: Desain responsif dengan prefiks breakpoint mudah (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`).
--   **Dark Mode**: Dukungan dark mode bawaan.
--   **Customization**: Konfigurasi tema, warna, dan spacing sesuai kebutuhan proyek.
--   **State Variants**: Styling untuk berbagai state (`hover:`, `focus:`, `active:`, dll).
--   **Plugins**: Memperluas Tailwind dengan plugin untuk kebutuhan khusus.
--   **Preflight**: Reset CSS yang elegan untuk konsistensi cross-browser.
--   **Grid & Flexbox**: Utilitas Layout yang kuat.
--   **Typography Plugin**: Styling tipografi yang anggun.
+-   **Pendekatan Utility-First**: Framework yang menyediakan class utilitas untuk membangun antarmuka dengan cepat langsung di HTML tanpa menulis CSS kustom.
+-   **Zero-Runtime**: Bekerja dengan memindai file template untuk nama class, menghasilkan gaya yang sesuai dan menulis ke file CSS statis.
+-   **Just-in-time Engine**: Kompilasi CSS yang sangat cepat dan hanya menghasilkan class yang benar-benar digunakan untuk file output minimal.
+-   **Desain dengan Constraints**: Menyediakan sistem desain yang telah ditentukan sebelumnya yang membuat pembuatan UI yang konsisten secara visual menjadi lebih mudah.
+-   **Responsive Design**: Desain responsif dengan prefiks breakpoint mudah (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`) untuk mengadaptasi tata letak di berbagai ukuran layar.
+-   **State Variants**: Styling mudah untuk berbagai state (`hover:`, `focus:`, `active:`, `disabled:`, `first:`, `last:`, dll).
+-   **Dark Mode**: Dukungan dark mode bawaan dengan prefiks `dark:` yang memudahkan implementasi tema gelap.
+-   **Customization**: Konfigurasi lengkap dengan file `tailwind.config.js` untuk tema, warna, spacing, dan lainnya sesuai kebutuhan proyek.
+-   **Plugins Official**: Plugin resmi seperti Typography, Forms, Aspect Ratio, dan Container Queries untuk memperluas fungsionalitas.
+-   **Layout Tools**: Utilitas layout yang kuat termasuk Flexbox, Grid, Positioning, dan Spacing untuk membuat layout kompleks.
+-   **Typography**: Kontrol lengkap atas font family, size, weight, line-height, dan banyak lagi untuk tipografi profesional.
+-   **Background & Borders**: Styling lengkap untuk background, gradients, borders, shadows, dan efek visual lainnya.
+-   **Transitions & Animations**: Sistem transisi dan animasi yang dapat dikonfigurasi untuk interaksi dinamis.
+-   **Transformations**: Kontrol untuk scale, rotate, translate, dan skew dengan nilai yang dapat disesuaikan.
+-   **Interactivity**: Utilitas untuk cursor, user-select, scroll behavior, dan elemen interaktif lainnya.
+-   **Accessibility**: Utilitas untuk memastikan konten dapat diakses oleh semua pengguna, termasuk screen readers.
+-   **Performance Optimization**: Tools untuk mengoptimalkan produksi seperti purge CSS, minification, dan content hashing.
+
+Untuk dokumentasi lengkap tentang TailwindCSS, kunjungi [Dokumentasi Resmi TailwindCSS](https://v3.tailwindcss.com/docs).
 
 ### Shadcn UI
 
