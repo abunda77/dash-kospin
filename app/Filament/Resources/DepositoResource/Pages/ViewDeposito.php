@@ -90,11 +90,11 @@ class ViewDeposito extends ViewRecord
                 ->icon('heroicon-o-document-text')
                 ->color('success')
                 ->action(function () {
-                    $pdf = Pdf::loadView('pdf.sertifikat-deposito', [
+                    $pdf = Pdf::loadView('pdf.sertifikat-deposito-a5', [
                         'deposito' => $this->record
                     ]);
 
-                    $pdf->setPaper('a4', 'landscape');
+                    $pdf->setPaper('a5', 'landscape');
 
                     $filename = 'sertifikat_deposito_' . $this->record->profile->first_name . '_' . $this->record->nomor_rekening . '.pdf';
 
