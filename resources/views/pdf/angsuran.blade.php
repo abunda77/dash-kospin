@@ -67,7 +67,7 @@
             </tr>
             <tr>
                 <td>Jangka Waktu</td>
-                <td>: {{ $pinjaman->jangka_waktu }} bulan</td>
+                <td>: {{ $pinjaman->jangka_waktu }} {{ $pinjaman->jangka_waktu_satuan }}</td>
             </tr>
             <tr>
                 <td>Tanggal Pinjaman</td>
