@@ -208,7 +208,7 @@
                     @endphp
                     <tr>
                         <td style="border: none;">Alamat</td>
-                        <td style="border: none;">: {{ $deposito->profile->address }}</td>
+                        <td style="border: none; word-wrap: break-word; overflow-wrap: break-word;">: {{ $deposito->profile->address }}</td>
                     </tr>
                     <tr>
                         <td style="border: none;">Provinsi</td>
