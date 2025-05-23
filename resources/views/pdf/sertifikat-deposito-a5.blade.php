@@ -127,7 +127,7 @@
         .bank-details {
             position: absolute;
             top: 220px;
-            left: 420px;
+            left: 500px;
             font-size: 8px;
             width: 200px;
             background-color: rgba(255, 255, 255, 0.85);
