@@ -155,6 +155,11 @@
             width: 100px;
             font-weight: 500;
         }
+        .alamat-wrap {
+            word-break: break-word;
+            white-space: pre-line;
+            max-width: 220px;
+        }
     </style>
 </head>
 <body>
@@ -208,7 +213,7 @@
                     @endphp
                     <tr>
                         <td style="border: none;">Alamat</td>
-                        <td style="border: none; word-wrap: break-word; overflow-wrap: break-word;">: {{ $deposito->profile->address }}</td>
+                        <td style="border: none;" class="alamat-wrap">: {{ $deposito->profile->address }}</td>
                     </tr>
                     <tr>
                         <td style="border: none;">Provinsi</td>
