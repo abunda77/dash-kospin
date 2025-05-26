@@ -9,9 +9,9 @@
         }
         body {
             font-family: Arial, sans-serif;
-            line-height: 2;
+            line-height: 1.8;
             color: #333;
-            font-size: 10px;
+            font-size: 9px;
             margin: 0;
             padding: 0;
         }
@@ -47,7 +47,7 @@
             margin-bottom: 15px;
         }
         .form-table td {
-            padding: 3px 6px;
+            padding: 2px 4px;
             vertical-align: top;
         }
         .label {
@@ -158,6 +158,32 @@
                     <label><input type="checkbox" name="survey" value="no"> Tidak</label>
                 </div>
             </td>
+        </tr>
+        <tr>
+            <td class="label">Domisili Tempat Tinggal</td>
+            <td>
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="domisili_tinggal" value="ya"> Ya</label>
+                    <label><input type="checkbox" name="domisili_tinggal" value="tidak"> Tidak</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Domisili Usaha</td>
+            <td>
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="domisili_usaha" value="ya"> Ya</label>
+                    <label><input type="checkbox" name="domisili_usaha" value="tidak"> Tidak</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Brand Usaha</td>
+            <td><div class="input-field"></div></td>
+        </tr>
+        <tr>
+            <td class="label">Omset Penjualan/Bulan</td>
+            <td><div class="input-field"></div></td>
         </tr>
         <tr>
             <td class="label">Limit Pengajuan</td>
