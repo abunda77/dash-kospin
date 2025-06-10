@@ -13,6 +13,7 @@ Dash-Kospin adalah aplikasi web yang dirancang untuk membantu pengelolaan kopera
 -   **Manajemen Anggota**: Pengelolaan data profil anggota koperasi
 -   **Tabungan**: Pencatatan dan pengelolaan rekening tabungan anggota
 -   **Pinjaman**: Pengelolaan pinjaman dengan berbagai jenis (Gadai, Kredit Elektronik, dll)
+-   **Pelunasan**: Pencatatan dan pengelolaan pelunasan pinjaman anggota
 -   **Deposito**: Pengelolaan deposito anggota dengan perhitungan bunga otomatis
 -   **Referral**: Sistem referensi anggota dan komisi
 -   **Laporan**: Pembuatan laporan dalam format PDF
@@ -149,12 +150,14 @@ Aplikasi ini menggunakan model-model berikut:
 -   **Profile**: Data profil lengkap anggota koperasi
 -   **Tabungan**: Rekening tabungan anggota
 -   **Pinjaman**: Manajemen pinjaman
+-   **Pelunasan**: Manajemen pelunasan pinjaman
 -   **Deposito**: Pengelolaan deposito anggota
 -   **Gadai**: Produk pinjaman dengan jaminan
 -   **KreditElektronik**: Produk kredit untuk pembelian elektronik
 -   **CicilanEmas**: Produk cicilan untuk pembelian emas
 -   **TransaksiTabungan**: Rekaman transaksi tabungan
 -   **TransaksiPinjaman**: Rekaman transaksi pinjaman
+-   **TransaksiPelunasan**: Rekaman transaksi pelunasan
 -   **ProdukTabungan**: Jenis-jenis produk tabungan
 -   **ProdukPinjaman**: Jenis-jenis produk pinjaman
 -   **AnggotaReferral**: Data referral anggota

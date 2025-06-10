@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreatePelunasan extends CreateRecord
 {
     protected static string $resource = PelunasanResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('view', ['record' => $this->record]);
+    }
 }
