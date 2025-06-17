@@ -44,7 +44,7 @@
         .form-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
         }
         .form-table td {
             padding: 2px 4px;
@@ -199,6 +199,15 @@
             </td>
         </tr>
         <tr>
+            <td class="label">Bersedia Pembayaran Angsuran Via Transfer</td>
+            <td>
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="angsuran_transfer" value="ya"> Ya</label>
+                    <label><input type="checkbox" name="angsuran_transfer" value="tidak"> Tidak</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
             <td class="label">Pekerjaan</td>
             <td><div class="input-field"></div></td>
         </tr>
@@ -226,25 +235,34 @@
             <td class="label">Tujuan Pinjaman</td>
             <td><div class="input-field"></div></td>
         </tr>
+        <tr>
+            <td class="label">Pencairan Pinjaman</td>
+            <td>
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="pencairan" value="cash"> CASH</label>
+                    <label><input type="checkbox" name="pencairan" value="transfer"> TRANSFER</label>
+                </div>
+            </td>
+        </tr>
     </table>
 
-    <div style="text-align: right; margin: 10px 0; font-size: 10px;">
+    <div style="text-align: right; margin: 1px 0; font-size: 10px;">
         <p>........................., ...............................</p>
     </div>
 
-    <table style="width: 100%; margin-top: 5px;">
+    <table style="width: 100%; margin-top: 1px;">
         <tr>
-            <td style="width: 50%; text-align: center;">
-                <p style="font-size: 10px; margin-bottom: 3px;">Marketing/Referral</p>
-                <div class="signature-box"></div>
-                <p style="font-size: 10px; margin: 3px 0;">(............................................)</p>
-                <p class="info-text">Tanda tangan dan nama lengkap</p>
+            <td style="width: 50%; text-align: center; vertical-align: top;">
+                <div style="margin-bottom: 5px; font-size: 10px;">Marketing/Referral</div>
+                <div class="signature-box" style="margin-bottom: 3px;"></div>
+                <div style="font-size: 10px; margin-bottom: 2px;">(............................................)</div>
+                <div class="info-text">Tanda tangan dan nama lengkap</div>
             </td>
-            <td style="width: 50%; text-align: center;">
-                <p style="font-size: 10px; margin-bottom: 3px;">Yang mengajukan,</p>
-                <div class="signature-box"></div>
-                <p style="font-size: 10px; margin: 3px 0;">(............................................)</p>
-                <p class="info-text">Tanda tangan dan nama lengkap</p>
+            <td style="width: 50%; text-align: center; vertical-align: top;">
+                <div style="margin-bottom: 5px; font-size: 10px;">Yang mengajukan,</div>
+                <div class="signature-box" style="margin-bottom: 3px;"></div>
+                <div style="font-size: 10px; margin-bottom: 2px;">(............................................)</div>
+                <div class="info-text">Tanda tangan dan nama lengkap</div>
             </td>
         </tr>
     </table>
@@ -260,7 +278,7 @@
             <td style="width: 5%;"></td>
 
             <!-- Kolom 2 -->
-            <td style="border: none; padding: 0; vertical-align: top; width: 50%;" colspan="3">Pencairan pinjaman: CASH / TRANSFER (pilih salah satu)</td>
+            <td style="border: none; padding: 0; vertical-align: top; width: 50%;" colspan="3"></td>
         </tr>
         <tr>
             <!-- Kolom 1 -->
