@@ -201,6 +201,7 @@
             <li>Penutupan Rekening akan dikenakan biaya sebesar Rp 50.000,- (lima puluh ribu rupiah).</li>
             <li>Rekening yang tidak aktif atau tidak memenuhi kewajiban simpanan selama 6 bulan berturut-turut akan dinyatakan dormant dan dapat ditutup oleh pihak koperasi.</li>
             <li>Nasabah wajib memberitahukan koperasi jika ada perubahan data pribadi.</li>
+            <li>Bersedia membayar beaya administrasi sebesar Rp 50.000,- (lima puluh ribu rupiah).</li>
         </ol>
 
         <p style="text-align: justify;">
