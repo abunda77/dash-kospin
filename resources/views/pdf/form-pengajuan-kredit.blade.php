@@ -9,7 +9,7 @@
         }
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.8;
+            line-height: 1.6;
             color: #333;
             font-size: 9px;
             margin: 0;
@@ -17,21 +17,21 @@
         }
         .header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         .logo {
-            width: 300px;
-            margin-bottom: 20px;
+            width: 280px;
+            margin-bottom: 15px;
         }
         .title {
             font-size: 14px;
             font-weight: bold;
-            margin: 5px 0;
+            margin: 3px 0;
         }
         .subtitle {
             font-size: 10px;
             color: #666;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         .form-number {
             font-size: 10px;
@@ -47,7 +47,7 @@
             margin-bottom: 5px;
         }
         .form-table td {
-            padding: 2px 4px;
+            padding: 1px 4px;
             vertical-align: top;
         }
         .label {
@@ -169,6 +169,20 @@
             </td>
         </tr>
         <tr>
+            <td class="label">Status Rumah</td>
+            <td>
+                <div class="checkbox-option">
+                    <label><input type="checkbox" name="status_rumah" value="sendiri"> Milik Sendiri</label>
+                    <label><input type="checkbox" name="status_rumah" value="keluarga"> Milik Keluarga</label>
+                    <label><input type="checkbox" name="status_rumah" value="kontrak"> Kontrak</label>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td class="label">Lama Menempati</td>
+            <td><div class="input-field" style="display: inline-block; width: 30px;"></div> tahun</td>
+        </tr>
+        <tr>
             <td class="label">Domisili Usaha</td>
             <td>
                 <div class="checkbox-option">
@@ -267,12 +281,12 @@
         </tr>
     </table>
 
-    <table style="position: absolute; bottom: 80px; left: 10px; font-size: 10px; border-collapse: collapse; width: 100%;">
+    <table style="position: absolute; bottom: 60px; left: 10px; font-size: 9px; border-collapse: collapse; width: 100%;">
         <tr>
             <!-- Kolom 1 -->
             <td style="border: none; padding: 0; vertical-align: top; width: 15%;">Kode Reff</td>
-            <td style="border: none; padding: 5px; vertical-align: top; width: 5%;">:</td>
-            <td style="border: none; padding: 5px; vertical-align: top; width: 25%;">.....................</td>
+            <td style="border: none; padding: 3px; vertical-align: top; width: 5%;">:</td>
+            <td style="border: none; padding: 3px; vertical-align: top; width: 25%;">.....................</td>
 
             <!-- Jarak antar kolom -->
             <td style="width: 5%;"></td>
@@ -283,30 +297,30 @@
         <tr>
             <!-- Kolom 1 -->
             <td style="border: none; padding: 0; vertical-align: top;">Nama Reff</td>
-            <td style="border: none; padding: 5px; vertical-align: top;">:</td>
-            <td style="border: none; padding: 5px; vertical-align: top;">.....................</td>
+            <td style="border: none; padding: 3px; vertical-align: top;">:</td>
+            <td style="border: none; padding: 3px; vertical-align: top;">.....................</td>
 
             <!-- Jarak antar kolom -->
             <td></td>
 
             <!-- Kolom 2 -->
             <td style="border: none; padding: 0; vertical-align: top; width: 15%;">Bank</td>
-            <td style="border: none; padding: 5px; vertical-align: top; width: 5%;">:</td>
-            <td style="border: none; padding: 5px; vertical-align: top; width: 30%;">.....................</td>
+            <td style="border: none; padding: 3px; vertical-align: top; width: 5%;">:</td>
+            <td style="border: none; padding: 3px; vertical-align: top; width: 30%;">.....................</td>
         </tr>
         <tr>
             <!-- Kolom 1 -->
             <td style="border: none; padding: 0; vertical-align: top;">No.Hp</td>
-            <td style="border: none; padding: 5px; vertical-align: top;">:</td>
-            <td style="border: none; padding: 5px; vertical-align: top;">.....................</td>
+            <td style="border: none; padding: 3px; vertical-align: top;">:</td>
+            <td style="border: none; padding: 3px; vertical-align: top;">.....................</td>
 
             <!-- Jarak antar kolom -->
             <td></td>
 
              <!-- Kolom 2 -->
             <td style="border: none; padding: 0; vertical-align: top;">No rekening</td>
-            <td style="border: none; padding: 5px; vertical-align: top;">:</td>
-            <td style="border: none; padding: 5px; vertical-align: top;">.....................</td>
+            <td style="border: none; padding: 3px; vertical-align: top;">:</td>
+            <td style="border: none; padding: 3px; vertical-align: top;">.....................</td>
         </tr>
         <tr>
             <!-- Kolom 1 (kosong) -->
@@ -319,8 +333,8 @@
 
              <!-- Kolom 2 -->
             <td style="border: none; padding: 0; vertical-align: top;">Nama di rekening</td>
-            <td style="border: none; padding: 5px; vertical-align: top;">:</td>
-            <td style="border: none; padding: 5px; vertical-align: top;">.....................</td>
+            <td style="border: none; padding: 3px; vertical-align: top;">:</td>
+            <td style="border: none; padding: 3px; vertical-align: top;">.....................</td>
         </tr>
     </table>
 </body>
