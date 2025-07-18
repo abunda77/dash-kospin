@@ -4,6 +4,16 @@ namespace App\Providers;
 
 use Carbon\Carbon;
 use App\Models\Admin;
+use App\Models\Pinjaman;
+use App\Models\TransaksiPinjaman;
+use App\Models\Deposito;
+use App\Models\Tabungan;
+use App\Models\TransaksiTabungan;
+use App\Observers\PinjamanObserver;
+use App\Observers\TransaksiPinjamanObserver;
+use App\Observers\DepositoObserver;
+use App\Observers\TabunganObserver;
+use App\Observers\TransaksiTabunganObserver;
 use Dedoc\Scramble\Scramble;
 use App\Policies\ActivityPolicy;
 use Spatie\Health\Facades\Health;
@@ -66,6 +76,13 @@ class AppServiceProvider extends ServiceProvider
             DebugModeCheck::new(),
             EnvironmentCheck::new(),
         ]);
+
+        // Register Observers
+        Pinjaman::observe(PinjamanObserver::class);
+        TransaksiPinjaman::observe(TransaksiPinjamanObserver::class);
+        Deposito::observe(DepositoObserver::class);
+        Tabungan::observe(TabunganObserver::class);
+        TransaksiTabungan::observe(TransaksiTabunganObserver::class);
 
         // Set locale ke Indonesia
         Carbon::setLocale('id');
