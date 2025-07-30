@@ -30,19 +30,19 @@ class BirthdayGreetingResource extends Resource
                 Forms\Components\TextInput::make('code')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\RichEditor::make('message')
+                Forms\Components\TextArea::make('message')
                     ->required()
-                    ->toolbarButtons([
-                        'bold',
-                        'italic',
-                        'strike',
-                        'orderedList',
-                        'bulletList',
-                        'blockquote',
-                        'codeBlock',
-                        'undo',
-                        'redo',
-                    ])
+                    // ->toolbarButtons([
+                    //     'bold',
+                    //     'italic',
+                    //     'strike',
+                    //     'orderedList',
+                    //     'bulletList',
+                    //     'blockquote',
+                    //     'codeBlock',
+                    //     'undo',
+                    //     'redo',
+                    // ])
                     ->hintAction(
                         Action::make('variables')
                             ->label('Available variables')

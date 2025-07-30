@@ -318,6 +318,11 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                             ]
                         ]);
 
+                        if ($response->status() === 200) {
+                            // Kirim data ke webhook N8N
+                            $this->sendToWebhook($whatsapp, $message, $record);
+                        }
+
                         Notification::make()
                             ->title($response->status() === 200 ?
                                 'Pengingat telah terkirim' :
@@ -386,5 +391,49 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
     private function generatePdfFilename()
     {
         return 'laporan_keterlambatan_' . date('Y-m-d_H-i-s') . '.pdf';
+    }
+
+    private function sendToWebhook($whatsapp, $message, $record)
+    {
+        try {
+            $webhookUrl = env('WEBHOOK_WA_N8N');
+            
+            if (empty($webhookUrl)) {
+                Log::warning('WEBHOOK_WA_N8N tidak dikonfigurasi di .env');
+                return;
+            }
+
+            $payload = [
+                'whatsapp' => $whatsapp,
+                'message' => $message,
+                'pinjaman_id' => $record->id,
+                'no_pinjaman' => $record->no_pinjaman,
+                'source' => 'list_keterlambatan',
+                'timestamp' => now()->toISOString()
+            ];
+
+            $response = Http::timeout(30)->post($webhookUrl, $payload);
+
+            if ($response->successful()) {
+                Log::info('Data berhasil dikirim ke webhook N8N dari List Keterlambatan', [
+                    'pinjaman_id' => $record->id,
+                    'webhook_url' => $webhookUrl,
+                    'status_code' => $response->status()
+                ]);
+            } else {
+                Log::warning('Gagal mengirim data ke webhook N8N dari List Keterlambatan', [
+                    'pinjaman_id' => $record->id,
+                    'webhook_url' => $webhookUrl,
+                    'status_code' => $response->status(),
+                    'response_body' => $response->body()
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error mengirim data ke webhook N8N dari List Keterlambatan: ' . $e->getMessage(), [
+                'pinjaman_id' => $record->id,
+                'webhook_url' => $webhookUrl ?? 'tidak tersedia'
+            ]);
+        }
     }
 }

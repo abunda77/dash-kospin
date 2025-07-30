@@ -61,6 +61,9 @@ class ReminderJob implements ShouldQueue
                 throw new \Exception('Gagal mengirim pesan WhatsApp: ' . $response->body());
             }
 
+            // Kirim data ke webhook N8N
+            $this->sendToWebhook($whatsapp, $message);
+
             Log::info('Reminder berhasil dikirim', [
                 'pinjaman_id' => $this->pinjaman->id,
                 'whatsapp' => $whatsapp
@@ -83,5 +86,48 @@ class ReminderJob implements ShouldQueue
         }
 
         return $whatsapp;
+    }
+
+    private function sendToWebhook($whatsapp, $message)
+    {
+        try {
+            $webhookUrl = env('WEBHOOK_WA_N8N');
+            
+            if (empty($webhookUrl)) {
+                Log::warning('WEBHOOK_WA_N8N tidak dikonfigurasi di .env');
+                return;
+            }
+
+            $payload = [
+                'whatsapp' => $whatsapp,
+                'message' => $message,
+                'pinjaman_id' => $this->pinjaman->id,
+                'no_pinjaman' => $this->pinjaman->no_pinjaman,
+                'timestamp' => now()->toISOString()
+            ];
+
+            $response = Http::timeout(30)->post($webhookUrl, $payload);
+
+            if ($response->successful()) {
+                Log::info('Data berhasil dikirim ke webhook N8N', [
+                    'pinjaman_id' => $this->pinjaman->id,
+                    'webhook_url' => $webhookUrl,
+                    'status_code' => $response->status()
+                ]);
+            } else {
+                Log::warning('Gagal mengirim data ke webhook N8N', [
+                    'pinjaman_id' => $this->pinjaman->id,
+                    'webhook_url' => $webhookUrl,
+                    'status_code' => $response->status(),
+                    'response_body' => $response->body()
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error mengirim data ke webhook N8N: ' . $e->getMessage(), [
+                'pinjaman_id' => $this->pinjaman->id,
+                'webhook_url' => $webhookUrl ?? 'tidak tersedia'
+            ]);
+        }
     }
 }

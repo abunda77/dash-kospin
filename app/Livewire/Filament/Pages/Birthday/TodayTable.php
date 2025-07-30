@@ -11,6 +11,7 @@ use Filament\Tables\Actions\Action;
 use App\Models\BirthdayLog;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Models\BirthdayGreeting;
 
 class TodayTable extends \Filament\Tables\TableComponent
@@ -81,6 +82,11 @@ class TodayTable extends \Filament\Tables\TableComponent
                             ]
                         ]);
 
+                        if ($response->status() === 200) {
+                            // Kirim data ke webhook N8N
+                            $this->sendToWebhook($whatsapp, $message, $record);
+                        }
+
                         BirthdayLog::create([
                             'id_profile' => $record->id_user,
                             'status_sent' => $response->status() === 200 ? 1 : 0,
@@ -108,5 +114,50 @@ class TodayTable extends \Filament\Tables\TableComponent
             ->heading('Ulang Tahun Hari Ini')
             ->defaultSort('first_name')
             ->paginated(false);
+    }
+
+    private function sendToWebhook($whatsapp, $message, $record)
+    {
+        try {
+            $webhookUrl = env('WEBHOOK_WA_N8N');
+            
+            if (empty($webhookUrl)) {
+                Log::warning('WEBHOOK_WA_N8N tidak dikonfigurasi di .env');
+                return;
+            }
+
+            $payload = [
+                'whatsapp' => $whatsapp,
+                'message' => $message,
+                'profile_id' => $record->id_user,
+                'full_name' => $record->first_name . ' ' . $record->last_name,
+                'birthday' => $record->birthday->format('Y-m-d'),
+                'source' => 'birthday_greeting',
+                'timestamp' => now()->toISOString()
+            ];
+
+            $response = Http::timeout(30)->post($webhookUrl, $payload);
+
+            if ($response->successful()) {
+                Log::info('Data berhasil dikirim ke webhook N8N dari Birthday Greeting', [
+                    'profile_id' => $record->id_user,
+                    'webhook_url' => $webhookUrl,
+                    'status_code' => $response->status()
+                ]);
+            } else {
+                Log::warning('Gagal mengirim data ke webhook N8N dari Birthday Greeting', [
+                    'profile_id' => $record->id_user,
+                    'webhook_url' => $webhookUrl,
+                    'status_code' => $response->status(),
+                    'response_body' => $response->body()
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Error mengirim data ke webhook N8N dari Birthday Greeting: ' . $e->getMessage(), [
+                'profile_id' => $record->id_user,
+                'webhook_url' => $webhookUrl ?? 'tidak tersedia'
+            ]);
+        }
     }
 }
