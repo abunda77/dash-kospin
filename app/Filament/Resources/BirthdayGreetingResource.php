@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Textarea;
 
 class BirthdayGreetingResource extends Resource
 {
