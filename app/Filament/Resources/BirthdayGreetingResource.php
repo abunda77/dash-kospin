@@ -31,7 +31,7 @@ class BirthdayGreetingResource extends Resource
                 Forms\Components\TextInput::make('code')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextArea::make('message')
+                Forms\Components\Textarea::make('message')
                     ->required()
                     // ->toolbarButtons([
                     //     'bold',
