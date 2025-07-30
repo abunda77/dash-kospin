@@ -175,7 +175,7 @@
 
         <div class="signature-box">
           <p>Hormat kami,</p>
-            <div class="signer-name">Andesta Rully</div>
+            <div class="signer-name">ANDREAS WIDEA</div>
             <div class="signer-title">(Ketua Koperasi Sinara Artha)</div>
         </div>
     </div>

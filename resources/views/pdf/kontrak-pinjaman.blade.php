@@ -293,7 +293,7 @@
             <p>PIHAK KEDUA</p>
             <div class="sign-box"></div>
             <p>KOPERASI SINARA ARTHA</p>
-            <p>(ANDESTA RULLY)</p>
+            <p>(ANDREAS WIDEA)</p>
         </div>
     </div>
 </body>
