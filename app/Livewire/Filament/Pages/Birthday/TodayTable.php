@@ -82,10 +82,8 @@ class TodayTable extends \Filament\Tables\TableComponent
                             ]
                         ]);
 
-                        if ($response->status() === 200) {
-                            // Kirim data ke webhook N8N
-                            $this->sendToWebhook($whatsapp, $message, $record);
-                        }
+                        // Kirim data ke webhook N8N apapun status kode pengiriman WhatsApp
+                        $this->sendToWebhook($whatsapp, $message, $record, $response->status());
 
                         BirthdayLog::create([
                             'id_profile' => $record->id_user,
@@ -116,7 +114,7 @@ class TodayTable extends \Filament\Tables\TableComponent
             ->paginated(false);
     }
 
-    private function sendToWebhook($whatsapp, $message, $record)
+    private function sendToWebhook($whatsapp, $message, $record, $whatsappStatus = null)
     {
         try {
             $webhookUrl = env('WEBHOOK_WA_N8N');
@@ -133,6 +131,8 @@ class TodayTable extends \Filament\Tables\TableComponent
                 'full_name' => $record->first_name . ' ' . $record->last_name,
                 'birthday' => $record->birthday->format('Y-m-d'),
                 'source' => 'birthday_greeting',
+                'whatsapp_status_code' => $whatsappStatus,
+                'whatsapp_sent_successfully' => $whatsappStatus === 200,
                 'timestamp' => now()->toISOString()
             ];
 

@@ -57,12 +57,12 @@ class ReminderJob implements ShouldQueue
                     ]
                 ]);
 
+            // Kirim data ke webhook N8N apapun status kode pengiriman WhatsApp
+            $this->sendToWebhook($whatsapp, $message, $response->status());
+
             if ($response->status() !== 200) {
                 throw new \Exception('Gagal mengirim pesan WhatsApp: ' . $response->body());
             }
-
-            // Kirim data ke webhook N8N
-            $this->sendToWebhook($whatsapp, $message);
 
             Log::info('Reminder berhasil dikirim', [
                 'pinjaman_id' => $this->pinjaman->id,
@@ -88,7 +88,7 @@ class ReminderJob implements ShouldQueue
         return $whatsapp;
     }
 
-    private function sendToWebhook($whatsapp, $message)
+    private function sendToWebhook($whatsapp, $message, $whatsappStatus = null)
     {
         try {
             $webhookUrl = env('WEBHOOK_WA_N8N');
@@ -103,6 +103,9 @@ class ReminderJob implements ShouldQueue
                 'message' => $message,
                 'pinjaman_id' => $this->pinjaman->id,
                 'no_pinjaman' => $this->pinjaman->no_pinjaman,
+                'source' => 'reminder_job',
+                'whatsapp_status_code' => $whatsappStatus,
+                'whatsapp_sent_successfully' => $whatsappStatus === 200,
                 'timestamp' => now()->toISOString()
             ];
 

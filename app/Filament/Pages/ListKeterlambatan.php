@@ -318,10 +318,8 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                             ]
                         ]);
 
-                        if ($response->status() === 200) {
-                            // Kirim data ke webhook N8N
-                            $this->sendToWebhook($whatsapp, $message, $record);
-                        }
+                        // Kirim data ke webhook N8N apapun status kode pengiriman WhatsApp
+                        $this->sendToWebhook($whatsapp, $message, $record, $response->status());
 
                         Notification::make()
                             ->title($response->status() === 200 ?
@@ -393,7 +391,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
         return 'laporan_keterlambatan_' . date('Y-m-d_H-i-s') . '.pdf';
     }
 
-    private function sendToWebhook($whatsapp, $message, $record)
+    private function sendToWebhook($whatsapp, $message, $record, $whatsappStatus = null)
     {
         try {
             $webhookUrl = env('WEBHOOK_WA_N8N');
@@ -409,6 +407,8 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                 'pinjaman_id' => $record->id,
                 'no_pinjaman' => $record->no_pinjaman,
                 'source' => 'list_keterlambatan',
+                'whatsapp_status_code' => $whatsappStatus,
+                'whatsapp_sent_successfully' => $whatsappStatus === 200,
                 'timestamp' => now()->toISOString()
             ];
 
