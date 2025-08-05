@@ -20,6 +20,16 @@ return [
      */
     'convert_entities' => true,
 
+    /*
+     * Enable Unicode support
+     */
+    'enable_unicode' => true,
+
+    /*
+     * Default charset for HTML content
+     */
+    'default_charset' => 'UTF-8',
+
     'options' => [
         /**
          * The location of the DOMPDF font directory
@@ -178,7 +188,7 @@ return [
          *
          * @var string
          */
-        'default_font' => 'serif',
+        'default_font' => 'DejaVu Sans',
 
         /**
          * Image DPI setting

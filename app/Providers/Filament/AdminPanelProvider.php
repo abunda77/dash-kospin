@@ -72,6 +72,7 @@ class AdminPanelProvider extends PanelProvider
                 //Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
                 StatistikNasabahWidget::class,
+                \App\Filament\Widgets\CriticalOverdueWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

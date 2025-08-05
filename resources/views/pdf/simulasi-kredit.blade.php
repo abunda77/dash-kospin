@@ -8,6 +8,19 @@
             font-family: Arial, sans-serif;
             font-size: 12px;
         }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            height: 100px;
+            width: auto;
+            margin-bottom: 15px;
+            object-fit: contain;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -36,7 +49,10 @@
     </style>
 </head>
 <body>
-    <div class="title">Simulasi Kredit</div>
+    <div class="header">
+        <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
+        <h2>Simulasi Kredit</h2>
+    </div>
 
     <div class="summary">
         <p><strong>Nominal Pinjaman:</strong> Rp {{ number_format((float) str_replace([',', '.'], '', $nominalPinjaman), 0, ',', '.') }}</p>
