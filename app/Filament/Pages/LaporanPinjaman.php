@@ -81,7 +81,8 @@ class LaporanPinjaman extends Page implements HasTable, HasForms
             ->persistFiltersInSession()
             ->striped()
             ->paginated([10, 25, 50, 100])
-            ->deferLoading()            ->poll('30s');
+            ->deferLoading()            
+            ->poll('60s');
     }
 
     public function mount(): void
@@ -148,14 +149,20 @@ class LaporanPinjaman extends Page implements HasTable, HasForms
                     }),
             ])
             ->columns(4)
-            ->statePath('data');    }    protected function getDateRange(): array
+            ->statePath('data');    
+        
+        }    
+            
+    protected function getDateRange(): array
     {
         // Ensure we have the latest data from the form
         $period = $this->data['period'] ?? $this->period;
         $dateRange = $this->data['dateRange'] ?? $this->dateRange;
         
         return $this->loanReportService->getDateRange($period, $dateRange);
-    }public function getStatsData(): array
+    }
+    
+    public function getStatsData(): array
     {
         // Ensure we have the latest data from the form
         $productFilter = $this->data['productFilter'] ?? $this->productFilter;
@@ -164,7 +171,9 @@ class LaporanPinjaman extends Page implements HasTable, HasForms
         $service = new LoanReportService($productFilter, $this->getDateRange());
         
         return $service->getLoanStats();
-    }    public function getStatsWidgets(): array
+    }    
+    
+    public function getStatsWidgets(): array
     {
         $stats = $this->getStatsData();
         $critical90DaysStats = $this->getCritical90DaysStats();
@@ -346,7 +355,9 @@ class LaporanPinjaman extends Page implements HasTable, HasForms
         $service = new LoanReportService($productFilter, $this->getDateRange());
         
         return $service->getPaymentTrends();
-    }    protected function getHeaderActions(): array
+    }    
+    
+    protected function getHeaderActions(): array
     {        return [            Action::make('export_all')
                 ->label('Cetak Laporan Pinjaman')
                 ->icon('heroicon-o-printer')
