@@ -478,7 +478,7 @@ class ListKeterlambatan90Hari extends Page implements HasTable, HasForms
                                 . "- Pencatatan di sistem kredit\n\n"
                                 . "🔔 Mohon segera hubungi kantor untuk penyelesaian.\n\n"
                                 . "Koperasi SinaraArtha\n"
-                                . "📞 Telp: [Nomor Kantor]";
+                                . "📞 Telp / WA: [087778715788]";
 
                             $whatsapp = $this->formatWhatsAppNumber($record->profile->whatsapp);
 

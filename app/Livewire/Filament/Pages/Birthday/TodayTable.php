@@ -119,6 +119,13 @@ class TodayTable extends \Filament\Tables\TableComponent
         try {
             $webhookUrl = env('WEBHOOK_WA_N8N');
             
+            // Debug: log nilai yang diterima
+            Log::info('Debug webhook URL', [
+                'webhook_url' => $webhookUrl,
+                'is_empty' => empty($webhookUrl),
+                'env_value' => env('WEBHOOK_WA_N8N', 'NOT_FOUND')
+            ]);
+            
             if (empty($webhookUrl)) {
                 Log::warning('WEBHOOK_WA_N8N tidak dikonfigurasi di .env');
                 return;
