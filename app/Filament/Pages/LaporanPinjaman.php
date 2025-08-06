@@ -358,59 +358,153 @@ class LaporanPinjaman extends Page implements HasTable, HasForms
     }    
     
     protected function getHeaderActions(): array
-    {        return [            Action::make('export_all')
+    {        
+        return [            
+    
+        Action::make('export_all')
                 ->label('Cetak Laporan Pinjaman')
                 ->icon('heroicon-o-printer')
                 ->action(function () {
                     try {
+                        // Log start of export process
+                        \Illuminate\Support\Facades\Log::info('Starting PDF export process for loan report');
+                        
                         $productFilter = $this->data['productFilter'] ?? $this->productFilter;
                         $dateRange = $this->getDateRange();
                         
+                        // Log filter parameters
+                        \Illuminate\Support\Facades\Log::info('Export parameters', [
+                            'productFilter' => $productFilter,
+                            'dateRange' => $dateRange
+                        ]);
+                        
                         $filename = 'laporan-pinjaman-' . \Carbon\Carbon::now()->format('Y-m-d-H-i-s') . '.pdf';
+                        
+                        // Log before file generation
+                        \Illuminate\Support\Facades\Log::info('Generating PDF file', ['filename' => $filename]);
+                        
                         $filepath = $this->loanReportExportService->generateLoanReportFile($productFilter, $dateRange, $filename);
                         
-                        $this->dispatch('download-file', [
-                            'url' => route('download-temp-file', ['filename' => basename($filepath)]),
+                        // Log file generation result
+                        \Illuminate\Support\Facades\Log::info('PDF generation completed', [
+                            'filepath' => $filepath,
+                            'file_exists' => file_exists($filepath),
+                            'file_size' => file_exists($filepath) ? filesize($filepath) : 0,
+                            'file_readable' => file_exists($filepath) ? is_readable($filepath) : false
+                        ]);
+                        
+                        // Check if file actually exists before proceeding
+                        if (!file_exists($filepath)) {
+                            throw new \Exception("Generated PDF file does not exist at path: " . $filepath);
+                        }
+                        
+                        if (filesize($filepath) === 0) {
+                            throw new \Exception("Generated PDF file is empty: " . $filepath);
+                        }
+                        
+                        \Illuminate\Support\Facades\Log::info('Starting direct download response', [
+                            'filepath' => $filepath,
                             'filename' => $filename
-                        ]);                        SafeNotificationHelper::success(
-                            'PDF Generated Successfully',
-                            'The loan report has been generated and will be downloaded shortly.'
-                        );
+                        ]);
+                        
+                        // Gunakan response download langsung seperti di LaporanTabungan
+                        return response()->download($filepath, $filename, [
+                            'Content-Type' => 'application/pdf',
+                            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                            'Pragma' => 'no-cache',
+                            'Expires' => '0'
+                        ])->deleteFileAfterSend(true);
                         
                     } catch (\Exception $e) {
-                        \Illuminate\Support\Facades\Log::error('PDF Export Error: ' . $e->getMessage());
+                        \Illuminate\Support\Facades\Log::error('PDF Export Error Details', [
+                            'error_message' => $e->getMessage(),
+                            'error_file' => $e->getFile(),
+                            'error_line' => $e->getLine(),
+                            'stack_trace' => $e->getTraceAsString(),
+                            'productFilter' => $productFilter ?? null,
+                            'dateRange' => $dateRange ?? null,
+                            'filename' => $filename ?? null,
+                            'filepath' => $filepath ?? null
+                        ]);
                         
                         \Filament\Notifications\Notification::make()
                             ->title('Error generating PDF')
-                            ->body('There was an error generating the PDF report. Please try again.')
+                            ->body('There was an error generating the PDF report. Please check the logs for details. Error: ' . $e->getMessage())
                             ->danger()
                             ->send();
                     }
-                }),            Action::make('export_transactions')
+                }),            
+            
+            
+                Action::make('export_transactions')
                 ->label('Cetak Laporan Transaksi')
                 ->icon('heroicon-o-document-chart-bar')
                 ->action(function () {
                     try {
+                        // Log start of export process
+                        \Illuminate\Support\Facades\Log::info('Starting PDF export process for transaction report');
+                        
                         $productFilter = $this->data['productFilter'] ?? $this->productFilter;
                         $dateRange = $this->getDateRange();
                         
+                        // Log filter parameters
+                        \Illuminate\Support\Facades\Log::info('Transaction export parameters', [
+                            'productFilter' => $productFilter,
+                            'dateRange' => $dateRange
+                        ]);
+                        
                         $filename = 'laporan-transaksi-' . \Carbon\Carbon::now()->format('Y-m-d-H-i-s') . '.pdf';
+                        
+                        // Log before file generation
+                        \Illuminate\Support\Facades\Log::info('Generating transaction PDF file', ['filename' => $filename]);
+                        
                         $filepath = $this->loanReportExportService->generateTransactionReportFile($productFilter, $dateRange, $filename);
                         
-                        $this->dispatch('download-file', [
-                            'url' => route('download-temp-file', ['filename' => basename($filepath)]),
+                        // Log file generation result
+                        \Illuminate\Support\Facades\Log::info('Transaction PDF generation completed', [
+                            'filepath' => $filepath,
+                            'file_exists' => file_exists($filepath),
+                            'file_size' => file_exists($filepath) ? filesize($filepath) : 0,
+                            'file_readable' => file_exists($filepath) ? is_readable($filepath) : false
+                        ]);
+                        
+                        // Check if file actually exists before proceeding
+                        if (!file_exists($filepath)) {
+                            throw new \Exception("Generated PDF file does not exist at path: " . $filepath);
+                        }
+                        
+                        if (filesize($filepath) === 0) {
+                            throw new \Exception("Generated PDF file is empty: " . $filepath);
+                        }
+                        
+                        \Illuminate\Support\Facades\Log::info('Starting direct download response for transaction report', [
+                            'filepath' => $filepath,
                             'filename' => $filename
-                        ]);                        SafeNotificationHelper::success(
-                            'PDF Generated Successfully',
-                            'The transaction report has been generated and will be downloaded shortly.'
-                        );
+                        ]);
+                        
+                        // Gunakan response download langsung seperti di LaporanTabungan
+                        return response()->download($filepath, $filename, [
+                            'Content-Type' => 'application/pdf',
+                            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                            'Pragma' => 'no-cache',
+                            'Expires' => '0'
+                        ])->deleteFileAfterSend(true);
                         
                     } catch (\Exception $e) {
-                        \Illuminate\Support\Facades\Log::error('PDF Export Error: ' . $e->getMessage());
+                        \Illuminate\Support\Facades\Log::error('Transaction PDF Export Error Details', [
+                            'error_message' => $e->getMessage(),
+                            'error_file' => $e->getFile(),
+                            'error_line' => $e->getLine(),
+                            'stack_trace' => $e->getTraceAsString(),
+                            'productFilter' => $productFilter ?? null,
+                            'dateRange' => $dateRange ?? null,
+                            'filename' => $filename ?? null,
+                            'filepath' => $filepath ?? null
+                        ]);
                         
                         \Filament\Notifications\Notification::make()
                             ->title('Error generating PDF')
-                            ->body('There was an error generating the PDF report. Please try again.')
+                            ->body('There was an error generating the PDF report. Please check the logs for details. Error: ' . $e->getMessage())
                             ->danger()
                             ->send();
                     }
@@ -549,7 +643,38 @@ class LaporanPinjaman extends Page implements HasTable, HasForms
                 ->icon('heroicon-o-printer')
                 ->color('success')
                 ->action(function ($records) {
-                    return $this->loanReportExportService->exportBulkLoanReport($records);
+                    try {
+                        $filename = 'bulk-loan-report-' . \Carbon\Carbon::now()->format('Y-m-d-H-i-s') . '.pdf';
+                        $filepath = $this->loanReportExportService->exportBulkLoanReport($records);
+
+                        // Log file generation result
+                        \Illuminate\Support\Facades\Log::info('Bulk loan PDF generation completed', [
+                            'filepath' => $filepath,
+                            'file_exists' => file_exists($filepath),
+                            'file_size' => file_exists($filepath) ? filesize($filepath) : 0,
+                            'records_count' => count($records)
+                        ]);
+
+                        if (!file_exists($filepath)) {
+                            throw new \Exception("Generated bulk PDF file does not exist");
+                        }
+
+                        return response()->download($filepath, $filename, [
+                            'Content-Type' => 'application/pdf',
+                            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                            'Pragma' => 'no-cache',
+                            'Expires' => '0'
+                        ])->deleteFileAfterSend(true);
+
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Bulk PDF Export Error: ' . $e->getMessage());
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Error generating PDF')
+                            ->body('There was an error generating the bulk PDF report. Please try again.')
+                            ->danger()
+                            ->send();
+                    }
                 })
         ];
     }
