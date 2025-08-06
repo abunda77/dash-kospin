@@ -22,7 +22,7 @@ Route::post('/reset-password', [App\Http\Controllers\Api\AuthController::class, 
 
 // Temporary file download route
 Route::get('/download-temp/{filename}', function (string $filename) {
-    $filepath = storage_path('app/temp/' . basename($filename));
+    $filepath = storage_path('app/public/reports/' . basename($filename));
     
     if (!file_exists($filepath)) {
         abort(404, 'File not found');
@@ -35,6 +35,7 @@ Route::get('/download-temp/{filename}', function (string $filename) {
     return response()->download($filepath, $safeFilename, [
         'Content-Type' => 'application/pdf',
         'Cache-Control' => 'no-cache',
+        'Access-Control-Allow-Origin' => '*',
     ])->deleteFileAfterSend(true);
 })->name('download-temp-file');
 

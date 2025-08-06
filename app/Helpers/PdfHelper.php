@@ -2,8 +2,42 @@
 
 namespace App\Helpers;
 
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 class PdfHelper
 {
+    /**
+     * Generate PDF from HTML content
+     */
+    public static function generatePdf($html, $filename)
+    {
+        // Create new Dompdf instance
+        $options = new Options();
+        $options->set('defaultFont', 'Arial');
+        $options->set('isRemoteEnabled', true);
+        $options->set('isHtml5ParserEnabled', true);
+        
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        
+        // Set paper size and orientation
+        $dompdf->setPaper('A4', 'portrait');
+        
+        // Render PDF
+        $dompdf->render();
+        
+        // Output PDF to browser or save to file
+        $output = $dompdf->output();
+        
+        // Save to storage
+        $filePath = storage_path('app/public/reports/' . $filename);
+        file_put_contents($filePath, $output);
+        
+        // Return the file path
+        return $filePath;
+    }
+    
     /**
      * Safely clean UTF-8 strings for PDF generation
      */
