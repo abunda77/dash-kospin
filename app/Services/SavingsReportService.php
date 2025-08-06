@@ -7,6 +7,7 @@ use App\Models\TransaksiTabungan;
 use App\Models\ProdukTabungan;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
 
 class SavingsReportService
 {
@@ -166,11 +167,48 @@ class SavingsReportService
 
     public function getTopSavers(int $limit = 10): array
     {
-        return $this->getActiveSavingsQuery()
-            ->orderBy('saldo', 'desc')
-            ->limit($limit)
-            ->get()
-            ->map(function ($tabungan) {
+        Log::info('SavingsReportService@getTopSavers called', [
+            'limit' => $limit,
+            'productFilter' => $this->productFilter,
+        ]);
+
+        try {
+            // Khusus Top Savers: JANGAN batasi dengan tanggal_buka_rekening,
+            // karena tujuan adalah saldo terbesar saat ini pada rekening aktif.
+            $query = Tabungan::query()
+                ->with(['profile.user', 'produkTabungan'])
+                ->where('status_rekening', 'aktif');
+
+            if ($this->productFilter) {
+                $query->where('produk_tabungan', $this->productFilter);
+            }
+
+            // Log preview query (SQL + bindings)
+            Log::debug('SavingsReportService@getTopSavers query preview', [
+                'sql' => $query->toSql(),
+                'bindings' => $query->getBindings(),
+                'orders' => [['column' => 'saldo', 'direction' => 'desc']],
+                'limit' => $limit,
+            ]);
+
+            $results = $query
+                ->orderBy('saldo', 'desc')
+                ->limit($limit)
+                ->get();
+
+            Log::info('SavingsReportService@getTopSavers fetched results', [
+                'count' => $results->count(),
+                'top_sample' => $results->take(3)->map(function ($t) {
+                    return [
+                        'no_tabungan' => $t->no_tabungan,
+                        'saldo' => $t->saldo,
+                        'produk' => $t->produkTabungan?->nama_produk,
+                        'nama' => $t->profile?->user?->name,
+                    ];
+                }),
+            ]);
+
+            $payload = $results->map(function ($tabungan) {
                 return [
                     'name' => $tabungan->profile?->user?->name ?? 'Unknown',
                     'account_number' => $tabungan->no_tabungan,
@@ -178,8 +216,22 @@ class SavingsReportService
                     'balance' => $tabungan->saldo,
                     'account_age_days' => Carbon::parse($tabungan->tanggal_buka_rekening)->diffInDays(now()),
                 ];
-            })
-            ->toArray();
+            })->toArray();
+
+            Log::debug('SavingsReportService@getTopSavers mapped payload preview', [
+                'payload_count' => count($payload),
+                'first_item' => $payload[0] ?? null,
+            ]);
+
+            return $payload;
+        } catch (\Throwable $e) {
+            Log::error('SavingsReportService@getTopSavers failed', [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'trace' => collect(explode("\n", $e->getTraceAsString()))->take(10),
+            ]);
+            throw $e;
+        }
     }
 
     public function getAccountGrowthTrend(): array
