@@ -9,6 +9,7 @@ use Filament\Actions\Action;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Button;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 
@@ -23,6 +24,7 @@ class SimulasiKredit extends Page
     public $nominalPinjaman;
     public $bunga;
     public $jangkaWaktu;
+    public $jenisJangkaWaktu = 'bulan';
     public $angsuranList = [];
 
     public function form(Form $form): Form
@@ -41,10 +43,22 @@ class SimulasiKredit extends Page
                     ->numeric()
                     ->required(),
 
-                TextInput::make('jangkaWaktu')
-                    ->label('Jangka Waktu (bulan)')
-                    ->numeric()
-                    ->required(),
+                Grid::make(2)
+                    ->schema([
+                        TextInput::make('jangkaWaktu')
+                            ->label('Jangka Waktu')
+                            ->numeric()
+                            ->required(),
+
+                        Select::make('jenisJangkaWaktu')
+                            ->label('Satuan Waktu')
+                            ->options([
+                                'bulan' => 'Bulan',
+                                'minggu' => 'Minggu',
+                            ])
+                            ->default('bulan')
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -79,10 +93,22 @@ class SimulasiKredit extends Page
         $pokok = (float) str_replace([',', '.'], '', $this->nominalPinjaman);
         $bungaPerTahun = (float) $this->bunga;
         $jangkaWaktu = (int) $this->jangkaWaktu;
+        $jenisJangkaWaktu = $this->jenisJangkaWaktu;
 
-        $bungaPerBulan = ($pokok * ($bungaPerTahun / 100)) / $jangkaWaktu;
-        $angsuranPokok = $pokok / $jangkaWaktu;
-        $totalAngsuran = $angsuranPokok + $bungaPerBulan;
+        // Perhitungan bunga berdasarkan jenis jangka waktu
+        if ($jenisJangkaWaktu === 'bulan') {
+            // Perhitungan untuk bulanan (sama seperti sebelumnya)
+            $bungaPerPeriode = ($pokok * ($bungaPerTahun / 100)) / $jangkaWaktu;
+            $angsuranPokok = $pokok / $jangkaWaktu;
+            $totalAngsuran = $angsuranPokok + $bungaPerPeriode;
+        } else {
+            // Perhitungan untuk mingguan
+            // Bunga tetap dihitung per tahun, tapi dibagi per minggu
+            $totalBunga = ($pokok * ($bungaPerTahun / 100) * $jangkaWaktu) / 48;
+            $bungaPerPeriode = $totalBunga / $jangkaWaktu;
+            $angsuranPokok = $pokok / $jangkaWaktu;
+            $totalAngsuran = $angsuranPokok + $bungaPerPeriode;
+        }
 
         $this->angsuranList = [];
         $sisaPokok = $pokok;
@@ -91,7 +117,7 @@ class SimulasiKredit extends Page
             $this->angsuranList[] = [
                 'bulan_ke' => $i,
                 'pokok' => $angsuranPokok,
-                'bunga' => $bungaPerBulan,
+                'bunga' => $bungaPerPeriode,
                 'angsuran' => $totalAngsuran,
             ];
 
@@ -111,6 +137,7 @@ class SimulasiKredit extends Page
             'nominalPinjaman' => $this->nominalPinjaman,
             'bunga' => $this->bunga,
             'jangkaWaktu' => $this->jangkaWaktu,
+            'jenisJangkaWaktu' => $this->jenisJangkaWaktu,
             'totalBunga' => collect($this->angsuranList)->sum('bunga'),
             'totalAngsuran' => collect($this->angsuranList)->sum('angsuran'),
         ];
@@ -128,6 +155,7 @@ class SimulasiKredit extends Page
             'nominalPinjaman' => (float) str_replace(['Rp', '.', ' '], '', $this->nominalPinjaman),
             'bunga' => $this->bunga,
             'jangkaWaktu' => $this->jangkaWaktu,
+            'jenisJangkaWaktu' => $this->jenisJangkaWaktu,
         ];
 
         $pdf = Pdf::loadView('pdf.form-pengajuan-kredit', $data);

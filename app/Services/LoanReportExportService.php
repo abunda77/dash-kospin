@@ -21,13 +21,21 @@ class LoanReportExportService
 
             $stats = $service->getLoanStats();
             
+            // Get additional widget statistics
+            $critical90DaysStats = $this->getCritical90DaysStats();
+            $productDistribution = $service->getProductDistribution();
+            
             // Pre-clean all data to ensure UTF-8 compatibility
             $cleanedLoans = $this->cleanDataForPdf($loans);
             $cleanedStats = $this->cleanArrayData($stats);
+            $cleanedCritical90DaysStats = $this->cleanArrayData($critical90DaysStats);
+            $cleanedProductDistribution = $this->cleanArrayData($productDistribution);
             
             $data = [
                 'pinjamans' => $cleanedLoans,
                 'stats' => $cleanedStats,
+                'critical90DaysStats' => $cleanedCritical90DaysStats,
+                'productDistribution' => $cleanedProductDistribution,
                 'dateRange' => $dateRange,
                 'productName' => $this->sanitizeString($productFilter ? ProdukPinjaman::find($productFilter)?->nama_produk : 'Semua Produk'),
                 'generatedAt' => Carbon::now()->format('d M Y H:i'),
@@ -491,10 +499,120 @@ class LoanReportExportService
     }
 
     /**
-     * Safe string for display (already sanitized)
+     * Get critical 90 days statistics for widget data
      */
-    private function safeString($value): string
+    private function getCritical90DaysStats(): array
     {
-        return $this->sanitizeString($value);
+        $today = Carbon::today();
+        
+        $critical90DaysQuery = Pinjaman::query()
+            ->with(['profile', 'biayaBungaPinjaman', 'denda', 'transaksiPinjaman'])
+            ->where('status_pinjaman', 'approved')
+            ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
+                $q->whereMonth('tanggal_pembayaran', $today->month)
+                  ->whereYear('tanggal_pembayaran', $today->year);
+            })
+            ->where(function ($query) use ($today) {
+                $query->whereHas('transaksiPinjaman', function ($q) use ($today) {
+                    $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 90', [$today]);
+                })
+                ->orWhere(function ($q) use ($today) {
+                    $q->whereDoesntHave('transaksiPinjaman');
+                });
+            });
+        
+        $critical90DaysData = $critical90DaysQuery->get();
+        
+        $totalAccounts = $critical90DaysData->count();
+        $totalOverdue = $critical90DaysData->sum(function ($record) use ($today) {
+            $hariTerlambat = abs($this->calculateHariTerlambat($record, $today));
+            $jumlahBulanTerlambat = ceil($hariTerlambat / 30);
+            
+            $angsuranPokok = abs($this->calculateAngsuranPokok($record));
+            $bungaPerBulan = abs($this->calculateBungaPerBulan($record));
+            
+            $totalPokok = $angsuranPokok * $jumlahBulanTerlambat;
+            $totalBunga = $bungaPerBulan * $jumlahBulanTerlambat;
+            
+            $angsuranTotal = $angsuranPokok + $bungaPerBulan;
+            $dendaPerHari = (0.05 * $angsuranTotal) / 30;
+            $totalDenda = $dendaPerHari * $hariTerlambat;
+            
+            return $totalPokok + $totalBunga + $totalDenda;
+        });
+        
+        // Get total active loans for risk percentage calculation
+        $totalActiveLoans = Pinjaman::where('status_pinjaman', 'approved')->count();
+        $riskPercentage = $totalActiveLoans > 0 ? ($totalAccounts / $totalActiveLoans) * 100 : 0;
+        
+        // Calculate average overdue days
+        $avgOverdueDays = $critical90DaysData->avg(function ($record) use ($today) {
+            return abs($this->calculateHariTerlambat($record, $today));
+        }) ?? 0;
+        
+        return [
+            'total_accounts' => $totalAccounts,
+            'total_overdue' => $totalOverdue,
+            'risk_percentage' => $riskPercentage,
+            'avg_overdue_days' => $avgOverdueDays,
+        ];
+    }
+
+    /**
+     * Helper function to calculate angsuran pokok
+     */
+    private function calculateAngsuranPokok($record)
+    {
+        return $record->jumlah_pinjaman / $record->jangka_waktu;
+    }
+
+    /**
+     * Helper function to calculate bunga per bulan
+     */
+    private function calculateBungaPerBulan($record)
+    {
+        $pokok = $record->jumlah_pinjaman;
+        $bungaPerTahun = $record->biayaBungaPinjaman->persentase_bunga;
+        $jangkaWaktu = $record->jangka_waktu;
+
+        // Hitung bunga per bulan (total bunga setahun dibagi jangka waktu)
+        return ($pokok * ($bungaPerTahun/100)) / $jangkaWaktu;
+    }
+
+    /**
+     * Helper function to calculate hari terlambat
+     */
+    private function calculateHariTerlambat($record, $today)
+    {
+        // Ambil tanggal jatuh tempo dari transaksi terakhir atau tanggal pinjaman
+        $lastTransaction = $record->transaksiPinjaman()
+            ->orderBy('angsuran_ke', 'desc')
+            ->first();
+
+        if ($lastTransaction) {
+            // Jika ada transaksi sebelumnya, gunakan tanggal jatuh tempo berikutnya
+            $tanggalJatuhTempo = Carbon::parse($lastTransaction->tanggal_pembayaran)
+                ->addMonth()
+                ->startOfDay();
+        } else {
+            // Jika belum ada transaksi, gunakan tanggal pinjaman + 1 bulan
+            $tanggalJatuhTempo = Carbon::parse($record->tanggal_pinjaman)
+                ->addMonth()
+                ->startOfDay();
+        }
+
+        // Jika masih dalam bulan yang sama dengan tanggal pinjaman, return 0
+        if ($today->format('Y-m') === Carbon::parse($record->tanggal_pinjaman)->format('Y-m')) {
+            return 0;
+        }
+
+        // Hitung keterlambatan hanya jika sudah melewati tanggal jatuh tempo
+        // dan berada di bulan yang berbeda
+        if ($today->gt($tanggalJatuhTempo) &&
+            $today->format('Y-m') !== $tanggalJatuhTempo->format('Y-m')) {
+            return $today->diffInDays($tanggalJatuhTempo);
+        }
+
+        return 0;
     }
 }

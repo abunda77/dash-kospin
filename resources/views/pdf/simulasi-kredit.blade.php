@@ -56,14 +56,20 @@
 
     <div class="summary">
         <p><strong>Nominal Pinjaman:</strong> Rp {{ number_format((float) str_replace([',', '.'], '', $nominalPinjaman), 0, ',', '.') }}</p>
-        <p><strong>Bunga:</strong> {{ $bunga }}%</p>
-        <p><strong>Jangka Waktu:</strong> {{ $jangkaWaktu }} bulan</p>
+        {{-- <p><strong>Bunga:</strong> {{ $bunga }}%</p> --}}
+        <p><strong>Jangka Waktu:</strong> {{ $jangkaWaktu }} {{ $jenisJangkaWaktu === 'bulan' ? 'bulan' : 'minggu' }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th class="text-left">Bulan Ke</th>
+                <th class="text-left">
+                    @if ($jenisJangkaWaktu === 'bulan')
+                        Bulan Ke
+                    @else
+                        Minggu Ke
+                    @endif
+                </th>
                 <th>Pokok</th>
                 <th>Bunga</th>
                 <th>Total Angsuran</th>
