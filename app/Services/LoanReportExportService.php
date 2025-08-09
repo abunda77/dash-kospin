@@ -835,7 +835,6 @@ class LoanReportExportService
             if (is_string($v)) {
                 $data[$k] = $this->sanitizeString($v);
             } else {
-                // keep only scalar / numeric / null
                 if (is_scalar($v) || is_null($v)) {
                     $data[$k] = $v;
                 } else {
@@ -843,16 +842,55 @@ class LoanReportExportService
                 }
             }
         }
-        // Minimal common relation fields (id + name-like) without loading extra if already loaded
+
+        // Relation attribute whitelist / pattern for domain specific needs
+        $relationExtraKeys = ['no_pinjaman','nama_produk','jumlah_pinjaman','status_pinjaman'];
+
         foreach ($model->getRelations() as $relName => $relVal) {
             if ($relVal instanceof \Illuminate\Database\Eloquent\Model) {
                 $relArr = ['id' => $relVal->getAttribute('id')];
-                foreach (['name','nama','nama_lengkap','full_name'] as $cand) {
-                    if ($relVal->getAttribute($cand)) { $relArr[$cand] = $this->sanitizeString((string)$relVal->getAttribute($cand)); }
+                // capture generic name fields
+                foreach (['name','nama','nama_lengkap','full_name','no_pinjaman','nama_produk'] as $cand) {
+                    if (!empty($relVal->getAttribute($cand))) {
+                        $relArr[$cand] = $this->sanitizeString((string)$relVal->getAttribute($cand));
+                    }
+                }
+                // capture whitelisted extras
+                foreach ($relationExtraKeys as $ek) {
+                    if (!array_key_exists($ek,$relArr) && !empty($relVal->getAttribute($ek))) {
+                        $relArr[$ek] = $relVal->getAttribute($ek);
+                    }
                 }
                 $data[$relName] = $relArr;
+
+                // Flatten frequently used nested chains (profile->user, pinjaman->profile->user, pinjaman->produkPinjaman)
+                if (method_exists($relVal,'getRelations')) {
+                    // Eager loaded nested user
+                    if ($relVal->relationLoaded('user') && ($userRel = $relVal->getRelation('user')) instanceof \Illuminate\Database\Eloquent\Model) {
+                        $userName = $userRel->getAttribute('name');
+                        if ($userName) {
+                            $data['user_name'] = $this->sanitizeString((string)$userName);
+                        }
+                    }
+                    // If this relation is 'pinjaman', also try to expose nested relations for easy access
+                    if ($relName === 'pinjaman') {
+                        if ($relVal->relationLoaded('profile') && ($prof = $relVal->getRelation('profile')) instanceof \Illuminate\Database\Eloquent\Model) {
+                            if ($prof->relationLoaded('user') && ($userRel = $prof->getRelation('user')) instanceof \Illuminate\Database\Eloquent\Model) {
+                                $userName = $userRel->getAttribute('name');
+                                if ($userName) {
+                                    $data['pinjaman_user_name'] = $this->sanitizeString((string)$userName);
+                                }
+                            }
+                        }
+                        if ($relVal->relationLoaded('produkPinjaman') && ($prod = $relVal->getRelation('produkPinjaman')) instanceof \Illuminate\Database\Eloquent\Model) {
+                            $prodName = $prod->getAttribute('nama_produk');
+                            if ($prodName) {
+                                $data['pinjaman_produk_nama'] = $this->sanitizeString((string)$prodName);
+                            }
+                        }
+                    }
+                }
             } elseif ($relVal instanceof \Illuminate\Support\Collection) {
-                // keep only ids to minimize
                 $data[$relName] = $relVal->pluck('id')->filter()->values()->all();
             }
         }
