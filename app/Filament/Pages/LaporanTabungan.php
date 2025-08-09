@@ -272,7 +272,9 @@ class LaporanTabungan extends Page implements HasTable, HasForms
         $service = new SavingsReportService($productFilter, $this->getDateRange());
 
         return $service->getProductDistribution();
-    }    public function getMonthlyTrends(): array
+    }    
+    
+    public function getMonthlyTrends(): array
     {
         $productFilter = $this->data['productFilter'] ?? $this->productFilter;
 

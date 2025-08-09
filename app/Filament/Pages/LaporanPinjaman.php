@@ -645,7 +645,25 @@ class LaporanPinjaman extends Page implements HasTable, HasForms
                 ->action(function ($records) {
                     try {
                         $filename = 'bulk-loan-report-' . \Carbon\Carbon::now()->format('Y-m-d-H-i-s') . '.pdf';
-                        $filepath = $this->loanReportExportService->exportBulkLoanReport($records);
+                        $pdfResult = $this->loanReportExportService->exportBulkLoanReport($records);
+                        
+                        // Check if we received a PDF object or a string filepath
+                        if ($pdfResult instanceof \Barryvdh\DomPDF\PDF) {
+                            // Generate a temporary filepath to save the PDF
+                            $tempFilepath = storage_path('app/temp/' . $filename);
+                            
+                            // Ensure directory exists
+                            if (!file_exists(dirname($tempFilepath))) {
+                                mkdir(dirname($tempFilepath), 0755, true);
+                            }
+                            
+                            // Save the PDF to the temporary filepath
+                            file_put_contents($tempFilepath, $pdfResult->output());
+                            $filepath = $tempFilepath;
+                        } else {
+                            // If it's already a filepath string
+                            $filepath = $pdfResult;
+                        }
 
                         // Log file generation result
                         \Illuminate\Support\Facades\Log::info('Bulk loan PDF generation completed', [

@@ -58,7 +58,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationItem::make('Whatsapp Gateway')
                     ->group('Settings')
                     ->icon('heroicon-o-chat-bubble-left-right')
-                    ->url('http://46.102.156.214:3001/', shouldOpenInNewTab: true)
+                    ->url('http://admin:sinara123@46.102.156.214:3003/', shouldOpenInNewTab: true)
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
