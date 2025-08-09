@@ -6,15 +6,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Transaksi Pinjaman</title>
     <style>
-        body { font-family: 'DejaVu Sans', Arial, sans-serif; margin: 20px; font-size: 12px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h2 { margin: 0; padding: 0; }
-        .header p { margin: 5px 0; }
-        table { width: 100%; border-collapse: collapse; }
-        table th, table td { border: 1px solid #ddd; padding: 5px; text-align: left; font-size: 10px; }
-        table th { background-color: #f2f2f2; }
-        .footer { margin-top: 30px; text-align: right; }
+        @page { 
+            margin: 15mm; 
+            size: A4 landscape; 
+        }
+        body { 
+            font-family: 'DejaVu Sans', Arial, sans-serif; 
+            margin: 0; 
+            font-size: 10px; 
+            line-height: 1.2;
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 15px; 
+        }
+        .header h2 { 
+            margin: 0; 
+            padding: 0; 
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .header p { 
+            margin: 3px 0; 
+            font-size: 11px;
+        }
+        .summary-box {
+            margin-bottom: 15px; 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            background: #f9f9f9;
+            font-size: 9px;
+            line-height: 1.3;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 8px;
+            table-layout: fixed;
+        }
+        table th, table td { 
+            border: 1px solid #ccc; 
+            padding: 3px 2px; 
+            text-align: left; 
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+        table th { 
+            background-color: #e8e8e8; 
+            font-weight: bold;
+            text-align: center;
+            font-size: 8px;
+        }
+        /* Optimized column widths for transaction report */
+        .col-no { width: 3%; text-align: center; }
+        .col-no-pinjaman { width: 10%; }
+        .col-nama { width: 15%; }
+        .col-produk { width: 12%; }
+        .col-tanggal { width: 8%; text-align: center; }
+        .col-angsuran-ke { width: 6%; text-align: center; }
+        .col-pokok { width: 11%; text-align: right; }
+        .col-bunga { width: 11%; text-align: right; }
+        .col-denda { width: 10%; text-align: right; }
+        .col-total { width: 11%; text-align: right; }
+        .col-status { width: 3%; text-align: center; }
+        
         .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .footer { 
+            margin-top: 15px; 
+            text-align: right; 
+            font-size: 9px;
+        }
+        
+        /* Responsive text sizing */
+        .currency { 
+            font-size: 7px; 
+            white-space: nowrap; 
+        }
+        .date { 
+            font-size: 7px; 
+            white-space: nowrap; 
+        }
+        .name-text {
+            font-size: 8px;
+            line-height: 1.1;
+        }
+        .status-text {
+            font-size: 7px;
+            font-weight: bold;
+        }
+        .angsuran-text {
+            font-size: 8px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -28,17 +112,17 @@
     <table>
         <thead>
             <tr>
-                <th>No.</th>
-                <th>No. Pinjaman</th>
-                <th>Nama Nasabah</th>
-                <th>Produk</th>
-                <th>Tanggal</th>
-                <th>Angsuran Ke</th>
-                <th>Pokok</th>
-                <th>Bunga</th>
-                <th>Denda</th>
-                <th>Total Bayar</th>
-                <th>Status</th>
+                <th class="col-no">No.</th>
+                <th class="col-no-pinjaman">No. Pinjaman</th>
+                <th class="col-nama">Nama Nasabah</th>
+                <th class="col-produk">Produk</th>
+                <th class="col-tanggal">Tanggal</th>
+                <th class="col-angsuran-ke">Angsuran Ke</th>
+                <th class="col-pokok">Pokok</th>
+                <th class="col-bunga">Bunga</th>
+                <th class="col-denda">Denda</th>
+                <th class="col-total">Total Bayar</th>
+                <th class="col-status">Status</th>
             </tr>
         </thead>
         <tbody>
@@ -63,27 +147,27 @@
                     $statusPembayaran = \App\Helpers\PdfHelper::cleanUtf8String($t['status_pembayaran'] ?? '');
                 @endphp
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $noPinjaman }}</td>
-                    <td>{{ $userName }}</td>
-                    <td>{{ $produkName }}</td>
-                    <td>{{ \App\Helpers\PdfHelper::formatDate($tanggalPembayaran) }}</td>
-                    <td>{{ $angsuranKe }}</td>
-                    <td class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($angsuranPokok) }}</td>
-                    <td class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($angsuranBunga) }}</td>
-                    <td class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($denda) }}</td>
-                    <td class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($totalBayar) }}</td>
-                    <td>{{ ucfirst($statusPembayaran) }}</td>
+                    <td class="col-no text-center">{{ $index + 1 }}</td>
+                    <td class="col-no-pinjaman">{{ $noPinjaman }}</td>
+                    <td class="col-nama name-text">{{ $userName }}</td>
+                    <td class="col-produk">{{ $produkName }}</td>
+                    <td class="col-tanggal date">{{ \App\Helpers\PdfHelper::formatDate($tanggalPembayaran) }}</td>
+                    <td class="col-angsuran-ke angsuran-text">{{ $angsuranKe }}</td>
+                    <td class="col-pokok currency">{{ \App\Helpers\PdfHelper::formatCurrency($angsuranPokok) }}</td>
+                    <td class="col-bunga currency">{{ \App\Helpers\PdfHelper::formatCurrency($angsuranBunga) }}</td>
+                    <td class="col-denda currency">{{ \App\Helpers\PdfHelper::formatCurrency($denda) }}</td>
+                    <td class="col-total currency">{{ \App\Helpers\PdfHelper::formatCurrency($totalBayar) }}</td>
+                    <td class="col-status status-text">{{ ucfirst($statusPembayaran) }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="6" class="text-right">Total</th>
-                <th class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($totalPokok) }}</th>
-                <th class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($totalBunga) }}</th>
-                <th class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($totalDenda) }}</th>
-                <th class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($totalPembayaran) }}</th>
+                <th colspan="6" class="text-right" style="font-weight: bold;">Total</th>
+                <th class="col-pokok currency" style="font-weight: bold;">{{ \App\Helpers\PdfHelper::formatCurrency($totalPokok) }}</th>
+                <th class="col-bunga currency" style="font-weight: bold;">{{ \App\Helpers\PdfHelper::formatCurrency($totalBunga) }}</th>
+                <th class="col-denda currency" style="font-weight: bold;">{{ \App\Helpers\PdfHelper::formatCurrency($totalDenda) }}</th>
+                <th class="col-total currency" style="font-weight: bold;">{{ \App\Helpers\PdfHelper::formatCurrency($totalPembayaran) }}</th>
                 <th></th>
             </tr>
         </tfoot>
