@@ -20,23 +20,38 @@ Route::post('/reset-password', [App\Http\Controllers\Api\AuthController::class, 
     ->middleware('guest')
     ->name('password.update');
 
-// Temporary file download route
-Route::get('/download-temp/{filename}', function (string $filename) {
+// PDF Report download routes
+Route::get('/download-report/{filename}', function (string $filename) {
     $filepath = storage_path('app/public/reports/' . basename($filename));
     
     if (!file_exists($filepath)) {
         abort(404, 'File not found');
     }
     
-    // Clean the filename to ensure it's UTF-8 safe
-    $safeFilename = preg_replace('/[^\x20-\x7E]/', '', $filename);
-    $safeFilename = preg_replace('/[^a-zA-Z0-9\-_\.]/', '-', $safeFilename);
+    // Security check - only allow PDF files
+    if (!str_ends_with(strtolower($filename), '.pdf')) {
+        abort(403, 'Invalid file type');
+    }
     
-    return response()->download($filepath, $safeFilename, [
+    return response()->download($filepath, $filename, [
         'Content-Type' => 'application/pdf',
-        'Cache-Control' => 'no-cache',
-        'Access-Control-Allow-Origin' => '*',
-    ])->deleteFileAfterSend(true);
-})->name('download-temp-file');
+    ]);
+})->name('report.download');
+
+// Progress monitor page
+Route::get('/export-monitor', function () {
+    return view('export-progress');
+})->name('export.monitor');
+
+// Progress check route for AJAX monitoring
+Route::get('/export-progress/{key}', function (string $key) {
+    $progress = \Illuminate\Support\Facades\Cache::get($key);
+    
+    if (!$progress) {
+        return response()->json(['error' => 'Progress not found'], 404);
+    }
+    
+    return response()->json($progress);
+})->name('export.progress');
 
 

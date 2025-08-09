@@ -6,15 +6,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Pinjaman</title>
     <style>
-        body { font-family: 'DejaVu Sans', Arial, sans-serif; margin: 20px; font-size: 12px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h2 { margin: 0; padding: 0; }
-        .header p { margin: 5px 0; }
-        table { width: 100%; border-collapse: collapse; }
-        table th, table td { border: 1px solid #ddd; padding: 5px; text-align: left; }
-        table th { background-color: #f2f2f2; }
+        @page { 
+            margin: 15mm; 
+            size: A4 landscape; 
+        }
+        body { 
+            font-family: 'DejaVu Sans', Arial, sans-serif; 
+            margin: 0; 
+            font-size: 10px; 
+            line-height: 1.2;
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 15px; 
+        }
+        .header h2 { 
+            margin: 0; 
+            padding: 0; 
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .header p { 
+            margin: 3px 0; 
+            font-size: 11px;
+        }
+        .summary-box {
+            margin-bottom: 15px; 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+            background: #f9f9f9;
+            font-size: 9px;
+            line-height: 1.3;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            font-size: 8px;
+            table-layout: fixed;
+        }
+        table th, table td { 
+            border: 1px solid #ccc; 
+            padding: 3px 2px; 
+            text-align: left; 
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+        table th { 
+            background-color: #e8e8e8; 
+            font-weight: bold;
+            text-align: center;
+            font-size: 8px;
+        }
+        /* Optimized column widths */
+        .col-no { width: 4%; text-align: center; }
+        .col-no-pinjaman { width: 12%; }
+        .col-nama { width: 18%; }
+        .col-produk { width: 15%; }
+        .col-jumlah { width: 15%; text-align: right; }
+        .col-tgl-pinjaman { width: 12%; text-align: center; }
+        .col-jatuh-tempo { width: 12%; text-align: center; }
+        .col-status { width: 12%; text-align: center; }
+        
         .text-right { text-align: right; }
-        .footer { margin-top: 30px; text-align: right; }
+        .text-center { text-align: center; }
+        .footer { 
+            margin-top: 15px; 
+            text-align: right; 
+            font-size: 9px;
+        }
+        .page-break { page-break-before: always; }
+        
+        /* Responsive text sizing */
+        .currency { 
+            font-size: 8px; 
+            white-space: nowrap; 
+        }
+        .date { 
+            font-size: 8px; 
+            white-space: nowrap; 
+        }
+        .name-text {
+            font-size: 8px;
+            line-height: 1.1;
+        }
     </style>
 </head>
 <body>
@@ -26,7 +100,7 @@
     </div>
 
     @if(isset($stats))
-    <div style="margin-bottom: 20px; border:1px solid #ddd; padding:10px; background:#f9f9f9;">
+    <div class="summary-box">
         <strong>Ringkasan:</strong><br>
         Pinjaman Aktif: {{ number_format($stats['active_loans'] ?? 0) }}<br>
         Total Pinjaman: {{ \App\Helpers\PdfHelper::formatCurrency($stats['total_loan_amount'] ?? 0) }}<br>
@@ -39,14 +113,14 @@
     <table>
         <thead>
             <tr>
-                <th>No.</th>
-                <th>No. Pinjaman</th>
-                <th>Nama Nasabah</th>
-                <th>Produk</th>
-                <th>Jumlah Pinjaman</th>
-                <th>Tanggal Pinjaman</th>
-                <th>Jatuh Tempo</th>
-                <th>Status</th>
+                <th class="col-no">No.</th>
+                <th class="col-no-pinjaman">No. Pinjaman</th>
+                <th class="col-nama">Nama Nasabah</th>
+                <th class="col-produk">Produk</th>
+                <th class="col-jumlah">Jumlah Pinjaman</th>
+                <th class="col-tgl-pinjaman">Tanggal Pinjaman</th>
+                <th class="col-jatuh-tempo">Jatuh Tempo</th>
+                <th class="col-status">Status</th>
             </tr>
         </thead>
         <tbody>
@@ -65,21 +139,21 @@
                     $statusPinjaman = \App\Helpers\PdfHelper::cleanUtf8String($isArray ? ($p['status_pinjaman'] ?? '') : ($p->status_pinjaman ?? ''));
                 @endphp
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $noPinjaman }}</td>
-                    <td>{{ $userName }}</td>
-                    <td>{{ $produkName }}</td>
-                    <td class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($jumlah) }}</td>
-                    <td>{{ \App\Helpers\PdfHelper::formatDate($tanggalPinjaman) }}</td>
-                    <td>{{ \App\Helpers\PdfHelper::formatDate($tanggalJatuhTempo) }}</td>
-                    <td>{{ ucfirst($statusPinjaman) }}</td>
+                    <td class="col-no text-center">{{ $index + 1 }}</td>
+                    <td class="col-no-pinjaman">{{ $noPinjaman }}</td>
+                    <td class="col-nama name-text">{{ $userName }}</td>
+                    <td class="col-produk">{{ $produkName }}</td>
+                    <td class="col-jumlah currency">{{ \App\Helpers\PdfHelper::formatCurrency($jumlah) }}</td>
+                    <td class="col-tgl-pinjaman date">{{ \App\Helpers\PdfHelper::formatDate($tanggalPinjaman) }}</td>
+                    <td class="col-jatuh-tempo date">{{ \App\Helpers\PdfHelper::formatDate($tanggalJatuhTempo) }}</td>
+                    <td class="col-status text-center">{{ ucfirst($statusPinjaman) }}</td>
                 </tr>
             @endforeach
         </tbody>
         <tfoot>
             <tr>
-                <th colspan="4" class="text-right">Total</th>
-                <th class="text-right">{{ \App\Helpers\PdfHelper::formatCurrency($totalPinjaman) }}</th>
+                <th colspan="4" class="text-right" style="font-weight: bold;">Total</th>
+                <th class="col-jumlah currency" style="font-weight: bold;">{{ \App\Helpers\PdfHelper::formatCurrency($totalPinjaman) }}</th>
                 <th colspan="3"></th>
             </tr>
         </tfoot>

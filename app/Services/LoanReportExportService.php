@@ -44,7 +44,7 @@ class LoanReportExportService
             ];
 
             $pdf = Pdf::loadView('reports.laporan-pinjaman', $data)
-                ->setPaper('A4', 'portrait')
+                ->setPaper('A4', 'landscape')
                 ->setOptions([
                     'defaultFont' => 'DejaVu Sans',
                     'isHtml5ParserEnabled' => true,
@@ -53,7 +53,8 @@ class LoanReportExportService
                     'chroot' => public_path(),
                     'defaultMediaType' => 'screen',
                     'isFontSubsettingEnabled' => true,
-                    'defaultPaperOrientation' => 'portrait',
+                    'defaultPaperOrientation' => 'landscape',
+                    'dpi' => 96,
                 ]);
             
             return $pdf;
@@ -155,7 +156,7 @@ class LoanReportExportService
             ];
 
             $pdf = Pdf::loadView('reports.laporan-pinjaman-bulk', $data)
-                ->setPaper('A4', 'portrait')
+                ->setPaper('A4', 'landscape')
                 ->setOptions([
                     'defaultFont' => 'DejaVu Sans',
                     'isHtml5ParserEnabled' => true,
@@ -164,7 +165,8 @@ class LoanReportExportService
                     'chroot' => public_path(),
                     'defaultMediaType' => 'screen',
                     'isFontSubsettingEnabled' => true,
-                    'defaultPaperOrientation' => 'portrait',
+                    'defaultPaperOrientation' => 'landscape',
+                    'dpi' => 96,
                 ]);
 
             return $pdf;
@@ -662,7 +664,7 @@ class LoanReportExportService
         $this->logMemoryUsage('loan_chunk_start');
         try {
             $service = new LoanReportService($productFilter, $dateRange);
-            $baseQuery = $service->getApprovedLoansQuery()->orderBy('id');
+            $baseQuery = $service->getApprovedLoansQuery()->orderBy('id_pinjaman');
             $total = (clone $baseQuery)->count();
             $processed = 0;
             $loansLean = [];
@@ -694,7 +696,7 @@ class LoanReportExportService
             ];
 
             $pdf = Pdf::loadView('reports.laporan-pinjaman', $data)
-                ->setPaper('A4', 'portrait')
+                ->setPaper('A4', 'landscape')
                 ->setOptions([
                     'defaultFont' => 'DejaVu Sans',
                     'isHtml5ParserEnabled' => true,
@@ -703,8 +705,8 @@ class LoanReportExportService
                     'chroot' => public_path(),
                     'defaultMediaType' => 'screen',
                     'isFontSubsettingEnabled' => true,
-                    'defaultPaperOrientation' => 'portrait',
-                    'dpi' => 72,
+                    'defaultPaperOrientation' => 'landscape',
+                    'dpi' => 96,
                 ]);
 
             $this->reportProgress($total, $total);
