@@ -656,7 +656,7 @@ class LoanReportExportService
      *              ->setProgressCallback(function($done,$total,$percent){ Cache::put('loan_report_progress', compact('done','total','percent')); });
      * $pdf = $service->exportLoanReportChunked($productId, $dateRange, 500);
      */
-    public function exportLoanReportChunked(?string $productFilter = null, array $dateRange = [], int $chunkSize = 500, int $memoryLimitMB = 512): \Barryvdh\DomPDF\PDF
+    public function exportLoanReportChunked(?string $productFilter = null, array $dateRange = [], int $chunkSize = 100, int $memoryLimitMB = 1024): \Barryvdh\DomPDF\PDF
     {
         $this->setMemoryLimit($memoryLimitMB);
         $this->logMemoryUsage('loan_chunk_start');
