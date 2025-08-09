@@ -656,25 +656,26 @@ class LoanReportExportService
      *              ->setProgressCallback(function($done,$total,$percent){ Cache::put('loan_report_progress', compact('done','total','percent')); });
      * $pdf = $service->exportLoanReportChunked($productId, $dateRange, 500);
      */
-    public function exportLoanReportChunked(?string $productFilter = null, array $dateRange = [], int $chunkSize = 500): \Barryvdh\DomPDF\PDF
+    public function exportLoanReportChunked(?string $productFilter = null, array $dateRange = [], int $chunkSize = 500, int $memoryLimitMB = 512): \Barryvdh\DomPDF\PDF
     {
+        $this->setMemoryLimit($memoryLimitMB);
+        $this->logMemoryUsage('loan_chunk_start');
         try {
             $service = new LoanReportService($productFilter, $dateRange);
-
-            $baseQuery = $service->getApprovedLoansQuery();
-            // Pastikan order by id untuk chunkById
-            $baseQuery->orderBy('id');
-
+            $baseQuery = $service->getApprovedLoansQuery()->orderBy('id');
             $total = (clone $baseQuery)->count();
             $processed = 0;
-            $loansCollection = collect();
+            $loansLean = [];
 
-            $baseQuery->chunkById($chunkSize, function ($chunk) use (&$processed, $total, &$loansCollection) {
+            $baseQuery->chunkById($chunkSize, function ($chunk) use (&$processed, $total, &$loansLean) {
                 foreach ($chunk as $loan) {
-                    $loansCollection->push($this->deepCleanObject($loan));
+                    $loansLean[] = $this->leanSanitizeModel($loan);
                 }
                 $processed += $chunk->count();
                 $this->reportProgress($processed, $total);
+                // Free chunk models
+                unset($chunk);
+                if ($processed % (1000) === 0) { gc_collect_cycles(); $this->logMemoryUsage('loan_chunk_'.$processed); }
             });
 
             $stats = $this->cleanArrayData($service->getLoanStats());
@@ -682,7 +683,7 @@ class LoanReportExportService
             $productDistribution = $this->cleanArrayData($service->getProductDistribution());
 
             $data = [
-                'pinjamans' => $loansCollection,
+                'pinjamans' => $loansLean,
                 'stats' => $stats,
                 'critical90DaysStats' => $critical90DaysStats,
                 'productDistribution' => $productDistribution,
@@ -703,31 +704,31 @@ class LoanReportExportService
                     'defaultMediaType' => 'screen',
                     'isFontSubsettingEnabled' => true,
                     'defaultPaperOrientation' => 'portrait',
+                    'dpi' => 72,
                 ]);
 
-            // Final 100% progress (jaga-jaga jika belum persis 100)
             $this->reportProgress($total, $total);
+            $this->logMemoryUsage('loan_chunk_end');
             return $pdf;
         } catch (\Exception $e) {
             Log::error('Chunked loan PDF generation failed', [
                 'error' => $e->getMessage(),
                 'productFilter' => $productFilter,
                 'dateRange' => $dateRange,
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
             ]);
             throw $e;
         }
     }
 
     /**
-     * Versi chunked untuk export transaction report.
+     * Versi chunked untuk export transaction report dengan lean array.
      */
-    public function exportTransactionReportChunked(?string $productFilter = null, array $dateRange = [], int $chunkSize = 500): \Barryvdh\DomPDF\PDF
+    public function exportTransactionReportChunked(?string $productFilter = null, array $dateRange = [], int $chunkSize = 500, int $memoryLimitMB = 512): \Barryvdh\DomPDF\PDF
     {
+        $this->setMemoryLimit($memoryLimitMB);
+        $this->logMemoryUsage('trx_chunk_start');
         try {
             $service = new LoanReportService($productFilter, $dateRange);
-
             $query = TransaksiPinjaman::query()
                 ->with(['pinjaman.profile.user', 'pinjaman.produkPinjaman'])
                 ->whereHas('pinjaman', function ($q) use ($productFilter) {
@@ -742,28 +743,30 @@ class LoanReportExportService
 
             $total = (clone $query)->count();
             $processed = 0;
-            $transactionsCollection = collect();
+            $trxLean = [];
 
-            $query->chunkById($chunkSize, function ($chunk) use (&$processed, $total, &$transactionsCollection) {
+            $query->chunkById($chunkSize, function ($chunk) use (&$processed, $total, &$trxLean) {
                 foreach ($chunk as $trx) {
-                    $transactionsCollection->push($this->deepCleanObject($trx));
+                    $trxLean[] = $this->leanSanitizeModel($trx);
                 }
                 $processed += $chunk->count();
                 $this->reportProgress($processed, $total);
+                unset($chunk);
+                if ($processed % (1000) === 0) { gc_collect_cycles(); $this->logMemoryUsage('trx_chunk_'.$processed); }
             });
 
             $stats = $this->cleanArrayData($service->getLoanStats());
 
             $data = [
-                'transactions' => $transactionsCollection,
+                'transactions' => $trxLean,
                 'stats' => $stats,
                 'dateRange' => $dateRange,
                 'productName' => $this->sanitizeString($productFilter ? ProdukPinjaman::find($productFilter)?->nama_produk : 'Semua Produk'),
                 'generatedAt' => Carbon::now()->format('d M Y H:i'),
                 'periode' => $this->formatDateRangeDisplay($dateRange),
                 'tanggal_cetak' => Carbon::now()->format('d/m/Y'),
-                'totalTransactions' => $transactionsCollection->count(),
-                'totalAmount' => $transactionsCollection->sum('total_pembayaran'),
+                'totalTransactions' => count($trxLean),
+                'totalAmount' => array_sum(array_column($trxLean, 'total_pembayaran')),
             ];
 
             $pdf = Pdf::loadView('reports.laporan-transaksi-pinjaman', $data)
@@ -777,19 +780,82 @@ class LoanReportExportService
                     'defaultMediaType' => 'screen',
                     'isFontSubsettingEnabled' => true,
                     'defaultPaperOrientation' => 'portrait',
+                    'dpi' => 72,
                 ]);
 
             $this->reportProgress($total, $total);
+            $this->logMemoryUsage('trx_chunk_end');
             return $pdf;
         } catch (\Exception $e) {
             Log::error('Chunked transaction PDF generation failed', [
                 'error' => $e->getMessage(),
                 'productFilter' => $productFilter,
                 'dateRange' => $dateRange,
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Set / adjust memory limit & execution time for heavy export.
+     */
+    private function setMemoryLimit(int $memoryLimitMB = 512): void
+    {
+        try {
+            $current = ini_get('memory_limit');
+            $desired = $memoryLimitMB . 'M';
+            if ($current !== '-1') {
+                @ini_set('memory_limit', $desired);
+            }
+            @set_time_limit(0);
+        } catch (\Throwable $e) {
+            Log::warning('Cannot adjust memory/time limit: '.$e->getMessage());
+        }
+    }
+
+    /**
+     * Simple memory logger (debug only).
+     */
+    private function logMemoryUsage(string $label): void
+    {
+        Log::debug('MemoryUsage', [
+            'label' => $label,
+            'usage_mb' => round(memory_get_usage(true)/1048576,2),
+            'peak_mb' => round(memory_get_peak_usage(true)/1048576,2)
+        ]);
+    }
+
+    /**
+     * Convert Model (and minimal relations) to lean sanitized array to reduce memory.
+     */
+    private function leanSanitizeModel(\Illuminate\Database\Eloquent\Model $model): array
+    {
+        $data = [];
+        foreach ($model->getAttributes() as $k => $v) {
+            if (is_string($v)) {
+                $data[$k] = $this->sanitizeString($v);
+            } else {
+                // keep only scalar / numeric / null
+                if (is_scalar($v) || is_null($v)) {
+                    $data[$k] = $v;
+                } else {
+                    $data[$k] = (string) $v; // fallback cast
+                }
+            }
+        }
+        // Minimal common relation fields (id + name-like) without loading extra if already loaded
+        foreach ($model->getRelations() as $relName => $relVal) {
+            if ($relVal instanceof \Illuminate\Database\Eloquent\Model) {
+                $relArr = ['id' => $relVal->getAttribute('id')];
+                foreach (['name','nama','nama_lengkap','full_name'] as $cand) {
+                    if ($relVal->getAttribute($cand)) { $relArr[$cand] = $this->sanitizeString((string)$relVal->getAttribute($cand)); }
+                }
+                $data[$relName] = $relArr;
+            } elseif ($relVal instanceof \Illuminate\Support\Collection) {
+                // keep only ids to minimize
+                $data[$relName] = $relVal->pluck('id')->filter()->values()->all();
+            }
+        }
+        return $data;
     }
 }
