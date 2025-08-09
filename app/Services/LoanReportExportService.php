@@ -10,7 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class LoanReportExportService
-{    public function exportLoanReport(?string $productFilter = null, array $dateRange = []): \Barryvdh\DomPDF\PDF
+{    
+    public function exportLoanReport(?string $productFilter = null, array $dateRange = []): \Barryvdh\DomPDF\PDF
     {
         try {
             $service = new LoanReportService($productFilter, $dateRange);
@@ -614,5 +615,181 @@ class LoanReportExportService
         }
 
         return 0;
+    }
+
+    /**
+     * Optional progress callback. Signature: function(int $processed, int $total, float $percent)
+     * Dapat di-set dari controller / job untuk update progress bar (misal simpan ke cache / broadcast event).
+     */
+    protected $progressCallback = null;
+
+    /**
+     * Set a progress callback used during chunked processing.
+     */
+    public function setProgressCallback(callable $callback): self
+    {
+        $this->progressCallback = $callback;
+        return $this;
+    }
+
+    /**
+     * Helper to invoke progress callback safely.
+     */
+    private function reportProgress(int $processed, int $total): void
+    {
+        if ($this->progressCallback && $total > 0) {
+            $percent = round(($processed / $total) * 100, 2);
+            try {
+                call_user_func($this->progressCallback, $processed, $total, $percent);
+            } catch (\Throwable $e) {
+                Log::warning('Progress callback error: ' . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Versi chunked untuk export loan report (hemat memory).
+     * Gunakan ketika data sangat besar. Progress bisa diterima via callback.
+     *
+     * Contoh penggunaan di controller:
+     * $service = (new LoanReportExportService())
+     *              ->setProgressCallback(function($done,$total,$percent){ Cache::put('loan_report_progress', compact('done','total','percent')); });
+     * $pdf = $service->exportLoanReportChunked($productId, $dateRange, 500);
+     */
+    public function exportLoanReportChunked(?string $productFilter = null, array $dateRange = [], int $chunkSize = 500): \Barryvdh\DomPDF\PDF
+    {
+        try {
+            $service = new LoanReportService($productFilter, $dateRange);
+
+            $baseQuery = $service->getApprovedLoansQuery();
+            // Pastikan order by id untuk chunkById
+            $baseQuery->orderBy('id');
+
+            $total = (clone $baseQuery)->count();
+            $processed = 0;
+            $loansCollection = collect();
+
+            $baseQuery->chunkById($chunkSize, function ($chunk) use (&$processed, $total, &$loansCollection) {
+                foreach ($chunk as $loan) {
+                    $loansCollection->push($this->deepCleanObject($loan));
+                }
+                $processed += $chunk->count();
+                $this->reportProgress($processed, $total);
+            });
+
+            $stats = $this->cleanArrayData($service->getLoanStats());
+            $critical90DaysStats = $this->cleanArrayData($this->getCritical90DaysStats());
+            $productDistribution = $this->cleanArrayData($service->getProductDistribution());
+
+            $data = [
+                'pinjamans' => $loansCollection,
+                'stats' => $stats,
+                'critical90DaysStats' => $critical90DaysStats,
+                'productDistribution' => $productDistribution,
+                'dateRange' => $dateRange,
+                'productName' => $this->sanitizeString($productFilter ? ProdukPinjaman::find($productFilter)?->nama_produk : 'Semua Produk'),
+                'generatedAt' => Carbon::now()->format('d M Y H:i'),
+                'periode' => $this->formatDateRangeDisplay($dateRange),
+            ];
+
+            $pdf = Pdf::loadView('reports.laporan-pinjaman', $data)
+                ->setPaper('A4', 'portrait')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans',
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'isPhpEnabled' => false,
+                    'chroot' => public_path(),
+                    'defaultMediaType' => 'screen',
+                    'isFontSubsettingEnabled' => true,
+                    'defaultPaperOrientation' => 'portrait',
+                ]);
+
+            // Final 100% progress (jaga-jaga jika belum persis 100)
+            $this->reportProgress($total, $total);
+            return $pdf;
+        } catch (\Exception $e) {
+            Log::error('Chunked loan PDF generation failed', [
+                'error' => $e->getMessage(),
+                'productFilter' => $productFilter,
+                'dateRange' => $dateRange,
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Versi chunked untuk export transaction report.
+     */
+    public function exportTransactionReportChunked(?string $productFilter = null, array $dateRange = [], int $chunkSize = 500): \Barryvdh\DomPDF\PDF
+    {
+        try {
+            $service = new LoanReportService($productFilter, $dateRange);
+
+            $query = TransaksiPinjaman::query()
+                ->with(['pinjaman.profile.user', 'pinjaman.produkPinjaman'])
+                ->whereHas('pinjaman', function ($q) use ($productFilter) {
+                    $q->where('status_pinjaman', LoanReportService::STATUS_APPROVED)
+                      ->when($productFilter, fn($query) => $query->where('produk_pinjaman_id', $productFilter));
+                })
+                ->when($dateRange, function ($query) use ($dateRange) {
+                    $query->whereDate('tanggal_pembayaran', '>=', $dateRange['start'])
+                          ->whereDate('tanggal_pembayaran', '<=', $dateRange['end']);
+                })
+                ->orderBy('id');
+
+            $total = (clone $query)->count();
+            $processed = 0;
+            $transactionsCollection = collect();
+
+            $query->chunkById($chunkSize, function ($chunk) use (&$processed, $total, &$transactionsCollection) {
+                foreach ($chunk as $trx) {
+                    $transactionsCollection->push($this->deepCleanObject($trx));
+                }
+                $processed += $chunk->count();
+                $this->reportProgress($processed, $total);
+            });
+
+            $stats = $this->cleanArrayData($service->getLoanStats());
+
+            $data = [
+                'transactions' => $transactionsCollection,
+                'stats' => $stats,
+                'dateRange' => $dateRange,
+                'productName' => $this->sanitizeString($productFilter ? ProdukPinjaman::find($productFilter)?->nama_produk : 'Semua Produk'),
+                'generatedAt' => Carbon::now()->format('d M Y H:i'),
+                'periode' => $this->formatDateRangeDisplay($dateRange),
+                'tanggal_cetak' => Carbon::now()->format('d/m/Y'),
+                'totalTransactions' => $transactionsCollection->count(),
+                'totalAmount' => $transactionsCollection->sum('total_pembayaran'),
+            ];
+
+            $pdf = Pdf::loadView('reports.laporan-transaksi-pinjaman', $data)
+                ->setPaper('A4', 'portrait')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans',
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'isPhpEnabled' => false,
+                    'chroot' => public_path(),
+                    'defaultMediaType' => 'screen',
+                    'isFontSubsettingEnabled' => true,
+                    'defaultPaperOrientation' => 'portrait',
+                ]);
+
+            $this->reportProgress($total, $total);
+            return $pdf;
+        } catch (\Exception $e) {
+            Log::error('Chunked transaction PDF generation failed', [
+                'error' => $e->getMessage(),
+                'productFilter' => $productFilter,
+                'dateRange' => $dateRange,
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+            throw $e;
+        }
     }
 }
