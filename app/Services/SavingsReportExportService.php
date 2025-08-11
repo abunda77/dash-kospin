@@ -9,6 +9,7 @@ use App\Helpers\PdfHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SavingsReportExportService
 {
@@ -51,312 +52,190 @@ class SavingsReportExportService
 
     public function generateSavingsReportFile($productFilter, array $dateRange, string $filename): string
     {
-        $service = new SavingsReportService($productFilter, $dateRange);
-        $stats = $service->getSavingsStats();
-        $savingsData = $service->getActiveSavingsQuery()->get();
+        try {
+            $service = new SavingsReportService($productFilter, $dateRange);
+            $stats = $service->getSavingsStats();
+            $savingsData = $service->getActiveSavingsQuery()->get();
 
-        $html = $this->generateSavingsReportHtml($stats, $savingsData, $dateRange, $productFilter);
+            // Pre-clean all data to ensure UTF-8 compatibility
+            $cleanedSavingsData = $this->cleanDataForPdf($savingsData);
+            $cleanedStats = $this->cleanArrayData($stats);
 
-        return PdfHelper::generatePdf($html, $filename);
+            $data = [
+                'savingsData' => $cleanedSavingsData,
+                'stats' => $cleanedStats,
+                'dateRange' => $dateRange,
+                'productName' => $this->sanitizeString($productFilter ? ProdukTabungan::find($productFilter)?->nama_produk : 'Semua Produk'),
+                'generatedAt' => Carbon::now()->format('d M Y H:i:s'),
+                'periode' => $this->formatDateRangeDisplay($dateRange),
+            ];
+
+            $pdf = Pdf::loadView('reports.laporan-tabungan', $data)
+                ->setPaper('A4', 'portrait')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans',
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'isPhpEnabled' => false,
+                    'chroot' => public_path(),
+                    'defaultMediaType' => 'screen',
+                    'isFontSubsettingEnabled' => true,
+                    'dpi' => 96,
+                ]);
+
+            $tempDir = storage_path('app/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $filepath = $tempDir . '/' . $filename;
+            file_put_contents($filepath, $pdf->output());
+
+            // Clean up old files (older than 1 hour)
+            $this->cleanupOldTempFiles($tempDir);
+
+            return $filepath;
+        } catch (\Exception $e) {
+            Log::error('Savings report generation failed', [
+                'error' => $e->getMessage(),
+                'productFilter' => $productFilter,
+                'dateRange' => $dateRange,
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+            throw $e;
+        }
     }
 
     public function generateTransactionReportFile($productFilter, array $dateRange, string $filename): string
     {
-        $service = new SavingsReportService($productFilter, $dateRange);
+        try {
+            $service = new SavingsReportService($productFilter, $dateRange);
 
-        // Get transaction data
-        $transaksiQuery = TransaksiTabungan::query()
-            ->with(['tabungan.profile.user', 'tabungan.produkTabungan', 'admin'])
-            ->whereHas('tabungan', function ($q) use ($productFilter) {
-                $q->where('status_rekening', 'aktif');
-                if ($productFilter) {
-                    $q->where('produk_tabungan', $productFilter);
-                }
-            });
+            // Get transaction data
+            $transaksiQuery = TransaksiTabungan::query()
+                ->with(['tabungan.profile.user', 'tabungan.produkTabungan', 'admin'])
+                ->whereHas('tabungan', function ($q) use ($productFilter) {
+                    $q->where('status_rekening', 'aktif');
+                    if ($productFilter) {
+                        $q->where('produk_tabungan', $productFilter);
+                    }
+                });
 
-        if (!empty($dateRange['start_date']) && !empty($dateRange['end_date'])) {
-            $transaksiQuery->whereBetween('tanggal_transaksi', [
-                $dateRange['start_date'],
-                $dateRange['end_date']
+            if (!empty($dateRange['start_date']) && !empty($dateRange['end_date'])) {
+                $transaksiQuery->whereBetween('tanggal_transaksi', [
+                    $dateRange['start_date'],
+                    $dateRange['end_date']
+                ]);
+            }
+
+            $transactionData = $transaksiQuery->orderBy('tanggal_transaksi', 'desc')->get();
+            $stats = $service->getSavingsStats();
+
+            // Pre-clean all data to ensure UTF-8 compatibility
+            $cleanedTransactionData = $this->cleanDataForPdf($transactionData);
+            $cleanedStats = $this->cleanArrayData($stats);
+
+            $data = [
+                'transactionData' => $cleanedTransactionData,
+                'stats' => $cleanedStats,
+                'dateRange' => $dateRange,
+                'productName' => $this->sanitizeString($productFilter ? ProdukTabungan::find($productFilter)?->nama_produk : 'Semua Produk'),
+                'generatedAt' => Carbon::now()->format('d M Y H:i:s'),
+                'periode' => $this->formatDateRangeDisplay($dateRange),
+            ];
+
+            $pdf = Pdf::loadView('reports.laporan-transaksi-tabungan', $data)
+                ->setPaper('A4', 'landscape')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans',
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'isPhpEnabled' => false,
+                    'chroot' => public_path(),
+                    'defaultMediaType' => 'screen',
+                    'isFontSubsettingEnabled' => true,
+                    'dpi' => 96,
+                ]);
+
+            $tempDir = storage_path('app/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $filepath = $tempDir . '/' . $filename;
+            file_put_contents($filepath, $pdf->output());
+
+            // Clean up old files (older than 1 hour)
+            $this->cleanupOldTempFiles($tempDir);
+
+            return $filepath;
+        } catch (\Exception $e) {
+            Log::error('Transaction report generation failed', [
+                'error' => $e->getMessage(),
+                'productFilter' => $productFilter,
+                'dateRange' => $dateRange,
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
             ]);
+            throw $e;
         }
-
-        $transactionData = $transaksiQuery->orderBy('tanggal_transaksi', 'desc')->get();
-        $stats = $service->getSavingsStats();
-
-        $html = $this->generateTransactionReportHtml($stats, $transactionData, $dateRange, $productFilter);
-
-        return PdfHelper::generatePdf($html, $filename);
     }
 
     public function exportBulkSavingsReport(Collection $records): string
     {
-        $filename = 'bulk-savings-report-' . Carbon::now()->format('Y-m-d-H-i-s') . '.pdf';
-        $html = $this->generateBulkSavingsReportHtml($records);
+        try {
+            $filename = 'bulk-savings-report-' . Carbon::now()->format('Y-m-d-H-i-s') . '.pdf';
 
-        return PdfHelper::generatePdf($html, $filename);
-    }
+            // Pre-clean all data to ensure UTF-8 compatibility
+            $cleanedRecords = $this->cleanDataForPdf($records);
 
-    private function generateSavingsReportHtml(array $stats, Collection $savingsData, array $dateRange, $productFilter): string
-    {
-        $startDate = Carbon::parse($dateRange['start_date'])->format('d M Y');
-        $endDate = Carbon::parse($dateRange['end_date'])->format('d M Y');
-        $productName = $productFilter ? \App\Models\ProdukTabungan::find($productFilter)?->nama_produk : 'Semua Produk';
+            $data = [
+                'records' => $cleanedRecords,
+                'generatedAt' => Carbon::now()->format('d M Y H:i:s'),
+            ];
 
-        $html = '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Laporan Tabungan</title>
-            <style>
-                body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
-                .header { text-align: center; margin-bottom: 30px; }
-                .header h1 { margin: 0; font-size: 18px; }
-                .header p { margin: 5px 0; color: #666; }
-                .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
-                .stat-card { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
-                .stat-value { font-size: 16px; font-weight: bold; color: #2563eb; }
-                .stat-label { color: #666; margin-top: 5px; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f8f9fa; font-weight: bold; }
-                .text-right { text-align: right; }
-                .footer { margin-top: 30px; text-align: center; color: #666; font-size: 10px; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>LAPORAN TABUNGAN</h1>
-                <p>Periode: ' . $startDate . ' - ' . $endDate . '</p>
-                <p>Produk: ' . $productName . '</p>
-                <p>Dicetak pada: ' . Carbon::now()->format('d M Y H:i:s') . '</p>
-            </div>
+            $pdf = Pdf::loadView('reports.laporan-tabungan-bulk', $data)
+                ->setPaper('A4', 'portrait')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans',
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'isPhpEnabled' => false,
+                    'chroot' => public_path(),
+                    'defaultMediaType' => 'screen',
+                    'isFontSubsettingEnabled' => true,
+                    'dpi' => 96,
+                ]);
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">' . number_format($stats['total_accounts']) . '</div>
-                    <div class="stat-label">Total Rekening Aktif</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['total_balance'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Total Saldo</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['avg_balance'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Rata-rata Saldo</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">' . number_format($stats['transaction_count']) . '</div>
-                    <div class="stat-label">Total Transaksi</div>
-                </div>
-            </div>
+            $tempDir = storage_path('app/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>No. Tabungan</th>
-                        <th>Nama Nasabah</th>
-                        <th>Produk</th>
-                        <th>Saldo</th>
-                        <th>Tanggal Buka</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>';
+            $filepath = $tempDir . '/' . $filename;
+            file_put_contents($filepath, $pdf->output());
 
-        foreach ($savingsData as $tabungan) {
-            $html .= '
-                    <tr>
-                        <td>' . $tabungan->no_tabungan . '</td>
-                        <td>' . ($tabungan->profile?->user?->name ?? 'N/A') . '</td>
-                        <td>' . ($tabungan->produkTabungan?->nama_produk ?? 'N/A') . '</td>
-                        <td class="text-right">Rp ' . number_format($tabungan->saldo, 0, ',', '.') . '</td>
-                        <td>' . Carbon::parse($tabungan->tanggal_buka_rekening)->format('d M Y') . '</td>
-                        <td>' . ucfirst($tabungan->status_rekening) . '</td>
-                    </tr>';
+            // Clean up old files (older than 1 hour)
+            $this->cleanupOldTempFiles($tempDir);
+
+            return $filepath;
+        } catch (\Exception $e) {
+            Log::error('Bulk savings report generation failed', [
+                'error' => $e->getMessage(),
+                'record_count' => $records->count(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+            throw $e;
         }
-
-        $html .= '
-                </tbody>
-            </table>
-
-            <div class="footer">
-                <p>Laporan ini digenerate secara otomatis oleh sistem</p>
-            </div>
-        </body>
-        </html>';
-
-        return $html;
     }
 
-    private function generateTransactionReportHtml(array $stats, Collection $transactionData, array $dateRange, $productFilter): string
-    {
-        $startDate = Carbon::parse($dateRange['start_date'])->format('d M Y');
-        $endDate = Carbon::parse($dateRange['end_date'])->format('d M Y');
-        $productName = $productFilter ? \App\Models\ProdukTabungan::find($productFilter)?->nama_produk : 'Semua Produk';
 
-        $html = '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Laporan Transaksi Tabungan</title>
-            <style>
-                body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
-                .header { text-align: center; margin-bottom: 30px; }
-                .header h1 { margin: 0; font-size: 18px; }
-                .header p { margin: 5px 0; color: #666; }
-                .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-                .stat-card { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
-                .stat-value { font-size: 16px; font-weight: bold; color: #2563eb; }
-                .stat-label { color: #666; margin-top: 5px; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
-                th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-                th { background-color: #f8f9fa; font-weight: bold; }
-                .text-right { text-align: right; }
-                .text-center { text-align: center; }
-                .debit { color: #10b981; }
-                .kredit { color: #f59e0b; }
-                .footer { margin-top: 30px; text-align: center; color: #666; font-size: 10px; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>LAPORAN TRANSAKSI TABUNGAN</h1>
-                <p>Periode: ' . $startDate . ' - ' . $endDate . '</p>
-                <p>Produk: ' . $productName . '</p>
-                <p>Dicetak pada: ' . Carbon::now()->format('d M Y H:i:s') . '</p>
-            </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['total_deposits'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Total Setoran (' . number_format($stats['deposit_count']) . ' transaksi)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['total_withdrawals'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Total Penarikan (' . number_format($stats['withdrawal_count']) . ' transaksi)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['total_deposits'] - $stats['total_withdrawals'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Net Flow</div>
-                </div>
-            </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>No. Tabungan</th>
-                        <th>Nasabah</th>
-                        <th>Jenis</th>
-                        <th>Jumlah</th>
-                        <th>Keterangan</th>
-                        <th>Teller</th>
-                    </tr>
-                </thead>
-                <tbody>';
 
-        foreach ($transactionData as $transaksi) {
-            $jenisClass = $transaksi->jenis_transaksi === TransaksiTabungan::JENIS_SETORAN ? 'debit' : 'kredit';
-            $jenisText = $transaksi->jenis_transaksi === TransaksiTabungan::JENIS_SETORAN ? 'Setoran' : 'Penarikan';
 
-            $html .= '
-                    <tr>
-                        <td>' . Carbon::parse($transaksi->tanggal_transaksi)->format('d M Y H:i') . '</td>
-                        <td>' . $transaksi->tabungan->no_tabungan . '</td>
-                        <td>' . ($transaksi->tabungan->profile?->user?->name ?? 'N/A') . '</td>
-                        <td class="' . $jenisClass . '">' . $jenisText . '</td>
-                        <td class="text-right">Rp ' . number_format($transaksi->jumlah, 0, ',', '.') . '</td>
-                        <td>' . ($transaksi->keterangan ?? '-') . '</td>
-                        <td>' . ($transaksi->admin?->name ?? 'N/A') . '</td>
-                    </tr>';
-        }
-
-        $html .= '
-                </tbody>
-            </table>
-
-            <div class="footer">
-                <p>Laporan ini digenerate secara otomatis oleh sistem</p>
-            </div>
-        </body>
-        </html>';
-
-        return $html;
-    }
-
-    private function generateBulkSavingsReportHtml(Collection $records): string
-    {
-        $html = '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Laporan Tabungan Terpilih</title>
-            <style>
-                body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
-                .header { text-align: center; margin-bottom: 30px; }
-                .header h1 { margin: 0; font-size: 18px; }
-                .header p { margin: 5px 0; color: #666; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f8f9fa; font-weight: bold; }
-                .text-right { text-align: right; }
-                .footer { margin-top: 30px; text-align: center; color: #666; font-size: 10px; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>LAPORAN TABUNGAN TERPILIH</h1>
-                <p>Total Rekening: ' . $records->count() . '</p>
-                <p>Dicetak pada: ' . Carbon::now()->format('d M Y H:i:s') . '</p>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>No. Tabungan</th>
-                        <th>Nama Nasabah</th>
-                        <th>Produk</th>
-                        <th>Saldo</th>
-                        <th>Tanggal Buka</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>';
-
-        foreach ($records as $tabungan) {
-            $html .= '
-                    <tr>
-                        <td>' . $tabungan->no_tabungan . '</td>
-                        <td>' . ($tabungan->profile?->user?->name ?? 'N/A') . '</td>
-                        <td>' . ($tabungan->produkTabungan?->nama_produk ?? 'N/A') . '</td>
-                        <td class="text-right">Rp ' . number_format($tabungan->saldo, 0, ',', '.') . '</td>
-                        <td>' . Carbon::parse($tabungan->tanggal_buka_rekening)->format('d M Y') . '</td>
-                        <td>' . ucfirst($tabungan->status_rekening) . '</td>
-                    </tr>';
-        }
-
-        $totalSaldo = $records->sum('saldo');
-        $html .= '
-                    <tr style="background-color: #f8f9fa; font-weight: bold;">
-                        <td colspan="3">TOTAL</td>
-                        <td class="text-right">Rp ' . number_format($totalSaldo, 0, ',', '.') . '</td>
-                        <td colspan="2"></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="footer">
-                <p>Laporan ini digenerate secara otomatis oleh sistem</p>
-            </div>
-        </body>
-        </html>';
-
-        return $html;
-    }
     /**
      * Versi chunked untuk generate savings report (hemat memory).
      * Gunakan ketika data sangat besar. Progress bisa diterima via callback.
@@ -394,12 +273,43 @@ class SavingsReportExportService
 
             $stats = $this->cleanArrayData($service->getSavingsStats());
 
-            $html = $this->generateSavingsReportHtmlFromLean($stats, $savingsLean, $dateRange, $productFilter);
+            $data = [
+                'savingsData' => $savingsLean,
+                'stats' => $stats,
+                'dateRange' => $dateRange,
+                'productName' => $this->sanitizeString($productFilter ? ProdukTabungan::find($productFilter)?->nama_produk : 'Semua Produk'),
+                'generatedAt' => Carbon::now()->format('d M Y H:i:s'),
+                'periode' => $this->formatDateRangeDisplay($dateRange),
+            ];
+
+            $pdf = Pdf::loadView('reports.laporan-tabungan', $data)
+                ->setPaper('A4', 'portrait')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans',
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'isPhpEnabled' => false,
+                    'chroot' => public_path(),
+                    'defaultMediaType' => 'screen',
+                    'isFontSubsettingEnabled' => true,
+                    'dpi' => 96,
+                ]);
+
+            $tempDir = storage_path('app/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $filepath = $tempDir . '/' . $filename;
+            file_put_contents($filepath, $pdf->output());
+
+            // Clean up old files (older than 1 hour)
+            $this->cleanupOldTempFiles($tempDir);
 
             $this->reportProgress($total, $total);
             $this->logMemoryUsage('savings_chunk_end');
 
-            return PdfHelper::generatePdf($html, $filename);
+            return $filepath;
         } catch (\Exception $e) {
             Log::error('Chunked savings report generation failed', [
                 'error' => $e->getMessage(),
@@ -458,12 +368,43 @@ class SavingsReportExportService
 
             $stats = $this->cleanArrayData($service->getSavingsStats());
 
-            $html = $this->generateTransactionReportHtmlFromLean($stats, $transactionsLean, $dateRange, $productFilter);
+            $data = [
+                'transactionData' => $transactionsLean,
+                'stats' => $stats,
+                'dateRange' => $dateRange,
+                'productName' => $this->sanitizeString($productFilter ? ProdukTabungan::find($productFilter)?->nama_produk : 'Semua Produk'),
+                'generatedAt' => Carbon::now()->format('d M Y H:i:s'),
+                'periode' => $this->formatDateRangeDisplay($dateRange),
+            ];
+
+            $pdf = Pdf::loadView('reports.laporan-transaksi-tabungan', $data)
+                ->setPaper('A4', 'landscape')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans',
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => false,
+                    'isPhpEnabled' => false,
+                    'chroot' => public_path(),
+                    'defaultMediaType' => 'screen',
+                    'isFontSubsettingEnabled' => true,
+                    'dpi' => 96,
+                ]);
+
+            $tempDir = storage_path('app/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $filepath = $tempDir . '/' . $filename;
+            file_put_contents($filepath, $pdf->output());
+
+            // Clean up old files (older than 1 hour)
+            $this->cleanupOldTempFiles($tempDir);
 
             $this->reportProgress($total, $total);
             $this->logMemoryUsage('trx_savings_chunk_end');
 
-            return PdfHelper::generatePdf($html, $filename);
+            return $filepath;
         } catch (\Exception $e) {
             Log::error('Chunked transaction report generation failed', [
                 'error' => $e->getMessage(),
@@ -639,202 +580,114 @@ class SavingsReportExportService
         return trim($string) ?: '';
     }
 
+
+
+
+
     /**
-     * Generate savings report HTML from lean array data
+     * Format date range for display in reports
      */
-    private function generateSavingsReportHtmlFromLean(array $stats, array $savingsLean, array $dateRange, $productFilter): string
+    private function formatDateRangeDisplay(array $dateRange): string
     {
-        $startDate = Carbon::parse($dateRange['start_date'])->format('d M Y');
-        $endDate = Carbon::parse($dateRange['end_date'])->format('d M Y');
-        $productName = $productFilter ? ProdukTabungan::find($productFilter)?->nama_produk : 'Semua Produk';
-
-        $html = '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Laporan Tabungan</title>
-            <style>
-                body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
-                .header { text-align: center; margin-bottom: 30px; }
-                .header h1 { margin: 0; font-size: 18px; }
-                .header p { margin: 5px 0; color: #666; }
-                .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
-                .stat-card { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
-                .stat-value { font-size: 16px; font-weight: bold; color: #2563eb; }
-                .stat-label { color: #666; margin-top: 5px; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                th { background-color: #f8f9fa; font-weight: bold; }
-                .text-right { text-align: right; }
-                .footer { margin-top: 30px; text-align: center; color: #666; font-size: 10px; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>LAPORAN TABUNGAN</h1>
-                <p>Periode: ' . $startDate . ' - ' . $endDate . '</p>
-                <p>Produk: ' . $productName . '</p>
-                <p>Dicetak pada: ' . Carbon::now()->format('d M Y H:i:s') . '</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">' . number_format($stats['total_accounts']) . '</div>
-                    <div class="stat-label">Total Rekening Aktif</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['total_balance'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Total Saldo</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['avg_balance'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Rata-rata Saldo</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">' . number_format($stats['transaction_count']) . '</div>
-                    <div class="stat-label">Total Transaksi</div>
-                </div>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>No. Tabungan</th>
-                        <th>Nama Nasabah</th>
-                        <th>Produk</th>
-                        <th>Saldo</th>
-                        <th>Tanggal Buka</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>';
-
-        foreach ($savingsLean as $tabungan) {
-            $userName = $tabungan['user_name'] ?? ($tabungan['profile']['nama'] ?? 'N/A');
-            $produkNama = $tabungan['produkTabungan']['nama_produk'] ?? 'N/A';
-
-            $html .= '
-                    <tr>
-                        <td>' . ($tabungan['no_tabungan'] ?? 'N/A') . '</td>
-                        <td>' . $userName . '</td>
-                        <td>' . $produkNama . '</td>
-                        <td class="text-right">Rp ' . number_format($tabungan['saldo'] ?? 0, 0, ',', '.') . '</td>
-                        <td>' . Carbon::parse($tabungan['tanggal_buka_rekening'])->format('d M Y') . '</td>
-                        <td>' . ucfirst($tabungan['status_rekening'] ?? 'N/A') . '</td>
-                    </tr>';
+        if (empty($dateRange) || !isset($dateRange['start_date']) || !isset($dateRange['end_date'])) {
+            return 'Semua Periode';
         }
 
-        $html .= '
-                </tbody>
-            </table>
+        $start = Carbon::parse($dateRange['start_date'])->format('d M Y');
+        $end = Carbon::parse($dateRange['end_date'])->format('d M Y');
 
-            <div class="footer">
-                <p>Laporan ini digenerate secara otomatis oleh sistem</p>
-            </div>
-        </body>
-        </html>';
+        if ($start === $end) {
+            return $start;
+        }
 
-        return $html;
+        return $start . ' - ' . $end;
     }
 
     /**
-     * Generate transaction report HTML from lean array data
+     * Clean and sanitize data for PDF generation
+     * Preserves object structure while cleaning string properties
      */
-    private function generateTransactionReportHtmlFromLean(array $stats, array $transactionsLean, array $dateRange, $productFilter): string
+    private function cleanDataForPdf($data)
     {
-        $startDate = Carbon::parse($dateRange['start_date'])->format('d M Y');
-        $endDate = Carbon::parse($dateRange['end_date'])->format('d M Y');
-        $productName = $productFilter ? ProdukTabungan::find($productFilter)?->nama_produk : 'Semua Produk';
-
-        $html = '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Laporan Transaksi Tabungan</title>
-            <style>
-                body { font-family: Arial, sans-serif; font-size: 12px; margin: 20px; }
-                .header { text-align: center; margin-bottom: 30px; }
-                .header h1 { margin: 0; font-size: 18px; }
-                .header p { margin: 5px 0; color: #666; }
-                .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
-                .stat-card { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
-                .stat-value { font-size: 16px; font-weight: bold; color: #2563eb; }
-                .stat-label { color: #666; margin-top: 5px; }
-                table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 11px; }
-                th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-                th { background-color: #f8f9fa; font-weight: bold; }
-                .text-right { text-align: right; }
-                .text-center { text-align: center; }
-                .debit { color: #10b981; }
-                .kredit { color: #f59e0b; }
-                .footer { margin-top: 30px; text-align: center; color: #666; font-size: 10px; }
-            </style>
-        </head>
-        <body>
-            <div class="header">
-                <h1>LAPORAN TRANSAKSI TABUNGAN</h1>
-                <p>Periode: ' . $startDate . ' - ' . $endDate . '</p>
-                <p>Produk: ' . $productName . '</p>
-                <p>Dicetak pada: ' . Carbon::now()->format('d M Y H:i:s') . '</p>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['total_deposits'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Total Setoran (' . number_format($stats['deposit_count']) . ' transaksi)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['total_withdrawals'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Total Penarikan (' . number_format($stats['withdrawal_count']) . ' transaksi)</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">Rp ' . number_format($stats['total_deposits'] - $stats['total_withdrawals'], 0, ',', '.') . '</div>
-                    <div class="stat-label">Net Flow</div>
-                </div>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>No. Tabungan</th>
-                        <th>Nasabah</th>
-                        <th>Jenis</th>
-                        <th>Jumlah</th>
-                        <th>Keterangan</th>
-                        <th>Teller</th>
-                    </tr>
-                </thead>
-                <tbody>';
-
-        foreach ($transactionsLean as $transaksi) {
-            $jenisClass = $transaksi['jenis_transaksi'] === TransaksiTabungan::JENIS_SETORAN ? 'debit' : 'kredit';
-            $jenisText = $transaksi['jenis_transaksi'] === TransaksiTabungan::JENIS_SETORAN ? 'Setoran' : 'Penarikan';
-            $userName = $transaksi['tabungan_user_name'] ?? ($transaksi['tabungan']['profile']['nama'] ?? 'N/A');
-            $adminName = $transaksi['admin']['name'] ?? 'N/A';
-
-            $html .= '
-                    <tr>
-                        <td>' . Carbon::parse($transaksi['tanggal_transaksi'])->format('d M Y H:i') . '</td>
-                        <td>' . ($transaksi['tabungan']['no_tabungan'] ?? 'N/A') . '</td>
-                        <td>' . $userName . '</td>
-                        <td class="' . $jenisClass . '">' . $jenisText . '</td>
-                        <td class="text-right">Rp ' . number_format($transaksi['jumlah'] ?? 0, 0, ',', '.') . '</td>
-                        <td>' . ($transaksi['keterangan'] ?? '-') . '</td>
-                        <td>' . $adminName . '</td>
-                    </tr>';
+        if ($data instanceof \Illuminate\Database\Eloquent\Collection || $data instanceof \Illuminate\Support\Collection) {
+            // For collections, map through and clean each item while preserving collection type
+            return $data->map(function ($item) {
+                return $this->deepCleanObject($item);
+            });
         }
 
-        $html .= '
-                </tbody>
-            </table>
+        if (is_object($data)) {
+            return $this->deepCleanObject($data);
+        }
 
-            <div class="footer">
-                <p>Laporan ini digenerate secara otomatis oleh sistem</p>
-            </div>
-        </body>';
-        return $html;
+        if (is_array($data)) {
+            return $this->cleanArrayData($data);
+        }
+
+        return $data;
+    }
+
+    /**
+     * Deep clean an object and all its relationships
+     */
+    private function deepCleanObject($object)
+    {
+        if (!is_object($object)) {
+            return $object;
+        }
+
+        if ($object instanceof \Illuminate\Database\Eloquent\Model) {
+            // Clean all attributes
+            $attributes = $object->getAttributes();
+            $cleanedAttributes = [];
+
+            foreach ($attributes as $key => $value) {
+                if (is_string($value)) {
+                    $cleanedAttributes[$key] = $this->sanitizeString($value);
+                } else {
+                    $cleanedAttributes[$key] = $value;
+                }
+            }
+
+            // Create new model instance with cleaned attributes
+            $cleanObject = $object->replicate();
+            $cleanObject->setRawAttributes($cleanedAttributes);
+
+            // Clean relationships recursively
+            foreach ($object->getRelations() as $relationName => $relationValue) {
+                if ($relationValue instanceof \Illuminate\Database\Eloquent\Collection) {
+                    $cleanedRelation = $relationValue->map(function ($item) {
+                        return $this->deepCleanObject($item);
+                    });
+                } else {
+                    $cleanedRelation = $this->deepCleanObject($relationValue);
+                }
+                $cleanObject->setRelation($relationName, $cleanedRelation);
+            }
+
+            return $cleanObject;
+        }
+
+        // For regular objects, return as-is to avoid issues
+        return $object;
+    }
+
+    /**
+     * Clean up temporary files older than specified time
+     */
+    private function cleanupOldTempFiles(string $directory, int $maxAgeHours = 1): void
+    {
+        try {
+            $files = glob($directory . '/*');
+            $cutoffTime = time() - ($maxAgeHours * 3600);
+
+            foreach ($files as $file) {
+                if (is_file($file) && filemtime($file) < $cutoffTime) {
+                    unlink($file);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning('Failed to cleanup temp files: ' . $e->getMessage());
+        }
     }
 }
