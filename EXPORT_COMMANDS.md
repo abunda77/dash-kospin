@@ -13,6 +13,9 @@ php artisan report:export-loan
 # Export savings report (all data)
 php artisan report:export-savings
 
+# Export deposit report (all data)
+php artisan report:export-deposit
+
 # Export transaction reports
 php artisan report:export-loan --type=transaction
 php artisan report:export-savings --type=transaction
@@ -20,14 +23,19 @@ php artisan report:export-savings --type=transaction
 # Export with date range
 php artisan report:export-loan --start-date=2024-01-01 --end-date=2024-12-31
 php artisan report:export-savings --start-date=2024-01-01 --end-date=2024-12-31
+php artisan report:export-deposit --start-date=2024-01-01 --end-date=2024-12-31
 
 # Export with product filter
 php artisan report:export-loan --product=1
 php artisan report:export-savings --product=1
 
+# Export with status/term filter
+php artisan report:export-deposit --status=active --jangka-waktu=12
+
 # Export to public storage with download link
 php artisan report:export-loan --public
 php artisan report:export-savings --public
+php artisan report:export-deposit --public
 ```
 
 ## 📊 Available Commands
@@ -100,7 +108,47 @@ php artisan report:export-savings --product=3 --public
 php artisan report:export-savings --chunk-size=500 --memory-limit=2048
 ```
 
-### 3. Check Export Progress (`report:check-progress`)
+### 3. Export Deposit Reports (`report:export-deposit`)
+
+**Syntax:**
+
+```bash
+php artisan report:export-deposit [options]
+```
+
+**Options:**
+
+-   `--status=STATUS` - Filter by status: `all`, `active`, `ended`, `cancelled` (default: `all`)
+-   `--jangka-waktu=TERM` - Filter by term: `all`, `1`, `3`, `6`, `12`, `24` (default: `all`)
+-   `--start-date=DATE` - Start date in Y-m-d format (e.g., 2024-01-01)
+-   `--end-date=DATE` - End date in Y-m-d format (e.g., 2024-12-31)
+-   `--chunk-size=SIZE` - Processing chunk size (default: 100)
+-   `--memory-limit=MB` - Memory limit in MB (default: 1024)
+-   `--public` - Save to public storage for web download
+
+**Examples:**
+
+```bash
+# Basic deposit report (current month)
+php artisan report:export-deposit
+
+# Active deposits only
+php artisan report:export-deposit --status=active
+
+# 12-month term deposits
+php artisan report:export-deposit --jangka-waktu=12
+
+# Deposit report with date range
+php artisan report:export-deposit --start-date=2024-01-01 --end-date=2024-03-31
+
+# Active 6-month deposits with public access
+php artisan report:export-deposit --status=active --jangka-waktu=6 --public
+
+# Large dataset with custom chunk size and memory limit
+php artisan report:export-deposit --chunk-size=500 --memory-limit=2048
+```
+
+### 4. Check Export Progress (`report:check-progress`)
 
 **Syntax:**
 
@@ -118,7 +166,7 @@ php artisan report:check-progress pdf_export_progress_abc123
 php artisan report:check-progress
 ```
 
-### 4. Cleanup Old Files (`report:cleanup`)
+### 5. Cleanup Old Files (`report:cleanup`)
 
 **Syntax:**
 
