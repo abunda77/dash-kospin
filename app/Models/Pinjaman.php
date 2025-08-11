@@ -40,7 +40,7 @@ class Pinjaman extends Model
 
     public function profile()
     {
-        return $this->belongsTo(Profile::class, 'profile_id');
+        return $this->belongsTo(Profile::class, 'profile_id', 'id_user');
     }
 
     public function produkPinjaman()
@@ -71,6 +71,11 @@ class Pinjaman extends Model
     public function kreditElektronik()
     {
         return $this->hasOne(KreditElektronik::class, 'pinjaman_id', 'id_pinjaman');
+    }
+
+    public function cicilanEmas()
+    {
+        return $this->hasMany(CicilanEmas::class, 'pinjaman_id', 'id_pinjaman');
     }
 
     public function getActivitylogOptions(): LogOptions

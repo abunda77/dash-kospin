@@ -71,6 +71,8 @@ class User extends Authenticatable
         return $this->hasMany(Profile::class, 'id_user');
     }
 
+
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

@@ -15,7 +15,6 @@ class CicilanEmas extends Model
     protected $primaryKey = 'id_cicilan_emas';
 
     protected $fillable = [
-        'user_id',
         'pinjaman_id',
         'no_transaksi',
         'berat_emas',
@@ -34,10 +33,7 @@ class CicilanEmas extends Model
 
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+
 
     public function pinjaman()
     {

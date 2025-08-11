@@ -62,6 +62,11 @@ class Profile extends Model
         return $this->hasMany(BirthdayLog::class, 'id_profile', 'id_user');
     }
 
+    public function pinjamans()
+    {
+        return $this->hasMany(Pinjaman::class, 'profile_id', 'id_user');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
