@@ -44,7 +44,7 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-4">
-                    <h3 class="text-lg font-semibold">Status Deposito</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Status Deposito</h3>
                     <div class="space-y-2">
                         @php
                             $statusCounts = $this->getBaseQuery()
@@ -54,9 +54,9 @@
                         @endphp
                         
                         @foreach(['active' => 'Aktif', 'ended' => 'Berakhir', 'cancelled' => 'Dibatalkan'] as $key => $label)
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span class="font-medium">{{ $label }}</span>
-                                <span class="text-sm text-gray-600">{{ $statusCounts[$key] ?? 0 }} deposito</span>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                                <span class="font-medium text-gray-900 dark:text-gray-100">{{ $label }}</span>
+                                <span class="text-sm text-gray-300 dark:text-gray-100">{{ $statusCounts[$key] ?? 0 }} deposito</span>
                             </div>
                         @endforeach
                     </div>
