@@ -52,6 +52,7 @@ class AdminPanelProvider extends PanelProvider
                 'Tabungan',
                 'Deposito',
                 'Pinjaman',
+                'Laporan',
                 'Settings'
             ])
             ->navigationItems([
