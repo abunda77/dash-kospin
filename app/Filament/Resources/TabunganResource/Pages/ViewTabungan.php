@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TabunganResource\Pages;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Infolists\Infolist;
 use App\Models\TransaksiTabungan;
@@ -63,7 +64,7 @@ class ViewTabungan extends ViewRecord
                 }),
 
             Action::make('print')
-                ->label('Cetak Formulir Pembukaan Rekening')
+                ->label('Cetak Formulir Pembukaan')
                 ->icon('heroicon-o-printer')
                 ->action(function () {
                     $pdf = Pdf::loadView('pdf.tabungan', [
@@ -77,53 +78,75 @@ class ViewTabungan extends ViewRecord
                     }, $filename);
                 }),
 
-            Action::make('printUmroh')
-                ->label('Cetak Form Tabungan Umroh')
-                ->icon('heroicon-o-printer')
-                ->color('danger')
-                ->action(function () {
-                    $pdf = Pdf::loadView('pdf.tabungan-umroh', [
-                        'tabungan' => $this->record
-                    ]);
+            ActionGroup::make([
+                Action::make('printUmroh')
+                    ->label('Tabungan Umroh')
+                    ->icon('heroicon-o-printer')
+                    ->color('danger')
+                    ->action(function () {
+                        $pdf = Pdf::loadView('pdf.tabungan-umroh', [
+                            'tabungan' => $this->record
+                        ]);
 
-                    $filename = 'rekening_umroh_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
+                        $filename = 'rekening_umroh_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
 
-                    return response()->streamDownload(function () use ($pdf) {
-                        echo $pdf->output();
-                    }, $filename);
-                }),
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->output();
+                        }, $filename);
+                    }),
 
-            Action::make('printLebaran')
-                ->label('Cetak Form Tabungan Lebaran')
-                ->icon('heroicon-o-printer')
-                ->color('info')
-                ->action(function () {
-                    $pdf = Pdf::loadView('pdf.tabungan-lebaran', [
-                        'tabungan' => $this->record
-                    ]);
+                Action::make('printLebaran')
+                    ->label('Tabungan Lebaran')
+                    ->icon('heroicon-o-printer')
+                    ->color('info')
+                    ->action(function () {
+                        $pdf = Pdf::loadView('pdf.tabungan-lebaran', [
+                            'tabungan' => $this->record
+                        ]);
 
-                    $filename = 'rekening_lebaran_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
+                        $filename = 'rekening_lebaran_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
 
-                    return response()->streamDownload(function () use ($pdf) {
-                        echo $pdf->output();
-                    }, $filename);
-                }),
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->output();
+                        }, $filename);
+                    }),
 
-            Action::make('printLiburan')
-                ->label('Cetak Form Tabungan Liburan')
-                ->icon('heroicon-o-printer')
-                ->color('purple')
-                ->action(function () {
-                    $pdf = Pdf::loadView('pdf.tabungan-liburan', [
-                        'tabungan' => $this->record
-                    ]);
+                Action::make('printLiburan')
+                    ->label('Tabungan Liburan')
+                    ->icon('heroicon-o-printer')
+                    ->color('purple')
+                    ->action(function () {
+                        $pdf = Pdf::loadView('pdf.tabungan-liburan', [
+                            'tabungan' => $this->record
+                        ]);
 
-                    $filename = 'rekening_liburan_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
+                        $filename = 'rekening_liburan_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
 
-                    return response()->streamDownload(function () use ($pdf) {
-                        echo $pdf->output();
-                    }, $filename);
-                }),
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->output();
+                        }, $filename);
+                    }),
+
+                Action::make('printMitraSinara')
+                    ->label('Tabungan Mitra Sinara')
+                    ->icon('heroicon-o-printer')
+                    ->color('warning')
+                    ->action(function () {
+                        $pdf = Pdf::loadView('pdf.tabungan-mitra-sinara', [
+                            'tabungan' => $this->record
+                        ]);
+
+                        $filename = 'rekening_mitra_sinara_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
+
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->output();
+                        }, $filename);
+                    }),
+            ])
+                ->label('Cetak Form Lainnya')
+                ->icon('heroicon-o-document-duplicate')
+                ->color('gray')
+                ->button(),
         ];
     }
 
@@ -185,3 +208,4 @@ class ViewTabungan extends ViewRecord
         }
     }
 }
+
