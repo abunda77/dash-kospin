@@ -59,6 +59,7 @@ Route::get('/tabungan/{id}/print-barcode', [App\Http\Controllers\TabunganBarcode
     ->name('tabungan.print-barcode');
 
 Route::get('/tabungan/{hash}/scan', [App\Http\Controllers\TabunganBarcodeController::class, 'scan'])
+    ->middleware('throttle:60,1') // 60 requests per minute
     ->name('tabungan.scan');
 
 // Debug route untuk test QR code

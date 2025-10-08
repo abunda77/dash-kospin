@@ -49,3 +49,18 @@ Route::apiResource('regions', RegionController::class);
 Route::get('/mutasi/{no_tabungan}/{periode}', [MutasiTabunganController::class, 'getMutasi']);
 
 Route::get('/config/api-base-url', [ConfigController::class, 'getApiBaseUrl']);
+
+// Barcode Scan Statistics API (public)
+Route::prefix('barcode')->group(function () {
+    Route::get('/stats', [App\Http\Controllers\Api\BarcodeScanController::class, 'stats'])
+        ->middleware('throttle:30,1');
+
+    Route::get('/recent-scans', [App\Http\Controllers\Api\BarcodeScanController::class, 'recentScans'])
+        ->middleware('throttle:30,1');
+
+    // Protected routes (require authentication)
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/my-scans', [App\Http\Controllers\Api\BarcodeScanController::class, 'myScans']);
+        Route::get('/tabungan/{id}/scan-history', [App\Http\Controllers\Api\BarcodeScanController::class, 'scanHistory']);
+    });
+});

@@ -16,3 +16,10 @@ Schedule::command('tabungan:hitung-bunga --all')
     });
 // Jalankan backup database setiap hari pukul 00:00
 Schedule::command('backup:run --only-db')->everyFourHours();
+
+// Cleanup old barcode scan logs every week (keep 90 days)
+Schedule::command('barcode:cleanup-logs --days=90')
+    ->weekly()
+    ->sundays()
+    ->at('02:00')
+    ->description('Cleanup barcode scan logs older than 90 days');

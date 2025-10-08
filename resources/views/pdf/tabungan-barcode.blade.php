@@ -110,7 +110,7 @@
         
         <div class="footer">
             <div>Scan barcode untuk melihat detail rekening</div>
-            {{-- <div class="scan-url">{{ $scanUrl }}</div> --}}
+            <div class="scan-url">{{ $scanUrl }}</div>
             <div style="margin-top: 10px;">
                 Dicetak pada: {{ date('d/m/Y H:i:s') }}
             </div>
