@@ -17,6 +17,7 @@ Dash-Kospin adalah aplikasi web yang dirancang untuk membantu pengelolaan kopera
 -   **Deposito**: Pengelolaan deposito anggota dengan perhitungan bunga otomatis
 -   **Referral**: Sistem referensi anggota dan komisi
 -   **Laporan**: Pembuatan laporan dalam format PDF
+-   **QR Code Barcode**: Cetak barcode QR Code untuk rekening tabungan dengan scan public access
 -   **Aktivitas Log**: Pencatatan aktivitas untuk audit trail
 -   **API Service**: Layanan API untuk integrasi dengan aplikasi lain
 -   **Dashboard Admin**: Panel admin yang komprehensif dengan Filament
@@ -34,6 +35,7 @@ Aplikasi ini menggunakan teknologi:
 -   **Laravel Octane** untuk performa tinggi
 -   **Laravel Sanctum** untuk autentikasi API
 -   **DOMPDF** untuk generasi laporan PDF
+-   **QRServer API** untuk generate QR Code barcode
 
 ## Detail Teknologi dan Framework
 
@@ -232,6 +234,27 @@ composer dev
 ```
 
 Perintah ini akan menjalankan server, antrian, log, dan vite secara bersamaan.
+
+## Fitur Khusus
+
+### QR Code Barcode Tabungan
+
+Aplikasi ini dilengkapi dengan fitur cetak barcode QR Code untuk setiap rekening tabungan. Fitur ini memungkinkan:
+
+-   **Cetak PDF Barcode**: Admin dapat mencetak barcode dalam format PDF untuk setiap rekening tabungan
+-   **Public Scan Access**: QR Code dapat di-scan oleh siapa saja untuk melihat informasi dasar rekening
+-   **Auto-Generated QR Code**: QR Code otomatis di-generate menggunakan QRServer API
+-   **Temporary File Management**: QR Code disimpan sementara dan otomatis dihapus setelah PDF generated
+
+**Cara Penggunaan:**
+
+1. Login ke admin panel Filament
+2. Buka halaman Rekening Tabungan
+3. Klik action "Cetak Barcode" pada rekening yang diinginkan
+4. PDF barcode akan otomatis ter-download
+5. Scan QR Code untuk melihat detail rekening secara public
+
+**Dokumentasi Lengkap:** Lihat [BARCODE_TABUNGAN.md](BARCODE_TABUNGAN.md) untuk detail implementasi dan troubleshooting.
 
 ## Lisensi
 

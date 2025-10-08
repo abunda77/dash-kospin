@@ -4,9 +4,13 @@
     <meta charset="utf-8">
     <title>Barcode Tabungan - {{ $tabungan->no_tabungan }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
             padding: 20px;
             text-align: center;
         }
@@ -15,7 +19,6 @@
             margin: 0 auto;
             border: 2px solid #333;
             padding: 20px;
-            border-radius: 10px;
         }
         .header {
             margin-bottom: 20px;
@@ -40,9 +43,6 @@
         .account-info td:first-child {
             font-weight: bold;
             width: 40%;
-        }
-        .qr-code {
-            margin: 20px 0;
         }
         .footer {
             margin-top: 20px;
@@ -90,18 +90,20 @@
         </div>
         
         <div class="qr-code">
-            @if(isset($hasQrCode) && $hasQrCode && isset($qrCodeBase64))
-                <img src="{{ $qrCodeBase64 }}" alt="QR Code" style="width: 200px; height: 200px;">
+            @if(isset($hasQrCode) && $hasQrCode && isset($qrCodePath))
+                <div style="text-align: center; margin: 20px 0;">
+                    <img src="{{ $qrCodePath }}" alt="QR Code" width="200" height="200" style="display: block; margin: 0 auto;">
+                </div>
             @else
-                <div style="width: 200px; height: 200px; border: 2px solid #333; display: table-cell; vertical-align: middle; text-align: center; font-size: 14px; color: #333;">
-                    <div>
+                <div style="width: 200px; height: 200px; border: 2px solid #333; margin: 20px auto; padding: 20px; text-align: center;">
+                    <div style="padding-top: 50px;">
                         <strong>QR Code</strong><br><br>
                         Scan untuk akses<br>
                         detail rekening
                     </div>
                 </div>
                 @if(isset($error))
-                    <div style="color: #888; font-size: 10px; margin-top: 10px;">{{ $error }}</div>
+                    <div style="color: #888; font-size: 10px; margin-top: 10px; text-align: center;">{{ $error }}</div>
                 @endif
             @endif
         </div>

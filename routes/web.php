@@ -61,4 +61,8 @@ Route::get('/tabungan/{id}/print-barcode', [App\Http\Controllers\TabunganBarcode
 Route::get('/tabungan/{id}/scan', [App\Http\Controllers\TabunganBarcodeController::class, 'scan'])
     ->name('tabungan.scan');
 
+// Debug route untuk test QR code
+Route::get('/test-qr/{id}', [App\Http\Controllers\TabunganBarcodeController::class, 'testQrCode'])
+    ->name('tabungan.test-qr');
+
 
