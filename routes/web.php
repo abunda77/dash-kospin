@@ -58,7 +58,7 @@ Route::get('/export-progress/{key}', function (string $key) {
 Route::get('/tabungan/{id}/print-barcode', [App\Http\Controllers\TabunganBarcodeController::class, 'printBarcode'])
     ->name('tabungan.print-barcode');
 
-Route::get('/tabungan/{id}/scan', [App\Http\Controllers\TabunganBarcodeController::class, 'scan'])
+Route::get('/tabungan/{hash}/scan', [App\Http\Controllers\TabunganBarcodeController::class, 'scan'])
     ->name('tabungan.scan');
 
 // Debug route untuk test QR code

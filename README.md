@@ -254,7 +254,14 @@ Aplikasi ini dilengkapi dengan fitur cetak barcode QR Code untuk setiap rekening
 4. PDF barcode akan otomatis ter-download
 5. Scan QR Code untuk melihat detail rekening secara public
 
-**Dokumentasi Lengkap:** Lihat [BARCODE_TABUNGAN.md](BARCODE_TABUNGAN.md) untuk detail implementasi dan troubleshooting.
+**Security:**
+- ID rekening di-obfuscate menggunakan Hashids untuk mencegah user menebak ID lain
+- URL format: `http://domain.com/tabungan/{hash}/scan` (bukan `/tabungan/{id}/scan`)
+- Hash unik per aplikasi menggunakan APP_KEY sebagai salt
+
+**Dokumentasi Lengkap:** 
+- [BARCODE_TABUNGAN.md](BARCODE_TABUNGAN.md) - Detail implementasi dan troubleshooting
+- [SECURITY_HASHIDS.md](SECURITY_HASHIDS.md) - Security implementation dengan Hashids
 
 ## Lisensi
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tabungan;
+use App\Helpers\HashidsHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 
@@ -12,8 +13,9 @@ class TabunganBarcodeController extends Controller
     {
         $tabungan = Tabungan::with(['profile', 'produkTabungan'])->findOrFail($id);
 
-        // Generate URL untuk scan barcode
-        $scanUrl = route('tabungan.scan', $tabungan->id);
+        // Generate URL untuk scan barcode dengan encoded ID
+        $encodedId = HashidsHelper::encode($tabungan->id);
+        $scanUrl = route('tabungan.scan', $encodedId);
         $qrCodePath = null;
         $hasQrCode = false;
         $error = null;
@@ -93,8 +95,15 @@ class TabunganBarcodeController extends Controller
         return $response;
     }
 
-    public function scan($id)
+    public function scan($hash)
     {
+        // Decode hash to get real ID
+        $id = HashidsHelper::decode($hash);
+
+        if ($id === null) {
+            abort(404, 'Invalid or expired barcode');
+        }
+
         $tabungan = Tabungan::with(['profile', 'produkTabungan'])->findOrFail($id);
 
         return view('tabungan.scan', compact('tabungan'));
@@ -103,7 +112,10 @@ class TabunganBarcodeController extends Controller
     public function testQrCode($id)
     {
         $tabungan = Tabungan::with(['profile', 'produkTabungan'])->findOrFail($id);
-        $scanUrl = route('tabungan.scan', $tabungan->id);
+        
+        // Generate encoded URL
+        $encodedId = HashidsHelper::encode($tabungan->id);
+        $scanUrl = route('tabungan.scan', $encodedId);
 
         // Test QR code generation
         $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($scanUrl);
@@ -124,11 +136,13 @@ class TabunganBarcodeController extends Controller
 
         $debug = [
             'tabungan_id' => $id,
+            'encoded_id' => $encodedId,
             'scan_url' => $scanUrl,
             'qr_api_url' => $qrCodeUrl,
             'qr_data_fetched' => $qrCodeData !== false,
             'qr_data_size' => $qrCodeData ? strlen($qrCodeData) : 0,
             'base64_preview' => $qrCodeData ? 'data:image/png;base64,' . base64_encode($qrCodeData) : null,
+            'security_note' => 'ID is now encoded using Hashids for security'
         ];
 
         return response()->json($debug);

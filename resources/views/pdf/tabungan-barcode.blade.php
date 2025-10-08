@@ -78,10 +78,10 @@
                     <td>Produk</td>
                     <td>: {{ $tabungan->produkTabungan->nama_produk }}</td>
                 </tr>
-                <tr>
+                {{-- <tr>
                     <td>Saldo</td>
                     <td>: {{ format_rupiah($tabungan->saldo) }}</td>
-                </tr>
+                </tr> --}}
                 <tr>
                     <td>Status</td>
                     <td>: {{ ucfirst($tabungan->status_rekening) }}</td>
@@ -110,7 +110,7 @@
         
         <div class="footer">
             <div>Scan barcode untuk melihat detail rekening</div>
-            <div class="scan-url">{{ $scanUrl }}</div>
+            {{-- <div class="scan-url">{{ $scanUrl }}</div> --}}
             <div style="margin-top: 10px;">
                 Dicetak pada: {{ date('d/m/Y H:i:s') }}
             </div>

@@ -13,6 +13,7 @@
         "dompdf/dompdf": "^3.0",
         "endroid/qr-code": "^6.0",
         "filament/filament": "^3.2",
+        "hashids/hashids": "^5.0",
         "joaopaulolndev/filament-edit-env": "^1.0",
         "laravel/framework": "^11.9",
         "laravel/octane": "^2.6",

@@ -170,11 +170,36 @@ storage/
 - **TailwindCSS**: Untuk styling halaman scan
 
 ## Security Notes
+
+### ID Obfuscation dengan Hashids
+Untuk meningkatkan security, aplikasi menggunakan **Hashids** untuk menyamarkan ID rekening pada URL public:
+
+**Sebelum:**
+```
+http://localhost:8000/tabungan/1/scan  ❌ ID mudah ditebak
+```
+
+**Sesudah:**
+```
+http://localhost:8000/tabungan/vgoYvMz14k/scan  ✅ ID ter-obfuscate
+```
+
+**Keuntungan:**
+- ✅ ID tidak sequential, sulit ditebak
+- ✅ Minimum 10 karakter
+- ✅ Menggunakan APP_KEY sebagai salt (unique per aplikasi)
+- ✅ URL-safe characters only
+- ✅ Reversible (dapat di-decode kembali)
+
+**Dokumentasi Lengkap:** Lihat [SECURITY_HASHIDS.md](SECURITY_HASHIDS.md)
+
+### General Security
 - Halaman scan bersifat **public** (tidak memerlukan autentikasi)
 - Hanya menampilkan informasi dasar rekening
 - Tidak ada aksi yang dapat dilakukan dari halaman scan
 - File PDF barcode dapat di-download langsung
 - Temporary files otomatis dihapus setelah PDF generated
+- ID rekening di-obfuscate menggunakan Hashids
 
 ## Troubleshooting
 
