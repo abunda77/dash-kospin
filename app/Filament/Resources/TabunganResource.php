@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use App\Models\Profile;
 use App\Models\Tabungan;
 use Filament\Forms\Form;
@@ -54,7 +55,7 @@ class TabunganResource extends Resource
                                                 🔥 Informasi Penting
                                             </h4>
                                             <div style="margin-top: 8px; color: #c2410c !important; font-size: 13px; line-height: 1.5;">
-                                                <p style="margin-bottom: 6px;">• Untuk produk <strong style="color: #9a3412 !important;">Tabungan Mitra Sinara</strong> pastikan diawali dengan kode <code style="background: #fb923c !important; color: #9a3412 !important; padding: 4px 8px; border-radius: 6px; font-family: ui-monospace, monospace; font-weight: 500;">5555-xxxx</code></p>
+                                                <p style="margin-bottom: 6px;">• Untuk produk <strong style="color: #9a3412 !important;">Tabungan Mitra Setia Sinara</strong> pastikan diawali dengan kode <code style="background: #fb923c !important; color: #9a3412 !important; padding: 4px 8px; border-radius: 6px; font-family: ui-monospace, monospace; font-weight: 500;">5555-xxxx</code></p>
                                                 <p>• Untuk produk tabungan lainnya menggunakan format <code style="background: #fb923c !important; color: #9a3412 !important; padding: 4px 8px; border-radius: 6px; font-family: ui-monospace, monospace; font-weight: 500;">8888-xxxx</code></p>
                                             </div>
                                         </div>
@@ -194,6 +195,13 @@ class TabunganResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('printBarcode')
+                    ->label('Cetak Barcode')
+                    ->icon('heroicon-o-qr-code')
+                    ->color('info')
+                    ->action(function ($record) {
+                        return redirect()->route('tabungan.print-barcode', $record->id);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

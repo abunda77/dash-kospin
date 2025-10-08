@@ -54,4 +54,11 @@ Route::get('/export-progress/{key}', function (string $key) {
     return response()->json($progress);
 })->name('export.progress');
 
+// Tabungan Barcode Routes
+Route::get('/tabungan/{id}/print-barcode', [App\Http\Controllers\TabunganBarcodeController::class, 'printBarcode'])
+    ->name('tabungan.print-barcode');
+
+Route::get('/tabungan/{id}/scan', [App\Http\Controllers\TabunganBarcodeController::class, 'scan'])
+    ->name('tabungan.scan');
+
 
