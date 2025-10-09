@@ -8,6 +8,7 @@ use App\Models\BarcodeScanLog;
 use App\Helpers\HashidsHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
 class TabunganBarcodeController extends Controller
@@ -124,7 +125,7 @@ class TabunganBarcodeController extends Controller
             $this->logScan($tabungan->id, $hash, $request);
 
             // Format response untuk React frontend
-            return response()->json([
+            $responseData = [
                 'success' => true,
                 'message' => 'Tabungan data retrieved successfully',
                 'data' => [
@@ -167,7 +168,12 @@ class TabunganBarcodeController extends Controller
                         'scanned_at_formatted' => now()->format('d/m/Y H:i:s'),
                     ]
                 ]
-            ], 200);
+            ];
+
+            // Send webhook notification
+            $this->sendWebhookNotification($responseData, $hash, $request);
+
+            return response()->json($responseData, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -279,5 +285,68 @@ class TabunganBarcodeController extends Controller
         }
 
         return false;
+    }
+
+    /**
+     * Send webhook notification with scan data
+     */
+    private function sendWebhookNotification(array $responseData, string $hash, Request $request): void
+    {
+        $webhookUrl = env('WEBHOOK_URL_BARCODE_TABUNGAN');
+        
+        if (!$webhookUrl) {
+            Log::warning('Webhook URL not configured', [
+                'env_var' => 'WEBHOOK_URL_BARCODE_TABUNGAN'
+            ]);
+            return;
+        }
+
+        try {
+            // Prepare webhook payload
+            $payload = [
+                'event' => 'barcode_scanned',
+                'timestamp' => now()->toISOString(),
+                'scan_data' => [
+                    'hash' => $hash,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'referer' => $request->header('referer'),
+                    'is_mobile' => $this->isMobile($request->userAgent()),
+                ],
+                'tabungan_data' => $responseData['data']
+            ];
+
+            // Send webhook request with timeout
+            $response = Http::timeout(10)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'User-Agent' => 'Kospin-Tabungan-Webhook/1.0'
+                ])
+                ->post($webhookUrl, $payload);
+
+            if ($response->successful()) {
+                Log::info('Webhook notification sent successfully', [
+                    'webhook_url' => $webhookUrl,
+                    'response_status' => $response->status(),
+                    'tabungan_id' => $responseData['data']['rekening']['no_tabungan'] ?? null,
+                    'hash' => $hash
+                ]);
+            } else {
+                Log::error('Webhook notification failed', [
+                    'webhook_url' => $webhookUrl,
+                    'response_status' => $response->status(),
+                    'response_body' => $response->body(),
+                    'tabungan_id' => $responseData['data']['rekening']['no_tabungan'] ?? null,
+                    'hash' => $hash
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to send webhook notification', [
+                'webhook_url' => $webhookUrl,
+                'error' => $e->getMessage(),
+                'tabungan_id' => $responseData['data']['rekening']['no_tabungan'] ?? null,
+                'hash' => $hash
+            ]);
+        }
     }
 }
