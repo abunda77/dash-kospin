@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tabungan;
+use App\Models\TransaksiTabungan;
 use App\Models\BarcodeScanLog;
 use App\Helpers\HashidsHelper;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -112,6 +113,12 @@ class TabunganBarcodeController extends Controller
 
         try {
             $tabungan = Tabungan::with(['profile', 'produkTabungan'])->findOrFail($id);
+            
+            // Ambil transaksi terakhir
+            $transaksiTerakhir = TransaksiTabungan::where('id_tabungan', $tabungan->id)
+                ->with('admin')
+                ->orderBy('tanggal_transaksi', 'desc')
+                ->first();
 
             // Log the scan activity
             $this->logScan($tabungan->id, $hash, $request);
@@ -144,6 +151,17 @@ class TabunganBarcodeController extends Controller
                         'nama' => $tabungan->produkTabungan->nama_produk ?? 'N/A',
                         'keterangan' => $tabungan->produkTabungan->keterangan ?? null,
                     ],
+                    'transaksi_terakhir' => $transaksiTerakhir ? [
+                        'kode_transaksi' => $transaksiTerakhir->kode_transaksi,
+                        'jenis_transaksi' => $transaksiTerakhir->jenis_transaksi,
+                        'jenis_transaksi_label' => $transaksiTerakhir->jenis_transaksi === TransaksiTabungan::JENIS_SETORAN ? 'Setoran' : 'Penarikan',
+                        'jumlah' => $transaksiTerakhir->jumlah,
+                        'jumlah_formatted' => format_rupiah($transaksiTerakhir->jumlah),
+                        'tanggal_transaksi' => $transaksiTerakhir->tanggal_transaksi->format('d/m/Y H:i:s'),
+                        'tanggal_transaksi_iso' => $transaksiTerakhir->tanggal_transaksi->toISOString(),
+                        'keterangan' => $transaksiTerakhir->keterangan,
+                        'teller' => $transaksiTerakhir->admin?->name ?? 'N/A',
+                    ] : null,
                     'metadata' => [
                         'scanned_at' => now()->toISOString(),
                         'scanned_at_formatted' => now()->format('d/m/Y H:i:s'),
