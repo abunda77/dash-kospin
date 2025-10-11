@@ -17,16 +17,15 @@ class TabunganBarcodeController extends Controller
     {
         $tabungan = Tabungan::with(['profile', 'produkTabungan'])->findOrFail($id);
 
-        // Generate URL untuk scan barcode dengan encoded ID
-        $encodedId = HashidsHelper::encode($tabungan->id);
-        $scanUrl = route('tabungan.scan', $encodedId);
+        // Generate QR Code dengan data no_tabungan (bukan URL)
+        $qrData = $tabungan->no_tabungan;
         $qrCodePath = null;
         $hasQrCode = false;
         $error = null;
 
         try {
-            // Download QR Code dari online service dengan context options
-            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($scanUrl);
+            // Download QR Code dari online service dengan no_tabungan sebagai data
+            $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . urlencode($qrData);
 
             // Set context options untuk file_get_contents
             $context = stream_context_create([
@@ -56,6 +55,7 @@ class TabunganBarcodeController extends Controller
 
                 Log::info('QR Code downloaded successfully', [
                     'tabungan_id' => $id,
+                    'no_tabungan' => $qrData,
                     'data_size' => strlen($qrCodeData),
                     'temp_path' => $qrCodePath
                 ]);
@@ -66,6 +66,7 @@ class TabunganBarcodeController extends Controller
             // Log error untuk debugging
             Log::error('QR Code generation failed', [
                 'tabungan_id' => $id,
+                'no_tabungan' => $qrData,
                 'error' => $e->getMessage(),
                 'url' => $qrCodeUrl ?? 'N/A'
             ]);
@@ -77,7 +78,7 @@ class TabunganBarcodeController extends Controller
         $pdf = Pdf::loadView('pdf.tabungan-barcode', [
             'tabungan' => $tabungan,
             'qrCodePath' => $qrCodePath,
-            'scanUrl' => $scanUrl,
+            'qrData' => $qrData,
             'hasQrCode' => $hasQrCode,
             'error' => $error
         ]);
@@ -114,7 +115,7 @@ class TabunganBarcodeController extends Controller
 
         try {
             $tabungan = Tabungan::with(['profile', 'produkTabungan'])->findOrFail($id);
-            
+
             // Ambil transaksi terakhir
             $transaksiTerakhir = TransaksiTabungan::where('id_tabungan', $tabungan->id)
                 ->with('admin')
@@ -197,7 +198,7 @@ class TabunganBarcodeController extends Controller
     public function testQrCode($id)
     {
         $tabungan = Tabungan::with(['profile', 'produkTabungan'])->findOrFail($id);
-        
+
         // Generate encoded URL
         $encodedId = HashidsHelper::encode($tabungan->id);
         $scanUrl = route('tabungan.scan', $encodedId);
@@ -274,8 +275,14 @@ class TabunganBarcodeController extends Controller
         }
 
         $mobileKeywords = [
-            'Mobile', 'Android', 'iPhone', 'iPad', 'iPod',
-            'BlackBerry', 'Windows Phone', 'Opera Mini'
+            'Mobile',
+            'Android',
+            'iPhone',
+            'iPad',
+            'iPod',
+            'BlackBerry',
+            'Windows Phone',
+            'Opera Mini'
         ];
 
         foreach ($mobileKeywords as $keyword) {
@@ -293,7 +300,7 @@ class TabunganBarcodeController extends Controller
     private function sendWebhookNotification(array $responseData, string $hash, Request $request): void
     {
         $webhookUrl = env('WEBHOOK_URL_BARCODE_TABUNGAN');
-        
+
         if (!$webhookUrl) {
             Log::warning('Webhook URL not configured', [
                 'env_var' => 'WEBHOOK_URL_BARCODE_TABUNGAN'

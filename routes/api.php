@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\RegionController;
 use App\Http\Controllers\Api\AngsuranController;
 use App\Http\Controllers\Api\MutasiTabunganController;
 use App\Http\Controllers\Api\ConfigController;
+use App\Http\Controllers\Api\MakanBergizisGratisController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -63,4 +64,19 @@ Route::prefix('barcode')->group(function () {
         Route::get('/my-scans', [App\Http\Controllers\Api\BarcodeScanController::class, 'myScans']);
         Route::get('/tabungan/{id}/scan-history', [App\Http\Controllers\Api\BarcodeScanController::class, 'scanHistory']);
     });
+});
+
+// Makan Bergizi Gratis API
+Route::prefix('makan-bergizi-gratis')->group(function () {
+    Route::get('/', [MakanBergizisGratisController::class, 'index'])
+        ->middleware('throttle:60,1');
+    
+    Route::get('/{id}', [MakanBergizisGratisController::class, 'show'])
+        ->middleware('throttle:60,1');
+    
+    Route::post('/check-today', [MakanBergizisGratisController::class, 'checkToday'])
+        ->middleware('throttle:60,1');
+    
+    Route::post('/', [MakanBergizisGratisController::class, 'store'])
+        ->middleware('throttle:60,1');
 });

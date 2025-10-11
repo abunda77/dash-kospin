@@ -179,7 +179,7 @@
             <li>Kontrak berlangsung minimal 3 bulan.</li>
             <li>Setoran minimal: Rp50.000 per minggu </li>
             <li>Pembukaan rekening dapat dilakukan kapan saja.</li>
-            <li>Penarikan tabungan: Dapat dilakukan setelah kontrak berakhir</li>
+            <li>Penarikan tabungan: Dapat dilakukan setelah kontrak berakhir dan TIDAK memiliki tanggungan pinjaman ( jika ada )</li>
             <li>Penutupan Rekening akan dikenakan biaya sebesar 2% dari saldo yang ditarik.</li>
             <li>Rekening yang tidak aktif selama 12 bulan berturut-turut akan dinyatakan dormant.</li>
             <li>Nasabah wajib memberitahukan koperasi jika ada perubahan data pribadi.</li>

@@ -66,4 +66,8 @@ Route::get('/tabungan/{hash}/scan', [App\Http\Controllers\TabunganBarcodeControl
 Route::get('/test-qr/{id}', [App\Http\Controllers\TabunganBarcodeController::class, 'testQrCode'])
     ->name('tabungan.test-qr');
 
+// Makan Bergizi Gratis Public Routes
+Route::get('/makan-bergizi-sinara/{hash?}', App\Livewire\MakanBergizisGratisCheckout::class)
+    ->name('makan-bergizi-gratis.checkout');
+
 

@@ -98,8 +98,8 @@
                 <div style="width: 200px; height: 200px; border: 2px solid #333; margin: 20px auto; padding: 20px; text-align: center;">
                     <div style="padding-top: 50px;">
                         <strong>QR Code</strong><br><br>
-                        Scan untuk akses<br>
-                        detail rekening
+                        Scan untuk input<br>
+                        Makan Bergizi Gratis
                     </div>
                 </div>
                 @if(isset($error))
@@ -109,8 +109,8 @@
         </div>
         
         <div class="footer">
-            <div>Scan barcode untuk melihat detail rekening</div>
-            <div class="scan-url">{{ $scanUrl }}</div>
+            <div>Scan barcode untuk input data Makan Bergizi Gratis</div>
+            <div class="scan-url">Data QR: {{ $qrData }}</div>
             <div style="margin-top: 10px;">
                 Dicetak pada: {{ date('d/m/Y H:i:s') }}
             </div>
