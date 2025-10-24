@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\KaryawanResource\Pages;
 
 use App\Filament\Resources\KaryawanResource;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ViewRecord;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class ViewKaryawan extends ViewRecord
 {
@@ -19,10 +19,10 @@ class ViewKaryawan extends ViewRecord
                 ->icon('heroicon-o-printer')
                 ->action(function () {
                     $pdf = Pdf::loadView('pdf.karyawan', [
-                        'karyawan' => $this->record
+                        'karyawan' => $this->record,
                     ]);
 
-                    $filename = 'data_karyawan_' . $this->record->first_name . '_' . $this->record->last_name . '.pdf';
+                    $filename = 'data_karyawan_'.str_replace(' ', '_', $this->record->nama).'.pdf';
 
                     return response()->streamDownload(function () use ($pdf) {
                         echo $pdf->output();

@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\Admin;
-use Spatie\Activitylog\Models\Activity;
+use App\Models\MakanBergizisGratis;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ActivityPolicy
+class MakanBergizisGratisPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class ActivityPolicy
      */
     public function viewAny(Admin $admin): bool
     {
-        return $admin->can('view_any_activitylog');
+        return $admin->can('view_any_makan::bergizis::gratis');
     }
 
     /**
      * Determine whether the admin can view the model.
      */
-    public function view(Admin $admin, Activity $activity): bool
+    public function view(Admin $admin, MakanBergizisGratis $makanBergizisGratis): bool
     {
-        return $admin->can('view_activitylog');
+        return $admin->can('view_makan::bergizis::gratis');
     }
 
     /**
@@ -31,23 +31,23 @@ class ActivityPolicy
      */
     public function create(Admin $admin): bool
     {
-        return $admin->can('create_activitylog');
+        return $admin->can('create_makan::bergizis::gratis');
     }
 
     /**
      * Determine whether the admin can update the model.
      */
-    public function update(Admin $admin, Activity $activity): bool
+    public function update(Admin $admin, MakanBergizisGratis $makanBergizisGratis): bool
     {
-        return $admin->can('update_activitylog');
+        return $admin->can('update_makan::bergizis::gratis');
     }
 
     /**
      * Determine whether the admin can delete the model.
      */
-    public function delete(Admin $admin, Activity $activity): bool
+    public function delete(Admin $admin, MakanBergizisGratis $makanBergizisGratis): bool
     {
-        return $admin->can('delete_activitylog');
+        return $admin->can('delete_makan::bergizis::gratis');
     }
 
     /**
@@ -55,15 +55,15 @@ class ActivityPolicy
      */
     public function deleteAny(Admin $admin): bool
     {
-        return $admin->can('delete_any_activitylog');
+        return $admin->can('delete_any_makan::bergizis::gratis');
     }
 
     /**
      * Determine whether the admin can permanently delete.
      */
-    public function forceDelete(Admin $admin, Activity $activity): bool
+    public function forceDelete(Admin $admin, MakanBergizisGratis $makanBergizisGratis): bool
     {
-        return $admin->can('force_delete_activitylog');
+        return $admin->can('force_delete_makan::bergizis::gratis');
     }
 
     /**
@@ -71,15 +71,15 @@ class ActivityPolicy
      */
     public function forceDeleteAny(Admin $admin): bool
     {
-        return $admin->can('force_delete_any_activitylog');
+        return $admin->can('force_delete_any_makan::bergizis::gratis');
     }
 
     /**
      * Determine whether the admin can restore.
      */
-    public function restore(Admin $admin, Activity $activity): bool
+    public function restore(Admin $admin, MakanBergizisGratis $makanBergizisGratis): bool
     {
-        return $admin->can('restore_activitylog');
+        return $admin->can('restore_makan::bergizis::gratis');
     }
 
     /**
@@ -87,15 +87,15 @@ class ActivityPolicy
      */
     public function restoreAny(Admin $admin): bool
     {
-        return $admin->can('restore_any_activitylog');
+        return $admin->can('restore_any_makan::bergizis::gratis');
     }
 
     /**
      * Determine whether the admin can replicate.
      */
-    public function replicate(Admin $admin, Activity $activity): bool
+    public function replicate(Admin $admin, MakanBergizisGratis $makanBergizisGratis): bool
     {
-        return $admin->can('replicate_activitylog');
+        return $admin->can('replicate_makan::bergizis::gratis');
     }
 
     /**
@@ -103,6 +103,6 @@ class ActivityPolicy
      */
     public function reorder(Admin $admin): bool
     {
-        return $admin->can('reorder_activitylog');
+        return $admin->can('reorder_makan::bergizis::gratis');
     }
 }
