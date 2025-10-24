@@ -2,30 +2,30 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use App\Models\Karyawan;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Support\RawJs;
-use Filament\Resources\Resource;
-use Illuminate\Database\Eloquent\Builder;
-use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 use App\Filament\Resources\KaryawanResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\KaryawanResource\RelationManagers;
-use Filament\Infolists\Infolist;
+use App\Models\Karyawan;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Filament\Support\RawJs;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class KaryawanResource extends Resource
 {
     protected static ?string $model = Karyawan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
+
     protected static ?string $navigationLabel = 'Data Karyawan';
+
     protected static ?string $title = 'Data Karyawan';
+
     public static function getNavigationGroup(): ?string
     {
         return 'Data Karyawan';
@@ -36,35 +36,36 @@ class KaryawanResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('nik_karyawan')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('first_name')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('last_name')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('tempat_lahir')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\DatePicker::make('tanggal_lahir')
-                    ->required(),
+                    // ->required(),
+                    ->maxLength(255),
                 Forms\Components\Select::make('jenis_kelamin')
-                    ->required()
+                    // ->required()
                     ->options([
                         'L' => 'Laki-laki',
-                        'P' => 'Perempuan'
+                        'P' => 'Perempuan',
                     ]),
                 Forms\Components\Select::make('status_pernikahan')
-                    ->required()
+                    // ->required()
                     ->options([
                         'Kawin' => 'Kawin',
                         'Belum Kawin' => 'Belum Kawin',
                         'Cerai Hidup' => 'Cerai Hidup',
-                        'Cerai Mati' => 'Cerai Mati'
+                        'Cerai Mati' => 'Cerai Mati',
                     ]),
                 Forms\Components\Select::make('agama')
-                    ->required()
+                    // ->required()
                     ->options([
                         'Islam' => 'Islam',
                         'Kristen' => 'Kristen',
@@ -72,41 +73,41 @@ class KaryawanResource extends Resource
                         'Hindu' => 'Hindu',
                         'Buddha' => 'Buddha',
                         'Konghucu' => 'Konghucu',
-                        'Lainnya' => 'Lainnya'
+                        'Lainnya' => 'Lainnya',
                     ]),
                 Forms\Components\Select::make('golongan_darah')
                     ->options([
                         'A' => 'A',
                         'B' => 'B',
                         'AB' => 'AB',
-                        'O' => 'O'
+                        'O' => 'O',
                     ]),
                 Forms\Components\Textarea::make('alamat')
-                    ->required()
+                    // ->required()
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('no_ktp')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('foto_ktp')
-                    ->image()
-                    ->required(),
+                    ->image(),
+                // ->required(),
                 Forms\Components\TextInput::make('no_npwp')
                     ->maxLength(255),
                 Forms\Components\FileUpload::make('foto_npwp')
                     ->image(),
                 Forms\Components\TextInput::make('email')
                     ->email()
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 PhoneInput::make('no_telepon')
                     ->defaultCountry('ID')
-                    ->label('No. Telepon/ WhatsApp')
-                    ->required(),
+                    ->label('No. Telepon/ WhatsApp'),
+                // ->required(),
                 Forms\Components\FileUpload::make('foto_profil')
-                    ->image()
-                    ->required(),
+                    ->image(),
+                // ->required(),
                 Forms\Components\TextInput::make('kontak_darurat_nama')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('kontak_darurat_hubungan')
                     ->label('Hubungan Kontak Darurat')
@@ -119,25 +120,25 @@ class KaryawanResource extends Resource
                         'sepupu' => 'Sepupu',
                         'mertua' => 'Mertua',
                         'ipar' => 'Ipar',
-                        'lainnya' => 'Lainnya'
-                    ])
-                    ->required(),
+                        'lainnya' => 'Lainnya',
+                    ]),
+                // ->required(),
                 PhoneInput::make('kontak_darurat_telepon')
                     ->defaultCountry('ID')
-                    ->label('No. Telepon Kontak Darurat')
-                    ->required(),
+                    ->label('No. Telepon Kontak Darurat'),
+                // ->required(),
                 Forms\Components\TextInput::make('nomor_pegawai')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('tanggal_bergabung')
-                    ->required(),
+                Forms\Components\DatePicker::make('tanggal_bergabung'),
+                // ->required(),
                 Forms\Components\Select::make('status_kepegawaian')
                     ->options([
                         'aktif' => 'Aktif',
                         'resign' => 'Resign',
-                        'pensiun' => 'Pensiun'
-                    ])
-                    ->required(),
+                        'pensiun' => 'Pensiun',
+                    ]),
+                // ->required(),
                 Forms\Components\Select::make('departemen')
                     ->options([
                         'direksi' => 'Direksi',
@@ -156,7 +157,7 @@ class KaryawanResource extends Resource
                         'collection' => 'Collection & Recovery',
                         'treasury' => 'Treasury',
                     ])
-                    ->required()
+                    // ->required()
                     ->searchable(),
                 Forms\Components\Select::make('jabatan')
                     ->options([
@@ -218,9 +219,9 @@ class KaryawanResource extends Resource
                         // Collection & Recovery
                         'kepala_collection' => 'Kepala Collection',
                         'collection_officer' => 'Collection Officer',
-                        'recovery_officer' => 'Recovery Officer'
+                        'recovery_officer' => 'Recovery Officer',
                     ])
-                    ->required()
+                    // ->required()
                     ->searchable(),
                 Forms\Components\Select::make('level_jabatan')
                     ->label('Level Jabatan')
@@ -247,9 +248,9 @@ class KaryawanResource extends Resource
 
                         // Entry Level
                         'trainee' => 'Management Trainee',
-                        'probation' => 'Probation Staff'
+                        'probation' => 'Probation Staff',
                     ])
-                    ->required()
+                    // ->required()
                     ->searchable(),
                 Forms\Components\Select::make('lokasi_kerja')
                     ->label('Lokasi Kerja')
@@ -275,9 +276,9 @@ class KaryawanResource extends Resource
                         // Jawa Timur
                         'surabaya' => 'Surabaya',
                         'malang' => 'Malang',
-                        'sidoarjo' => 'Sidoarjo'
+                        'sidoarjo' => 'Sidoarjo',
                     ])
-                    ->required()
+                    // ->required()
                     ->searchable(),
                 Forms\Components\TextInput::make('gaji_pokok')
                     ->label('Gaji Pokok (IDR)')
@@ -291,8 +292,8 @@ class KaryawanResource extends Resource
                             $component->state(number_format($state, 0, '.', ','));
                         }
                     })
-                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
-                    ->required(),
+                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state)),
+                // ->required(),
                 Forms\Components\Select::make('pendidikan_terakhir')
                     ->label('Pendidikan Terakhir')
                     ->options([
@@ -305,28 +306,28 @@ class KaryawanResource extends Resource
                         'd4' => 'D4',
                         's1' => 'S1',
                         's2' => 'S2',
-                        's3' => 'S3'
+                        's3' => 'S3',
                     ])
-                    ->required()
+                    // ->required()
                     ->searchable(),
                 Forms\Components\TextInput::make('nama_institusi')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('jurusan')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('tahun_lulus')
                     ->options(array_combine(range(2000, 2030), range(2000, 2030)))
-                    ->required()
+                    // ->required()
                     ->searchable(),
                 Forms\Components\TextInput::make('ipk')
                     ->numeric(),
                 Forms\Components\Select::make('pengalaman_kerja')
                     ->label('Pengalaman Kerja')
-                    ->options(array_combine(range(0, 10), array_map(function($year) {
-                        return $year . ' Tahun';
+                    ->options(array_combine(range(0, 10), array_map(function ($year) {
+                        return $year.' Tahun';
                     }, range(0, 10))))
-                    ->required()
+                    // ->required()
                     ->searchable(),
                 Forms\Components\TextInput::make('keahlian'),
                 Forms\Components\TextInput::make('sertifikasi'),
@@ -347,22 +348,22 @@ class KaryawanResource extends Resource
                         'panin' => 'Panin Bank',
                         'uob' => 'UOB Indonesia',
                         'maybank' => 'Maybank Indonesia',
-                        'other' => 'Bank Lainnya'
+                        'other' => 'Bank Lainnya',
                     ])
-                    ->required()
+                    // ->required()
                     ->searchable(),
                 Forms\Components\TextInput::make('nomor_rekening')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('nama_pemilik_rekening')
-                    ->required()
+                    // ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('no_bpjs_kesehatan')
                     ->maxLength(255),
                 Forms\Components\TextInput::make('no_bpjs_ketenagakerjaan')
                     ->maxLength(255),
-                Forms\Components\Toggle::make('is_active')
-                    ->required(),
+                Forms\Components\Toggle::make('is_active'),
+                // ->required(),
                 Forms\Components\DatePicker::make('tanggal_keluar'),
                 Forms\Components\TextInput::make('alasan_keluar')
                     ->maxLength(255),
