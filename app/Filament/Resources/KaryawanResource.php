@@ -47,9 +47,8 @@ class KaryawanResource extends Resource
                 Forms\Components\TextInput::make('tempat_lahir')
                     // ->required()
                     ->maxLength(255),
-                Forms\Components\DatePicker::make('tanggal_lahir')
-                    // ->required(),
-                    ->maxLength(255),
+                Forms\Components\DatePicker::make('tanggal_lahir'),
+                // ->required(),
                 Forms\Components\Select::make('jenis_kelamin')
                     // ->required()
                     ->options([
