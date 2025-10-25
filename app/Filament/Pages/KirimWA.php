@@ -40,7 +40,7 @@ class KirimWA extends Page
                             ->whereNotNull('no_telepon')
                             ->get()
                             ->mapWithKeys(function ($karyawan) {
-                                return [$karyawan->id => $karyawan->first_name . ' ' . $karyawan->last_name . ' (' . $karyawan->no_telepon . ')'];
+                                return [$karyawan->id => $karyawan->nama . ' (' . $karyawan->no_telepon . ')'];
                             })
                     )
                     ->searchable()
@@ -48,7 +48,7 @@ class KirimWA extends Page
                 Textarea::make('message')
                     ->label('Pesan WhatsApp')
                     ->required()
-                    ->hint('Variabel yang tersedia: {first_name}, {last_name}')
+                    ->hint('Variabel yang tersedia: {nama}, {nik_karyawan}')
                     ->rows(5),
             ])
             ->statePath('data');

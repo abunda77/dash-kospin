@@ -27,8 +27,8 @@ class SendBulkWhatsAppMessage implements ShouldQueue
 
             // Ganti variabel placeholder
             $messageText = str_replace(
-                ['{first_name}', '{last_name}'],
-                [$karyawan->first_name, $karyawan->last_name],
+                ['{nama}', '{nik_karyawan}'],
+                [$karyawan->nama, $karyawan->nik_karyawan],
                 $messageText
             );
 
@@ -81,7 +81,8 @@ class SendBulkWhatsAppMessage implements ShouldQueue
                 'whatsapp' => $whatsapp,
                 'message' => $message,
                 'karyawan_id' => $karyawan->id,
-                'karyawan_name' => $karyawan->first_name . ' ' . $karyawan->last_name,
+                'karyawan_name' => $karyawan->nama,
+                'nik_karyawan' => $karyawan->nik_karyawan,
                 'source' => 'send_bulk_whatsapp_message_job',
                 'whatsapp_status_code' => $whatsappStatus,
                 'whatsapp_sent_successfully' => $whatsappStatus === 200,

@@ -36,7 +36,7 @@ class KirimWAKaryawan extends Page
                 Textarea::make('message')
                     ->label('Pesan WhatsApp')
                     ->required()
-                    ->hint('Variabel yang tersedia: {first_name}, {last_name}')
+                    ->hint('Variabel yang tersedia: {nama}, {nik_karyawan}')
                     ->rows(5)
             ])
             ->statePath('data');

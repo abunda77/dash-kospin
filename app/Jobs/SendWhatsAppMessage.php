@@ -23,8 +23,8 @@ class SendWhatsAppMessage implements ShouldQueue
     public function handle(): void
     {
         $messageText = str_replace(
-            ['{first_name}', '{last_name}'],
-            [$this->karyawan->first_name, $this->karyawan->last_name],
+            ['{nama}', '{nik_karyawan}'],
+            [$this->karyawan->nama, $this->karyawan->nik_karyawan],
             $this->message
         );
 
@@ -74,7 +74,8 @@ class SendWhatsAppMessage implements ShouldQueue
                 'whatsapp' => $whatsapp,
                 'message' => $message,
                 'karyawan_id' => $this->karyawan->id,
-                'karyawan_name' => $this->karyawan->first_name . ' ' . $this->karyawan->last_name,
+                'karyawan_name' => $this->karyawan->nama,
+                'nik_karyawan' => $this->karyawan->nik_karyawan,
                 'source' => 'send_whatsapp_message_job',
                 'whatsapp_status_code' => $whatsappStatus,
                 'whatsapp_sent_successfully' => $whatsappStatus === 200,
