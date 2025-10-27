@@ -70,4 +70,8 @@ Route::get('/test-qr/{id}', [App\Http\Controllers\TabunganBarcodeController::cla
 Route::get('/makan-bergizi-sinara/{hash?}', App\Livewire\MakanBergizisGratisCheckout::class)
     ->name('makan-bergizi-gratis.checkout');
 
+// QRIS Public Generator
+Route::get('/qris-generator', App\Livewire\QrisPublicGenerator::class)
+    ->name('qris.public-generator');
+
 
