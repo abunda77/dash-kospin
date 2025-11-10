@@ -72,12 +72,12 @@ class ViewCicilanEmas extends ViewRecord
                         TextEntry::make('setoran_awal')
                             ->label('Setoran Awal')
                             ->money('IDR')
-                            ->helperText('5% dari harga emas'),
+                            ->helperText('10% dari harga emas'),
 
                         TextEntry::make('biaya_admin')
                             ->label('Biaya Admin')
                             ->money('IDR')
-                            ->helperText('0.5% dari total harga'),
+                            ->helperText('2.5% dari total harga'),
 
                         TextEntry::make('status')
                             ->label('Status')

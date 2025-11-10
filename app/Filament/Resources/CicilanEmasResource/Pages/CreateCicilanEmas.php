@@ -19,8 +19,8 @@ class CreateCicilanEmas extends CreateRecord
 
         // Pastikan setoran_awal dan biaya_admin dihitung dengan benar
         if (isset($data['total_harga'])) {
-            $data['setoran_awal'] = $data['total_harga'] * 0.05; // 5% dari total harga
-            $data['biaya_admin'] = $data['total_harga'] * 0.005; // 0.5% dari total harga
+            $data['setoran_awal'] = $data['total_harga'] * 0.10; // 10% dari total harga
+            $data['biaya_admin'] = $data['total_harga'] * 0.025; // 2.5% dari total harga
         }
 
         return $data;

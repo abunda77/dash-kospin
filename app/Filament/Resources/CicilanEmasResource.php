@@ -73,8 +73,8 @@ class CicilanEmasResource extends Resource
                     ->prefix('Rp')
                     ->reactive()
                     ->afterStateUpdated(function ($set, $state) {
-                        $set('setoran_awal', $state * 0.05);
-                        $set('biaya_admin', $state * 0.005);
+                        $set('setoran_awal', $state * 0.10);
+                        $set('biaya_admin', $state * 0.025);
                     }),
 
                 TextInput::make('setoran_awal')
@@ -83,7 +83,7 @@ class CicilanEmasResource extends Resource
                     ->prefix('Rp')
                     ->disabled()
                     ->dehydrated(true)
-                    ->helperText('5% dari harga emas'),
+                    ->helperText('10% dari harga emas'),
 
                 TextInput::make('biaya_admin')
                     ->required()
@@ -91,7 +91,7 @@ class CicilanEmasResource extends Resource
                     ->prefix('Rp')
                     ->disabled()
                     ->dehydrated(true)
-                    ->helperText('0.5% dari total harga'),
+                    ->helperText('2.5% dari total harga'),
 
 
 

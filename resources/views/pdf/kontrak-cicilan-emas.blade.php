@@ -188,7 +188,7 @@
                     </tr>
                 </table>
             </li>
-            <li>Emas tersebut dihitung nilainya  sebesar Rp {{ number_format($cicilan->pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($cicilan->pinjaman->jumlah_pinjaman)) }} Rupiah).</li>
+            <li>Cicilan Emas tersebut dihitung nilainya  sebesar Rp {{ number_format($cicilan->pinjaman->jumlah_pinjaman, 0, ',', '.') }} ({{ ucwords(terbilang($cicilan->pinjaman->jumlah_pinjaman)) }} Rupiah) setelah dipotong setoran awal sebesar Rp {{ number_format($cicilan->setoran_awal, 0, ',', '.') }}.</li>
         </ol>
     </div>
 
@@ -197,7 +197,7 @@
         <ol>
             <li>Total harga emas adalah sebesar Rp {{ number_format($cicilan->total_harga, 0, ',', '.') }} dengan setoran awal sebesar Rp {{ number_format($cicilan->setoran_awal, 0, ',', '.') }}.</li>
             <li>PIHAK KEDUA memberikan fasilitas cicilan kepada PIHAK PERTAMA sebesar Rp {{ number_format($cicilan->pinjaman->jumlah_pinjaman, 0, ',', '.') }}.</li>
-            <li>Biaya administrasi yang dikenakan sebesar Rp {{ number_format($cicilan->biaya_admin, 0, ',', '.') }} (0,5% dari total harga).</li>
+            <li>Biaya administrasi yang dikenakan sebesar Rp {{ number_format($cicilan->biaya_admin, 0, ',', '.') }} (2,5% dari total harga).</li>
             <li>Jangka waktu cicilan adalah {{ $cicilan->pinjaman->jangka_waktu }} bulan terhitung sejak tanggal {{ $cicilan->pinjaman->tanggal_pinjaman->translatedFormat('d F Y') }}.</li>
         </ol>
     </div>
