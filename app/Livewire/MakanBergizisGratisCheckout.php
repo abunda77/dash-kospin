@@ -398,7 +398,8 @@ class MakanBergizisGratisCheckout extends Component
                 'tanggal_cetak' => now()->format('d/m/Y H:i:s'),
             ]);
 
-            $pdf->setPaper('a4', 'portrait');
+            // Set paper size with auto height (210mm width, auto height)
+            $pdf->setPaper([0, 0, 595.28, 841.89], 'portrait'); // A4 width, flexible height
             
             $filename = 'Struk-MBG-' . $record->no_tabungan . '-' . now()->format('Ymd-His') . '.pdf';
             
