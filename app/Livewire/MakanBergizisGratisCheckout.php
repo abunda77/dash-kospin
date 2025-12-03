@@ -9,6 +9,7 @@ use App\Models\MakanBergizisGratis;
 use App\Helpers\HashidsHelper;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MakanBergizisGratisCheckout extends Component
 {
@@ -20,6 +21,7 @@ class MakanBergizisGratisCheckout extends Component
     public $success = null;
     public $checkoutLoading = false;
     public $alreadyCheckedOut = false;
+    public $lastCheckoutRecord = null;
 
     protected $rules = [
         'noTabungan' => 'required|string',
@@ -118,6 +120,14 @@ class MakanBergizisGratisCheckout extends Component
 
         // Check if already checked out today
         $this->alreadyCheckedOut = MakanBergizisGratis::existsForToday($tabungan->no_tabungan);
+        
+        // Get last checkout record for today
+        if ($this->alreadyCheckedOut) {
+            $this->lastCheckoutRecord = MakanBergizisGratis::where('no_tabungan', $tabungan->no_tabungan)
+                ->whereDate('tanggal_pemberian', today())
+                ->latest()
+                ->first();
+        }
 
         // Calculate account age
         $accountAge = $this->calculateAccountAge($tabungan->tanggal_buka_rekening);
@@ -241,6 +251,7 @@ class MakanBergizisGratisCheckout extends Component
 
             $this->success = 'Checkout berhasil! Data telah tersimpan.';
             $this->alreadyCheckedOut = true;
+            $this->lastCheckoutRecord = $record;
 
             Log::info('Makan Bergizi Gratis checkout success', [
                 'record_id' => $record->id,
@@ -372,6 +383,38 @@ class MakanBergizisGratisCheckout extends Component
         ];
     }
 
+    public function downloadStruk()
+    {
+        if (!$this->lastCheckoutRecord) {
+            $this->error = 'Data checkout tidak tersedia';
+            return;
+        }
+
+        try {
+            $record = $this->lastCheckoutRecord;
+            
+            $pdf = Pdf::loadView('reports.struk-makan-bergizi-gratis', [
+                'record' => $record,
+                'tanggal_cetak' => now()->format('d/m/Y H:i:s'),
+            ]);
+
+            $pdf->setPaper('a4', 'portrait');
+            
+            $filename = 'Struk-MBG-' . $record->no_tabungan . '-' . now()->format('Ymd-His') . '.pdf';
+            
+            return response()->streamDownload(function () use ($pdf) {
+                echo $pdf->output();
+            }, $filename);
+
+        } catch (\Exception $e) {
+            Log::error('Error generating struk PDF', [
+                'record_id' => $this->lastCheckoutRecord->id ?? null,
+                'error' => $e->getMessage()
+            ]);
+            $this->error = 'Terjadi kesalahan saat membuat struk';
+        }
+    }
+
     public function resetForm()
     {
         $this->noTabungan = '';
@@ -379,6 +422,7 @@ class MakanBergizisGratisCheckout extends Component
         $this->error = null;
         $this->success = null;
         $this->alreadyCheckedOut = false;
+        $this->lastCheckoutRecord = null;
     }
 
     public function render()
