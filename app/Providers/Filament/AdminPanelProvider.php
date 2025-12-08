@@ -37,12 +37,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->authGuard('admin')
-            ->authPasswordBroker('admin')
+            ->authPasswordBroker('admins')
             ->brandName('Kospin Sinara Artha')
             ->brandLogo(asset('images/logo_kospin.png'))
             ->brandLogoHeight('4rem')
             ->darkModeBrandLogo(asset('images/logo_kospin.png'))
             ->login()
+            ->passwordReset()
             ->colors([
                 'primary' => Color::Amber,
             ])
