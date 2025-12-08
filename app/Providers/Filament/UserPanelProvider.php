@@ -32,6 +32,7 @@ class UserPanelProvider extends PanelProvider
             ->path('user')
             ->login()
             ->registration()
+            ->passwordReset()
             ->brandName('Kospin Sinara Artha')
             ->brandLogo(asset('images/logo_kospin.png'))
             ->brandLogoHeight('4rem')
