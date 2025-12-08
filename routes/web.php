@@ -74,4 +74,7 @@ Route::get('/makan-bergizi-sinara/{hash?}', App\Livewire\MakanBergizisGratisChec
 Route::get('/qris-generator', App\Livewire\QrisPublicGenerator::class)
     ->name('qris.public-generator');
 
+// Mobile App Request - Public page for closed beta access request
+Route::get('/mobile-app', App\Livewire\MobileAppRequest::class)
+    ->name('mobile-app.request');
 
