@@ -48,7 +48,7 @@ class MobileAppRequest extends Component
             // Kirim email notifikasi ke admin
             $this->sendNotificationToAdmin($user);
 
-            $this->success = 'Permintaan Anda telah dikirim! Tim kami akan menghubungi Anda melalui email yang terdaftar untuk memberikan akses uji coba aplikasi mobile.';
+            $this->success = 'Permintaan Anda telah dikirim! Silakancoba join tester dan download app ke depan maksimal 1x24 jam. Jika ada kendala silakan hubungi email : admin@kospinsinaraartha.co.id.';
             $this->requestSent = true;
 
             Log::info('Mobile app request submitted', [
