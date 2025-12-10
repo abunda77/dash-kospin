@@ -12,7 +12,7 @@ class Profile extends Model
 {
     use LogsActivity, HasFactory;
 
-    protected $primaryKey = 'id_user';  // atau 'id_user' sesuai struktur tabel Anda
+    protected $primaryKey = 'id';  // Primary key adalah 'id', bukan 'id_user'
     protected $fillable = [
         'id_user',
         'first_name',

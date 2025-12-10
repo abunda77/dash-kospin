@@ -40,7 +40,7 @@ class Pinjaman extends Model
 
     public function profile()
     {
-        return $this->belongsTo(Profile::class, 'profile_id', 'id_user');
+        return $this->belongsTo(Profile::class, 'profile_id');
     }
 
     public function produkPinjaman()

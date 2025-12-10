@@ -117,7 +117,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
         }
 
         return Pinjaman::query()
-            ->where('profile_id', $profile->id_user)
+            ->where('profile_id', $profile->id)
             ->with(['produkPinjaman', 'biayaBungaPinjaman', 'transaksiPinjaman', 'denda']);
     }
 
@@ -314,7 +314,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
             return format_rupiah(0);
         }
 
-        $total = Pinjaman::where('profile_id', $profile->id_user)
+        $total = Pinjaman::where('profile_id', $profile->id)
             ->where('status_pinjaman', 'approved')
             ->sum('jumlah_pinjaman');
 
@@ -329,7 +329,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
             return format_rupiah(0);
         }
 
-        $pinjamans = Pinjaman::where('profile_id', $profile->id_user)
+        $pinjamans = Pinjaman::where('profile_id', $profile->id)
             ->where('status_pinjaman', 'approved')
             ->with('transaksiPinjaman')
             ->get();
@@ -351,7 +351,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
             return 0;
         }
 
-        return Pinjaman::where('profile_id', $profile->id_user)->count();
+        return Pinjaman::where('profile_id', $profile->id)->count();
     }
 
     public function getPinjamanAktif(): int
@@ -362,7 +362,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
             return 0;
         }
 
-        return Pinjaman::where('profile_id', $profile->id_user)
+        return Pinjaman::where('profile_id', $profile->id)
             ->where('status_pinjaman', 'approved')
             ->count();
     }
