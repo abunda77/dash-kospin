@@ -64,7 +64,7 @@ class Profile extends Model
 
     public function pinjamans()
     {
-        return $this->hasMany(Pinjaman::class, 'profile_id', 'id_user');
+        return $this->hasMany(Pinjaman::class, 'profile_id');
     }
 
     public function getActivitylogOptions(): LogOptions

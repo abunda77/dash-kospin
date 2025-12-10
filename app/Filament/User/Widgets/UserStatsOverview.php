@@ -30,7 +30,7 @@ class UserStatsOverview extends BaseWidget
         }
 
         // Hitung total saldo tabungan
-        $tabungans = Tabungan::where('id_profile', $profile->id_user)
+        $tabungans = Tabungan::where('id_profile', $profile->id)
             ->where('status_rekening', 'aktif')
             ->get();
         
@@ -47,7 +47,7 @@ class UserStatsOverview extends BaseWidget
         }
 
         // Hitung sisa pinjaman
-        $pinjamans = Pinjaman::where('profile_id', $profile->id_user)
+        $pinjamans = Pinjaman::where('profile_id', $profile->id)
             ->where('status_pinjaman', 'approved')
             ->with('transaksiPinjaman')
             ->get();
@@ -64,8 +64,8 @@ class UserStatsOverview extends BaseWidget
             ->sum('nominal_penempatan');
 
         // Jumlah rekening
-        $jumlahTabungan = Tabungan::where('id_profile', $profile->id_user)->count();
-        $jumlahPinjaman = Pinjaman::where('profile_id', $profile->id_user)->count();
+        $jumlahTabungan = Tabungan::where('id_profile', $profile->id)->count();
+        $jumlahPinjaman = Pinjaman::where('profile_id', $profile->id)->count();
         $jumlahDeposito = Deposito::where('id_user', $profile->id_user)->count();
 
         return [
