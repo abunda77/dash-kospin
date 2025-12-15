@@ -28,7 +28,7 @@ class Tabungan extends Model
 
     public function profile()
     {
-        return $this->belongsTo(Profile::class, 'id_profile', 'id');
+        return $this->belongsTo(Profile::class, 'id_profile', 'id_user');
     }
 
     public function produkTabungan()
