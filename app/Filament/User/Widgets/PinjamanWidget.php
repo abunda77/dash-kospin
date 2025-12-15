@@ -64,7 +64,7 @@ class PinjamanWidget extends BaseWidget
         }
 
         return Pinjaman::query()
-            ->where('profile_id', $profile->id)
+            ->where('profile_id', $profile->id_user)
             ->where('status_pinjaman', 'approved')
             ->with(['produkPinjaman', 'transaksiPinjaman'])
             ->limit(5);

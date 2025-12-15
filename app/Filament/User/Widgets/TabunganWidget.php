@@ -2,18 +2,18 @@
 
 namespace App\Filament\User\Widgets;
 
-use App\Models\Tabungan;
-use App\Models\TransaksiTabungan;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use App\Models\Tabungan;
+use App\Models\TransaksiTabungan;
 use Illuminate\Support\Facades\Auth;
 
 class TabunganWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
-
-    protected int|string|array $columnSpan = 'full';
+    
+    protected int | string | array $columnSpan = 'full';
 
     protected static ?string $heading = '💰 Tabungan Saya';
 
@@ -43,7 +43,6 @@ class TabunganWidget extends BaseWidget
                         $totalKredit = TransaksiTabungan::where('id_tabungan', $record->id)
                             ->where('jenis_transaksi', 'kredit')
                             ->sum('jumlah');
-
                         return $saldoAwal + ($totalDebit - $totalKredit);
                     })
                     ->money('IDR', locale: 'id')
@@ -68,13 +67,13 @@ class TabunganWidget extends BaseWidget
     protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $profile = Auth::user()->profile;
-
-        if (! $profile) {
+        
+        if (!$profile) {
             return Tabungan::query()->whereRaw('1 = 0');
         }
 
         return Tabungan::query()
-            ->where('id_profile', $profile->id)
+            ->where('id_profile', $profile->id_user)
             ->where('status_rekening', 'aktif')
             ->with('produkTabungan')
             ->limit(5);
