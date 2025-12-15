@@ -13,7 +13,7 @@ class FixTabunganProfileData extends Command
      *
      * @var string
      */
-    protected $signature = 'app:fix-tabungan-profile-data {--dry-run : Jalankan pengecekan tanpa melakukan perubahan}';
+    protected $signature = 'app:fix-tabungan-profile-data {--dry-run : Jalankan pengecekan tanpa melakukan perubahan} {--force : Jalankan perbaikan tanpa konfirmasi}';
 
     /**
      * The console command description.
@@ -48,17 +48,31 @@ class FixTabunganProfileData extends Command
 
         $this->warn('⚠️  Ditemukan id_profile yang tidak valid: ' . implode(', ', $invalidProfiles));
 
-        // Ambil id_user pertama yang valid sebagai fallback
-        $fallbackUserId = reset($validUserIds);
+        // Mapping berdasarkan profiles.id ke profiles.id_user
+        // Jika id_profile = 1, cari profile dengan id = 1, ambil id_user nya
+        $mapping = [];
+        foreach ($invalidProfiles as $invalidProfile) {
+            // Coba cari profile dengan id = invalidProfile (bukan id_user)
+            $profile = Profile::where('id', $invalidProfile)->first();
+            if ($profile) {
+                $mapping[$invalidProfile] = $profile->id_user; // Ambil id_user yang benar
+            } else {
+                // Jika tidak ada profile dengan id = invalidProfile, gunakan fallback
+                $mapping[$invalidProfile] = reset($validUserIds);
+            }
+        }
 
-        $this->info("ID User fallback yang akan digunakan: {$fallbackUserId}");
+        $this->info("Mapping perbaikan:");
+        foreach ($mapping as $from => $to) {
+            $this->line("  {$from} → {$to}");
+        }
 
         if ($this->option('dry-run')) {
             $this->info('🔍 Dry run mode - hanya menampilkan apa yang akan diperbaiki:');
 
-            foreach ($invalidProfiles as $invalidProfile) {
-                $count = Tabungan::where('id_profile', $invalidProfile)->count();
-                $this->line("  - {$count} tabungan dengan id_profile {$invalidProfile} akan diubah menjadi {$fallbackUserId}");
+            foreach ($mapping as $from => $to) {
+                $count = Tabungan::where('id_profile', $from)->count();
+                $this->line("  - {$count} tabungan dengan id_profile {$from} akan diubah menjadi {$to}");
             }
 
             $this->info('Gunakan tanpa --dry-run untuk melakukan perbaikan sebenarnya.');
@@ -66,7 +80,8 @@ class FixTabunganProfileData extends Command
         }
 
         // Konfirmasi sebelum melakukan perubahan
-        if (!$this->confirm('Apakah Anda yakin ingin memperbaiki data ini?', true)) {
+        $confirmed = $this->option('force') || $this->confirm('Apakah Anda yakin ingin memperbaiki data ini?', true);
+        if (!$confirmed) {
             $this->info('Operasi dibatalkan.');
             return;
         }
@@ -74,10 +89,10 @@ class FixTabunganProfileData extends Command
         $this->info('🔧 Memulai perbaikan data...');
 
         $totalFixed = 0;
-        foreach ($invalidProfiles as $invalidProfile) {
-            $count = Tabungan::where('id_profile', $invalidProfile)->update(['id_profile' => $fallbackUserId]);
+        foreach ($mapping as $from => $to) {
+            $count = Tabungan::where('id_profile', $from)->update(['id_profile' => $to]);
             $totalFixed += $count;
-            $this->line("  ✓ {$count} tabungan dengan id_profile {$invalidProfile} diperbaiki");
+            $this->line("  ✓ {$count} tabungan dengan id_profile {$from} diperbaiki menjadi {$to}");
         }
 
         $this->info("✅ Perbaikan selesai. Total {$totalFixed} data tabungan diperbaiki.");
