@@ -2,18 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Profile extends Model
 {
-    use HasFactory, LogsActivity;
+    use LogsActivity, HasFactory;
 
     protected $primaryKey = 'id';  // Primary key adalah 'id', bukan 'id_user'
-
     protected $fillable = [
         'id_user',
         'first_name',
@@ -39,7 +38,7 @@ class Profile extends Model
         'avatar',
         'remote_url',
         'notes',
-        'ibu_kandung',
+        'ibu_kandung'
     ];
 
     protected $casts = [
@@ -47,7 +46,7 @@ class Profile extends Model
         'monthly_income' => 'decimal:2',
         'birthday' => 'date',
         'created_at' => 'date',
-        'updated_at' => 'date',
+        'updated_at' => 'date'
     ];
 
     /**
@@ -66,11 +65,6 @@ class Profile extends Model
     public function pinjamans()
     {
         return $this->hasMany(Pinjaman::class, 'profile_id');
-    }
-
-    public function tabungans()
-    {
-        return $this->hasMany(Tabungan::class, 'id_profile');
     }
 
     public function getActivitylogOptions(): LogOptions
@@ -101,7 +95,7 @@ class Profile extends Model
                 'avatar',
                 'remote_url',
                 'notes',
-                'ibu_kandung',
+                'ibu_kandung'
             ]);
     }
 }
