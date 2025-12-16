@@ -114,13 +114,13 @@ class TabunganSaya extends Page implements HasTable, HasInfolists
     protected function getTableQuery(): Builder
     {
         $profile = Auth::user()->profile;
-        
+
         if (!$profile) {
             return Tabungan::query()->whereRaw('1 = 0'); // Return empty query
         }
 
         return Tabungan::query()
-            ->where('id_profile', $profile->id_user)
+            ->where('id_profile', $profile->id)
             ->with(['produkTabungan', 'transaksi']);
     }
 
@@ -227,12 +227,12 @@ class TabunganSaya extends Page implements HasTable, HasInfolists
     public function getTotalSaldo(): string
     {
         $profile = Auth::user()->profile;
-        
+
         if (!$profile) {
             return format_rupiah(0);
         }
 
-        $tabungans = Tabungan::where('id_profile', $profile->id_user)
+        $tabungans = Tabungan::where('id_profile', $profile->id)
             ->where('status_rekening', 'aktif')
             ->get();
 
@@ -247,11 +247,11 @@ class TabunganSaya extends Page implements HasTable, HasInfolists
     public function getJumlahTabungan(): int
     {
         $profile = Auth::user()->profile;
-        
+
         if (!$profile) {
             return 0;
         }
 
-        return Tabungan::where('id_profile', $profile->id_user)->count();
+        return Tabungan::where('id_profile', $profile->id)->count();
     }
 }
