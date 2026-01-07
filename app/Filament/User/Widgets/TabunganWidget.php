@@ -17,6 +17,25 @@ class TabunganWidget extends BaseWidget
 
     protected static ?string $heading = '💰 Tabungan Saya';
 
+    /**
+     * Hitung saldo akhir tabungan berdasarkan saldo awal + transaksi
+     * Rumus: saldo_akhir = saldo_awal + (total_debit - total_kredit)
+     */
+    public function hitungSaldoAkhir(Tabungan $tabungan): float
+    {
+        $saldoAwal = $tabungan->saldo;
+
+        $totalDebit = TransaksiTabungan::where('id_tabungan', $tabungan->id)
+            ->where('jenis_transaksi', 'debit')
+            ->sum('jumlah');
+
+        $totalKredit = TransaksiTabungan::where('id_tabungan', $tabungan->id)
+            ->where('jenis_transaksi', 'kredit')
+            ->sum('jumlah');
+
+        return $saldoAwal + ($totalDebit - $totalKredit);
+    }
+
     public function table(Table $table): Table
     {
         return $table
@@ -35,16 +54,7 @@ class TabunganWidget extends BaseWidget
 
                 TextColumn::make('saldo_akhir')
                     ->label('Saldo')
-                    ->state(function (Tabungan $record) {
-                        $saldoAwal = $record->saldo;
-                        $totalDebit = TransaksiTabungan::where('id_tabungan', $record->id)
-                            ->where('jenis_transaksi', 'debit')
-                            ->sum('jumlah');
-                        $totalKredit = TransaksiTabungan::where('id_tabungan', $record->id)
-                            ->where('jenis_transaksi', 'kredit')
-                            ->sum('jumlah');
-                        return $saldoAwal + ($totalDebit - $totalKredit);
-                    })
+                    ->state(fn (Tabungan $record) => $this->hitungSaldoAkhir($record))
                     ->money('IDR', locale: 'id')
                     ->weight('bold')
                     ->color('success'),
@@ -73,9 +83,9 @@ class TabunganWidget extends BaseWidget
         }
 
         return Tabungan::query()
-            ->where('id_profile', $profile->id_user)
+            ->where('id_profile', $profile->id)
             ->where('status_rekening', 'aktif')
-            ->with('produkTabungan')
+            ->with(['produkTabungan', 'transaksi'])
             ->limit(5);
     }
 }
