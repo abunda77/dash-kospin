@@ -109,8 +109,7 @@ class TabunganResource extends Resource
                     ->label('Status')
                     ->options([
                         'aktif' => 'Aktif',
-                        'tidak_aktif' => 'Tidak Aktif',
-                        'blokir' => 'Blokir'
+                        'ditutup' => 'Ditutup',
                     ])
                     ->required(),
                 Forms\Components\Fieldset::make('Kode Teller')
@@ -166,13 +165,11 @@ class TabunganResource extends Resource
                     ->sortable()
                     ->formatStateUsing(fn(string $state): string => match ($state) {
                         'aktif' => 'Aktif',
-                        'tidak_aktif' => 'Tidak Aktif',
-                        'blokir' => 'Blokir',
+                        'ditutup' => 'Ditutup',
                     })
                     ->color(fn(string $state): string => match ($state) {
                         'aktif' => 'success',
-                        'tidak_aktif' => 'danger',
-                        'blokir' => 'warning',
+                        'ditutup' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
