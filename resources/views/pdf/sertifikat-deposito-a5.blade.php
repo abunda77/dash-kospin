@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Sertifikat Deposito</title>
     <style>
         @page {
             size: A5 landscape;
             margin: 0;
         }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
         }
+
         .border-container {
             position: relative;
             margin: 10px;
             height: calc(100vh - 20px);
             background: white;
         }
+
         .border-frame {
             position: absolute;
             top: 0;
@@ -30,30 +34,36 @@
             background-repeat: no-repeat;
             z-index: 1;
         }
+
         .content-wrapper {
             position: relative;
             z-index: 2;
             padding: 40px 50px;
         }
+
         .header {
             text-align: center;
             margin-bottom: 3px;
         }
+
         .header img {
             height: 70px;
             margin-bottom: 2px;
         }
+
         .header .company-name {
             font-size: 14px;
             font-weight: bold;
             color: #2B3990;
             margin: 2px 0;
         }
+
         .header .company-address {
             font-size: 8px;
             margin: 1px 0;
             line-height: 1.1;
         }
+
         .certificate-title {
             text-align: center;
             font-size: 16px;
@@ -61,6 +71,7 @@
             color: #FF4500;
             margin: 5px 0;
         }
+
         .nominal {
             text-align: center;
             font-size: 18px;
@@ -68,41 +79,50 @@
             color: #2B3990;
             margin: 5px 0;
         }
+
         .terbilang {
             text-align: center;
             font-style: italic;
             margin: 2px 0 5px 0;
             font-size: 9px;
         }
+
         .info-table {
             width: 100%;
             margin: 5px 0;
             border-collapse: collapse;
         }
-        .info-table td, .info-table th {
+
+        .info-table td,
+        .info-table th {
             padding: 3px;
             text-align: center;
             border: 1px solid #ddd;
             font-size: 8px;
         }
+
         .info-table th {
             background-color: #f5f5f5;
             font-weight: bold;
         }
+
         .customer-info {
             margin-top: 8px;
             margin-left: 20px;
             font-size: 8px;
             line-height: 1.2;
         }
+
         .customer-info p {
             margin: 1px 0;
         }
+
         .certificate-number {
             top: 20px;
             right: 30px;
             font-size: 8px;
         }
+
         .signature {
             position: absolute;
             bottom: 50px;
@@ -110,13 +130,16 @@
             text-align: center;
             font-size: 8px;
         }
+
         .signature p {
             margin: 1px 0;
         }
+
         .signature img {
             width: 80px;
             margin: 3px 0;
         }
+
         .signature .name {
             font-weight: bold;
             border-top: 1px solid #000;
@@ -124,6 +147,7 @@
             margin-top: 3px;
             width: 100px;
         }
+
         .bank-details {
             position: absolute;
             top: 220px;
@@ -134,6 +158,7 @@
             padding: 3px 5px;
             border-radius: 2px;
         }
+
         .bank-details h4 {
             font-size: 9px;
             margin: 0 0 4px 0;
@@ -143,18 +168,22 @@
             padding-bottom: 2px;
             text-transform: uppercase;
         }
+
         .bank-details table {
             width: 100%;
             border-collapse: collapse;
         }
+
         .bank-details table td {
             padding: 1px 0;
             line-height: 1.3;
         }
+
         .bank-details table td:first-child {
             width: 100px;
             font-weight: 500;
         }
+
         .alamat-wrap {
             word-break: break-word;
             white-space: pre-line;
@@ -162,6 +191,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="border-container">
         <div class="border-frame"></div>
@@ -204,10 +234,11 @@
                     </tr>
                     <tr>
                         <td style="border: none;">Atas Nama</td>
-                        <td style="border: none;">: {{ $deposito->profile->first_name }} {{ $deposito->profile->last_name }}</td>
+                        <td style="border: none;">: {{ $deposito->profile->first_name }}
+                            {{ $deposito->profile->last_name }}</td>
                     </tr>
                     @php
-                        $getRegionName = function($code) {
+                        $getRegionName = function ($code) {
                             return DB::table('regions')->where('code', $code)->value('name') ?? '-';
                         };
                     @endphp
@@ -257,9 +288,10 @@
                 <p>Ketua / Pengurus</p>
                 <p>KOPERASI SINARA ARTHA</p>
                 <img src="{{ public_path('images/ttd_andesta_nobg.png') }}" alt="Tanda Tangan">
-                <p class="name">ANDESTA RULLI</p>
+                <p class="name">JIMMY TANDIONO</p>
             </div>
         </div>
     </div>
 </body>
+
 </html>

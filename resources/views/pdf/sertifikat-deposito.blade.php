@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Sertifikat Deposito</title>
     <style>
         @page {
             size: landscape;
             margin: 0;
         }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
         }
+
         .border-container {
             position: relative;
             margin: 30px;
             height: calc(100vh - 60px);
             background: white;
         }
+
         .border-frame {
             position: absolute;
             top: 0;
@@ -30,30 +34,36 @@
             background-repeat: no-repeat;
             z-index: 1;
         }
+
         .content-wrapper {
             position: relative;
             z-index: 2;
             padding: 100px 120px;
         }
+
         .header {
             text-align: center;
             margin-bottom: 5px;
         }
+
         .header img {
             height: 100px;
             margin-bottom: 3px;
         }
+
         .header .company-name {
             font-size: 16px;
             font-weight: bold;
             color: #2B3990;
             margin: 3px 0;
         }
+
         .header .company-address {
             font-size: 9px;
             margin: 1px 0;
             line-height: 1.2;
         }
+
         .certificate-title {
             text-align: center;
             font-size: 20px;
@@ -61,6 +71,7 @@
             color: #FF4500;
             margin: 8px 0;
         }
+
         .nominal {
             text-align: center;
             font-size: 24px;
@@ -68,42 +79,51 @@
             color: #2B3990;
             margin: 8px 0;
         }
+
         .terbilang {
             text-align: center;
             font-style: italic;
             margin: 3px 0 10px 0;
             font-size: 11px;
         }
+
         .info-table {
             width: 100%;
             margin: 8px 0;
             border-collapse: collapse;
         }
-        .info-table td, .info-table th {
+
+        .info-table td,
+        .info-table th {
             padding: 4px;
             text-align: center;
             border: 1px solid #ddd;
             font-size: 10px;
         }
+
         .info-table th {
             background-color: #f5f5f5;
             font-weight: bold;
         }
+
         .customer-info {
             margin-top: 12px;
             margin-left: 50px;
             font-size: 10px;
             line-height: 1.3;
         }
+
         .customer-info p {
             margin: 2px 0;
         }
+
         .certificate-number {
             /* position: absolute; */
             top: 25px;
             right: 50px;
             font-size: 9px;
         }
+
         .signature {
             position: absolute;
             bottom: 100px;
@@ -111,13 +131,16 @@
             text-align: center;
             font-size: 10px;
         }
+
         .signature p {
             margin: 1px 0;
         }
+
         .signature img {
             width: 120px;
             margin: 5px 0;
         }
+
         .signature .name {
             font-weight: bold;
             border-top: 1px solid #000;
@@ -125,6 +148,7 @@
             margin-top: 5px;
             width: 140px;
         }
+
         .bank-details {
             position: absolute;
             top: 365px;
@@ -135,6 +159,7 @@
             padding: 5px 10px;
             border-radius: 3px;
         }
+
         .bank-details h4 {
             font-size: 11px;
             margin: 0 0 6px 0;
@@ -144,20 +169,24 @@
             padding-bottom: 3px;
             text-transform: uppercase;
         }
+
         .bank-details table {
             width: 100%;
             border-collapse: collapse;
         }
+
         .bank-details table td {
             padding: 2px 0;
             line-height: 1.4;
         }
+
         .bank-details table td:first-child {
             width: 150px;
             font-weight: 500;
         }
     </style>
 </head>
+
 <body>
     <div class="border-container">
         <div class="border-frame"></div>
@@ -203,10 +232,11 @@
                     </tr>
                     <tr>
                         <td style="border: none;">Atas Nama</td>
-                        <td style="border: none;">: {{ $deposito->profile->first_name }} {{ $deposito->profile->last_name }}</td>
+                        <td style="border: none;">: {{ $deposito->profile->first_name }}
+                            {{ $deposito->profile->last_name }}</td>
                     </tr>
                     @php
-                        $getRegionName = function($code) {
+                        $getRegionName = function ($code) {
                             return DB::table('regions')->where('code', $code)->value('name') ?? '-';
                         };
                     @endphp
@@ -256,9 +286,10 @@
                 <p>Ketua / Pengurus</p>
                 <p>KOPERASI SINARA ARTHA</p>
                 <img src="{{ public_path('images/ttd_andesta_nobg.png') }}" alt="Tanda Tangan">
-                <p class="name">ANDESTA RULLI</p>
+                <p class="name">JIMMY TANDIONO</p>
             </div>
         </div>
     </div>
 </body>
+
 </html>
