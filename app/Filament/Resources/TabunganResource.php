@@ -2,21 +2,15 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use App\Models\Profile;
-use App\Models\Tabungan;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Support\RawJs;
-use App\Models\ProdukTabungan;
-use Filament\Resources\Resource;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\TabunganResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\TabunganResource\RelationManagers;
+use App\Models\Tabungan;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Support\RawJs;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Log;
 
 class TabunganResource extends Resource
 {
@@ -25,7 +19,9 @@ class TabunganResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
     protected static ?string $navigationLabel = 'Rekening Tabungan';
+
     protected static ?string $title = 'Rekening Tabungan';
+
     public static function getNavigationGroup(): ?string
     {
         return 'Tabungan';
@@ -73,8 +69,9 @@ class TabunganResource extends Resource
                     ->maxLength(255)
                     ->default(function () {
                         do {
-                            $number = '8888-' . str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+                            $number = '8888-'.str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
                         } while (Tabungan::where('no_tabungan', $number)->exists());
+
                         return $number;
                     })
                     ->disabled(false)
@@ -82,7 +79,7 @@ class TabunganResource extends Resource
                 Forms\Components\Select::make('id_profile')
                     ->label('Nasabah')
                     ->relationship('profile', 'first_name')
-                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->first_name} {$record->last_name}")
+                    ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->first_name} {$record->last_name}")
                     ->required(),
                 Forms\Components\Select::make('produk_tabungan')
                     ->label('Produk Tabungan')
@@ -100,7 +97,7 @@ class TabunganResource extends Resource
                             $component->state(number_format($state, 0, '.', ','));
                         }
                     })
-                    ->dehydrateStateUsing(fn($state) => (int) str_replace(',', '', $state))
+                    ->dehydrateStateUsing(fn ($state) => (int) str_replace(',', '', $state))
                     ->required(),
                 Forms\Components\DatePicker::make('tanggal_buka_rekening')
                     ->label('Tanggal Buka')
@@ -116,9 +113,14 @@ class TabunganResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('kode_teller')
                             ->label('Kode Teller')
-                            ->default(auth('admin')->user()->id)
+                            ->default(fn () => auth('admin')->user()?->id)
+                            ->afterStateHydrated(function (Forms\Components\TextInput $component, $state) {
+                                if (! filled($state)) {
+                                    $component->state(auth('admin')->user()?->id);
+                                }
+                            })
                             ->disabled()
-                            ->dehydrated(fn($state) => filled($state))
+                            ->dehydrated(true)
                             ->required(),
                     ]),
             ]);
@@ -137,7 +139,7 @@ class TabunganResource extends Resource
                     ->formatStateUsing(function ($record) {
                         Log::info('Debug Tabungan-Profile:', [
                             'id_profile' => $record->id_profile,
-                            'profile' => $record->profile
+                            'profile' => $record->profile,
                         ]);
 
                         return $record->profile
@@ -163,11 +165,11 @@ class TabunganResource extends Resource
                     ->badge()
                     ->searchable()
                     ->sortable()
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
                         'aktif' => 'Aktif',
                         'ditutup' => 'Ditutup',
                     })
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'aktif' => 'success',
                         'ditutup' => 'danger',
                     }),
