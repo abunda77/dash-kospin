@@ -11,7 +11,7 @@
         <!-- Header -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="text-center">
-                <h1 class="text-2xl font-bold text-gray-800 mb-2">KoSPIN Dash</h1>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">KOPERASI Dash</h1>
                 <p class="text-gray-600">Detail Rekening Tabungan</p>
             </div>
         </div>
@@ -100,7 +100,7 @@
                 Data diakses pada: {{ date('d/m/Y H:i:s') }}
             </p>
             <p class="text-gray-500 text-xs mt-2">
-                KoSPIN Dash - Sistem Manajemen Koperasi Simpan Pinjam
+                KOPERASI Dash - Sistem Manajemen Koperasi SINARA ARTHA NAYA
             </p>
         </div>
     </div>

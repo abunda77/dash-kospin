@@ -84,7 +84,7 @@
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
         <h1>FORMULIR PENDAFTARAN ANGGOTA</h1>
-        <h1>KOPERASI SINARA ARTHA</h1>
+        <h1>KOPERASI SINARA ARTHA NAYA</h1>
     </div>
 
     <div class="section">
@@ -169,9 +169,9 @@
     </div>
 
     <div class="terms">
-        <h2>Syarat dan Ketentuan Menjadi Anggota Koperasi SINARA ARTHA</h2>
+        <h2>Syarat dan Ketentuan Menjadi Anggota Koperasi SINARA ARTHA NAYA</h2>
 
-        <p>Dengan ini saya menyatakan bahwa saya telah memahami dan setuju untuk memenuhi syarat dan kewajiban sebagai anggota Koperasi SINARA ARTHA, sebagai berikut:</p>
+        <p>Dengan ini saya menyatakan bahwa saya telah memahami dan setuju untuk memenuhi syarat dan kewajiban sebagai anggota Koperasi SINARA ARTHA NAYA, sebagai berikut:</p>
 
         <h3>Syarat Menjadi Anggota:</h3>
         <ol class="terms-list">
@@ -179,7 +179,7 @@
             <li>Memiliki KTP yang masih berlaku.</li>
             <li>Mengisi formulir pendaftaran anggota dengan lengkap dan benar.</li>
             <li>Membayar simpanan pokok dan simpanan wajib sesuai ketentuan koperasi.</li>
-            <li>Menyetujui dan mematuhi anggaran dasar dan anggaran rumah tangga (AD/ART) Koperasi SINARA ARTHA.</li>
+            <li>Menyetujui dan mematuhi anggaran dasar dan anggaran rumah tangga (AD/ART) Koperasi SINARA ARTHA NAYA.</li>
             <li>Bersedia mengikuti program dan kegiatan yang diselenggarakan oleh koperasi.</li>
         </ol>
 
@@ -203,7 +203,7 @@
             <li>Meminta laporan tahunan koperasi dan transparansi terkait operasional koperasi.</li>
         </ol>
 
-        <p>Dengan menandatangani formulir ini, saya menyatakan bahwa saya telah membaca dan menyetujui syarat, kewajiban, serta hak sebagai anggota Koperasi SINARA ARTHA. Saya akan mematuhi seluruh peraturan yang berlaku di dalam koperasi.</p>
+        <p>Dengan menandatangani formulir ini, saya menyatakan bahwa saya telah membaca dan menyetujui syarat, kewajiban, serta hak sebagai anggota Koperasi SINARA ARTHA NAYA. Saya akan mematuhi seluruh peraturan yang berlaku di dalam koperasi.</p>
     </div>
 
     <div class="footer">

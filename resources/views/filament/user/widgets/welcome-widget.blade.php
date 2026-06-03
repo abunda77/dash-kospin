@@ -15,7 +15,7 @@
                         {{ $this->getGreeting() }}, <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-yellow-400 dark:from-yellow-300 dark:to-yellow-500">{{ $this->getUserName() }}</span>! 👋
                     </h2>
                     <p class="mt-2 text-primary-100 dark:text-primary-200 text-sm md:text-base font-medium">
-                        Selamat datang di portal anggota Kospin Sinara Artha
+                        Selamat datang di portal anggota KOPERASI SINARA ARTHA NAYA
                     </p>
                 </div>
 

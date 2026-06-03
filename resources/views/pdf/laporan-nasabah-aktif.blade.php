@@ -200,7 +200,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>KOPERASI SIMPAN PINJAM SINARA ARTHA</h1>
+        <h1>KOPERASI SINARA ARTHA NAYA</h1>
         <h2>LAPORAN NASABAH AKTIF</h2>
         <p>Periode: {{ $dateFrom }} s/d {{ $dateTo }}</p>
     </div>
@@ -294,7 +294,7 @@
 
     <div class="footer">
         <p>Laporan ini dibuat secara otomatis pada {{ $generatedAt }}</p>
-        <p>Kospin Sinara Artha - Sistem Informasi Koperasi</p>
+        <p>KOPERASI SINARA ARTHA NAYA - Sistem Informasi Koperasi</p>
     </div>
 </body>
 </html>

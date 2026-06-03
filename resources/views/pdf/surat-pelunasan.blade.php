@@ -165,7 +165,7 @@
             </tr>
         </table>
 
-        <p>Dengan demikian, kami menyatakan bahwa Saudara/i telah melunasi seluruh kewajiban kredit kepada <strong>Koperasi Sinara Artha</strong> sampai dengan tanggal <strong>{{ \Carbon\Carbon::parse($pelunasan->tanggal_pelunasan)->translatedFormat('d F Y') }}</strong>, dengan jumlah pelunasan sebesar <strong>Rp {{ number_format($pelunasan->jumlah_pelunasan, 0, ',', '.') }}</strong>.</p>
+        <p>Dengan demikian, kami menyatakan bahwa Saudara/i telah melunasi seluruh kewajiban kredit kepada <strong>Koperasi SINARA ARTHA NAYA</strong> sampai dengan tanggal <strong>{{ \Carbon\Carbon::parse($pelunasan->tanggal_pelunasan)->translatedFormat('d F Y') }}</strong>, dengan jumlah pelunasan sebesar <strong>Rp {{ number_format($pelunasan->jumlah_pelunasan, 0, ',', '.') }}</strong>.</p>
         <br>
         <p>Surat pelunasan ini harap disimpan sebagai <strong>bukti yang sah</strong> serta dapat digunakan dengan semestinya.</p>
 
@@ -176,7 +176,7 @@
         <div class="signature-box">
           <p>Hormat kami,</p>
             <div class="signer-name">ANDREAS WIDEA</div>
-            <div class="signer-title">(Ketua Koperasi Sinara Artha)</div>
+            <div class="signer-title">(Ketua Koperasi SINARA ARTHA NAYA)</div>
         </div>
     </div>
 

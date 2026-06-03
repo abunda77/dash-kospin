@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ $title ?? 'KOSPIN Sinara Artha' }}</title>
-    <meta name="description" content="{{ $description ?? 'Koperasi Simpan Pinjam Sinara Artha - Solusi keuangan terpercaya untuk tabungan, pinjaman, dan deposito.' }}">
+    <title>{{ $title ?? 'KOPERASI SINARA ARTHA NAYA' }}</title>
+    <meta name="description" content="{{ $description ?? 'Koperasi SINARA ARTHA NAYA - Solusi keuangan terpercaya untuk tabungan, pinjaman, dan deposito.' }}">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">

@@ -14,7 +14,7 @@
         </div>
 
         <h2 class="mt-2 text-center text-3xl font-extrabold text-slate-900 tracking-tight">
-            KOSPIN Mobile
+            KOPERASI Mobile
         </h2>
         <p class="mt-2 text-center text-sm text-slate-600 max-w">
             Akses layanan keuangan dalam genggaman. <br>
@@ -284,7 +284,7 @@
         </div>
 
         <p class="mt-8 text-center text-xs text-slate-400">
-            &copy; {{ date('Y') }} Koperasi Simpan Pinjam Sinara Artha. <br>
+            &copy; {{ date('Y') }} Koperasi SINARA ARTHA NAYA. <br>
             All rights reserved.
         </p>
     </div>

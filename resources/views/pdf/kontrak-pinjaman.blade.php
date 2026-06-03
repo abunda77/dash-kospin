@@ -84,7 +84,7 @@
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
         <h1>SURAT PERJANJIAN PINJAMAN UANG</h1>
-        <h1>KOPERASI SINARA ARTHA</h1>
+        <h1>KOPERASI SINARA ARTHA NAYA</h1>
     </div>
 
     <p>Pada hari ini {{ now()->locale('id')->isoFormat('dddd') }}, {{ now()->locale('id')->isoFormat('D MMMM Y') }} di SURABAYA, kami yang bertanda tangan di bawah ini:</p>
@@ -148,7 +148,7 @@
                 <tr>
                     <td style="width: 150px">Nama</td>
                     <td style="width: 10px">:</td>
-                    <td>KOPERASI SINARA ARTHA</td>
+                    <td>KOPERASI SINARA ARTHA NAYA</td>
                 </tr>
                 <tr>
                     <td>Alamat</td>
@@ -208,7 +208,7 @@
                 pada tanggal {{ $pinjaman->tanggal_pinjaman->format('d') }}
                 @endif
                 setiap {{ $pinjaman->jangka_waktu_satuan }}.</li>
-            <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 {{ $pinjaman->jangka_waktu_satuan }} angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA sebagai jaminan pembayaran angsuran ( kecuali <b>PINJAMAN INSTANT</b>).</li>
+            <li>PIHAK PERTAMA menyetujui bahwa dana sebesar Rp {{ number_format($angsuran_per_bulan, 0, ',', '.') }} (setara dengan 1 {{ $pinjaman->jangka_waktu_satuan }} angsuran) akan ditahan <b>(hold)</b> di dalam sistem KOPERASI SINARA ARTHA NAYA sebagai jaminan pembayaran angsuran ( kecuali <b>PINJAMAN INSTANT</b>).</li>
 
         </ol>
     </div>
@@ -216,7 +216,7 @@
     <div class="article">
         <h3>Pasal 3<br>CARA PEMBAYARAN</h3>
         <ol>
-            <li>Pembayaran angsuran dilakukan melalui transfer bank ke rekening PIHAK KEDUA di Bank BCA No. Rekening : 0889333288 atau secara tunai di kantor KOPERASI SINARA ARTHA.</li>
+            <li>Pembayaran angsuran dilakukan melalui transfer bank ke rekening PIHAK KEDUA di Bank BCA No. Rekening : 0889333288 atau secara tunai di kantor KOPERASI SINARA ARTHA NAYA.</li>
             <li>PIHAK PERTAMA harus menyertakan bukti pembayaran setiap kali melakukan angsuran sebagai tanda bukti pelunasan sebagian.</li>
             <li>PIHAK PERTAMA wajib melakukan konfirmasi pembayaran kepada PIHAK KEDUA setiap kali melakukan pembayaran angsuran melalui media komunikasi yang telah ditentukan oleh PIHAK KEDUA.</li>
             <li>Kelalaian dalam melakukan konfirmasi pembayaran dapat mengakibatkan pembayaran dianggap belum diterima oleh PIHAK KEDUA dan dapat dikenakan sanksi keterlambatan sebagaimana diatur dalam Pasal 4 perjanjian ini.</li>
@@ -292,7 +292,7 @@
         <div class="sign-column">
             <p>PIHAK KEDUA</p>
             <div class="sign-box"></div>
-            <p>KOPERASI SINARA ARTHA</p>
+            <p>KOPERASI SINARA ARTHA NAYA</p>
             <p>(ANDREAS WIDEA)</p>
         </div>
     </div>

@@ -89,7 +89,7 @@
 </head>
 <body>
     <div class="header">
-        <h2>KOSPIN SINARA ARTHA</h2>
+        <h2>KOPERASI SINARA ARTHA NAYA</h2>
         <p>Laporan Tabungan Terpilih</p>
         <p>Total Rekening: {{ is_countable($records) ? count($records) : (method_exists($records,'count') ? $records->count() : 0) }}</p>
         <p>Tanggal Cetak: {{ $generatedAt ?? now()->format('d M Y H:i:s') }}</p>

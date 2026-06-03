@@ -14,7 +14,7 @@
                     📱 Permintaan Akses Aplikasi Mobile
                 </h1>
                 <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0; font-size: 14px;">
-                    Uji Coba Tertutup - KOSPIN Sinara Artha
+                    Uji Coba Tertutup - KOPERASI SINARA ARTHA NAYA
                 </p>
             </td>
         </tr>
@@ -27,7 +27,7 @@
                 </p>
                 
                 <p style="margin: 0 0 25px; font-size: 16px; color: #555;">
-                    Ada pengguna yang mengajukan permintaan untuk mendapatkan akses uji coba aplikasi mobile KOSPIN Sinara Artha.
+                    Ada pengguna yang mengajukan permintaan untuk mendapatkan akses uji coba aplikasi mobile KOPERASI SINARA ARTHA NAYA.
                 </p>
 
                 <!-- User Info Card -->
@@ -70,7 +70,7 @@
                 </div>
 
                 <p style="margin: 0; font-size: 14px; color: #888;">
-                    Email ini dikirim secara otomatis oleh sistem KOSPIN Sinara Artha.
+                    Email ini dikirim secara otomatis oleh sistem KOPERASI SINARA ARTHA NAYA.
                 </p>
             </td>
         </tr>
@@ -79,7 +79,7 @@
         <tr>
             <td style="background-color: #f8fafc; padding: 25px 30px; text-align: center; border-top: 1px solid #e5e7eb;">
                 <p style="margin: 0 0 5px; font-size: 13px; color: #9ca3af;">
-                    &copy; {{ date('Y') }} Koperasi Simpan Pinjam Sinara Artha
+                    &copy; {{ date('Y') }} Koperasi SINARA ARTHA NAYA
                 </p>
                 <p style="margin: 0; font-size: 12px; color: #9ca3af;">
                     Sistem Administrasi & Manajemen Koperasi

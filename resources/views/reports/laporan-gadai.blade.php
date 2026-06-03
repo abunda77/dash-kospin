@@ -98,7 +98,7 @@
 <body>
     <div class="header">
         <h1>LAPORAN GADAI</h1>
-        <p>Koperasi Simpan Pinjam</p>
+        <p>Koperasi SINARA ARTHA NAYA</p>
         <p>Periode: {{ \Carbon\Carbon::parse($filters['tanggal_mulai'])->format('d/m/Y') }} - {{ \Carbon\Carbon::parse($filters['tanggal_akhir'])->format('d/m/Y') }}</p>
     </div>
 

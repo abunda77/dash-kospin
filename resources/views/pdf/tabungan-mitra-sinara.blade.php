@@ -69,7 +69,7 @@
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
         <h1>FORMULIR PEMBUKAAN REKENING TABUNGAN MITRA SINARA</h1>
-        <h1>KOPERASI SINARA ARTHA</h1>
+        <h1>KOPERASI SINARA ARTHA NAYA</h1>
     </div>
 
     <div class="section">

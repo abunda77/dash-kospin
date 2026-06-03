@@ -103,7 +103,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="company-name">KOPERASI SIMPAN PINJAM</div>
+        <div class="company-name">KOPERASI SINARA ARTHA NAYA</div>
         <div class="report-title">{{ $reportTitle ?? 'Laporan Pinjaman Terpilih' }}</div>
         <div class="report-info">
             Dicetak pada: {{ $generatedAt ?? now()->format('d M Y H:i') }}

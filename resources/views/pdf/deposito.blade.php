@@ -70,7 +70,7 @@
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
         <h1>FORMULIR PEMBUKAAN REKENING DEPOSITO</h1>
-        <h1>KOPERASI SINARA ARTHA</h1>
+        <h1>KOPERASI SINARA ARTHA NAYA</h1>
     </div>
 
     <div class="section">
@@ -245,7 +245,7 @@
         <p style="text-align: justify;">
             Dengan menandatangani formulir ini, saya menyatakan bahwa data yang saya berikan adalah benar
             dan dapat dipertanggungjawabkan. Saya menyetujui ketentuan yang berlaku dan akan mematuhi
-            seluruh peraturan yang ditetapkan oleh Koperasi SINARA ARTHA, termasuk ketentuan penalti
+            seluruh peraturan yang ditetapkan oleh Koperasi SINARA ARTHA NAYA, termasuk ketentuan penalti
             pencairan sebelum jatuh tempo dan mekanisme perpanjangan deposito.
         </p>
     </div>

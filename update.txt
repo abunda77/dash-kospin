@@ -1,0 +1,13 @@
+Local
+====
+
+composer update filament/* livewire/livewire --with-all-dependencies
+composer update symfony/* league/commonmark --with-all-dependencies
+composer update phpunit/phpunit psy/psysh --with-all-dependencies
+composer audit
+npm run build
+
+Production
+====
+composer install --no-dev --optimize-autoloader
+npm run build

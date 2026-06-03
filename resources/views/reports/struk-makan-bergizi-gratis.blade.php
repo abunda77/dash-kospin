@@ -96,7 +96,7 @@
 <body>
     <div class="header">
         <h1>STRUK MAKAN BERGIZI GRATIS</h1>
-        <div class="subtitle">SINARA ARTHA</div>
+        <div class="subtitle">SINARA ARTHA NAYA</div>
         <div class="subtitle">{{ $record->tanggal_pemberian->format('d F Y') }}</div>
     </div>
 

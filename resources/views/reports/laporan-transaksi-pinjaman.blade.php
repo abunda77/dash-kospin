@@ -103,7 +103,7 @@
 </head>
 <body>
     <div class="header">
-        <h2>KOSPIN SINARA ARTHA</h2>
+        <h2>KOPERASI SINARA ARTHA NAYA</h2>
         <p>Laporan Transaksi Pinjaman</p>
         <p>{{ $periode }}</p>
         <p>Tanggal Cetak: {{ $tanggal_cetak }}</p>

@@ -130,7 +130,7 @@
 <body>
     <div class="header">
         <h1>LAPORAN DEPOSITO</h1>
-        <h2>Koperasi Simpan Pinjam</h2>
+        <h2>Koperasi SINARA ARTHA NAYA</h2>
         <p>
             Periode: {{ \Carbon\Carbon::parse($filters['tanggal_mulai'])->format('d M Y') }} - 
             {{ \Carbon\Carbon::parse($filters['tanggal_akhir'])->format('d M Y') }}

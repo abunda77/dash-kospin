@@ -248,7 +248,7 @@
 
         <!-- Footer -->
         <div class="text-center mt-6 text-gray-500 text-xs">
-            <p>&copy; {{ date('Y') }} Koperasi Simpan Pinjam</p>
+            <p>&copy; {{ date('Y') }} Koperasi SINARA ARTHA NAYA</p>
         </div>
     </div>
 </div>

@@ -93,7 +93,7 @@
 </head>
 <body>
     <div class="header">
-        <h2>KOSPIN SINARA ARTHA</h2>
+        <h2>KOPERASI SINARA ARTHA NAYA</h2>
         <p>Laporan Pinjaman</p>
         @if(isset($periode))<p>{{ $periode }}</p>@endif
         <p>Tanggal Cetak: {{ now()->format('d/m/Y') }}</p>

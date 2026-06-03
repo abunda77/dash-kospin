@@ -107,7 +107,7 @@
 </head>
 <body>
     <div class="header">
-        <h2>KOSPIN SINARA ARTHA</h2>
+        <h2>KOPERASI SINARA ARTHA NAYA</h2>
         <p>Laporan Transaksi Tabungan</p>
         @if(isset($periode))<p>{{ $periode }}</p>@endif
         @if(isset($productName))<p>Produk: {{ $productName }}</p>@endif
