@@ -142,6 +142,54 @@ class ViewTabungan extends ViewRecord
                             echo $pdf->output();
                         }, $filename);
                     }),
+
+                Action::make('printHalloSinaran')
+                    ->label('Simpanan Hallo Sinaran')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->action(function () {
+                        $pdf = Pdf::loadView('pdf.tabungan-hallo-sinaran', [
+                            'tabungan' => $this->record
+                        ]);
+
+                        $filename = 'rekening_hallo_sinaran_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
+
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->output();
+                        }, $filename);
+                    }),
+
+                Action::make('printSuperSinaran')
+                    ->label('Simpanan Super Sinaran')
+                    ->icon('heroicon-o-printer')
+                    ->color('primary')
+                    ->action(function () {
+                        $pdf = Pdf::loadView('pdf.tabungan-super-sinaran', [
+                            'tabungan' => $this->record
+                        ]);
+
+                        $filename = 'rekening_super_sinaran_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
+
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->output();
+                        }, $filename);
+                    }),
+
+                Action::make('printVPSinaran')
+                    ->label('Simpanan VP Sinaran')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray')
+                    ->action(function () {
+                        $pdf = Pdf::loadView('pdf.tabungan-vp-sinaran', [
+                            'tabungan' => $this->record
+                        ]);
+
+                        $filename = 'rekening_vp_sinaran_' . $this->record->profile->first_name . '_' . $this->record->profile->last_name . '_' . $this->record->no_tabungan . '.pdf';
+
+                        return response()->streamDownload(function () use ($pdf) {
+                            echo $pdf->output();
+                        }, $filename);
+                    }),
             ])
                 ->label('Cetak Form Lainnya')
                 ->icon('heroicon-o-document-duplicate')
