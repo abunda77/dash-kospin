@@ -61,7 +61,7 @@
     <div class="container">
         <div class="header">
             <div class="title">BARCODE TABUNGAN</div>
-            <div>KoSPIN Dash</div>
+            <div>KOPERASI SINARA ARTHA NAYA</div>
         </div>
         
         <div class="account-info">
