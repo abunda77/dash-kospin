@@ -2,119 +2,127 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Barcode Tabungan - {{ $tabungan->no_tabungan }}</title>
+    <title>Kartu Member - {{ $tabungan->no_tabungan }}</title>
+
     <style>
+        @page {
+            size: 85.6mm 53.98mm;
+            margin: 0;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
+        html,
         body {
+            width: 85.6mm;
+            height: 53.98mm;
+            margin: 0;
+            padding: 0;
             font-family: Arial, Helvetica, sans-serif;
-            padding: 20px;
-            text-align: center;
         }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            border: 2px solid #333;
-            padding: 20px;
+
+        .card {
+            position: relative;
+            width: 85.6mm;
+            height: 53.98mm;
+            overflow: hidden;
+            background: #ffffff;
+            
         }
-        .header {
-            margin-bottom: 20px;
+        .card-logo {
+    position: absolute;
+    top: 4.5mm;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 55mm;
+    height: auto;
+    max-height: 12mm;
+
+    object-fit: contain;
+    display: block;
+}
+
+        .member-name {
+            position: absolute;
+            left: 6mm;
+            bottom: 20mm;
+            width: 48mm;
+
+            font-family: "Times New Roman", serif;
+            font-size: 3mm;
+            line-height: 3.6mm;
+            font-weight: normal;
+            letter-spacing: 0.25mm;
+            text-transform: uppercase;
+            color: #111;
+
+            white-space: normal;
+            overflow: hidden;
         }
-        .title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
+
+        .qr-wrapper {
+            position: absolute;
+            right: 5mm;
+            bottom: 4mm;
+            width: 21mm;
+            height: 21mm;
+            background: #ffffff;
+            padding: 1.2mm;
         }
-        .account-info {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .account-info table {
+
+        .qr-wrapper img {
             width: 100%;
-            border-collapse: collapse;
+            height: 100%;
+            display: block;
+            object-fit: contain;
         }
-        .account-info td {
-            padding: 5px;
-            border-bottom: 1px solid #eee;
+
+        .qr-placeholder {
+            width: 100%;
+            height: 100%;
+            border: 0.3mm solid #333;
+            font-size: 2.2mm;
+            text-align: center;
+            padding-top: 6mm;
+            color: #333;
         }
-        .account-info td:first-child {
-            font-weight: bold;
-            width: 40%;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #666;
-        }
-        .scan-url {
-            font-size: 10px;
-            word-break: break-all;
-            margin-top: 10px;
-            color: #888;
+
+        @media print {
+            html,
+            body {
+                width: 85.6mm;
+                height: 53.98mm;
+            }
+
+            .card {
+                page-break-after: always;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="title">BARCODE TABUNGAN</div>
-            <div>KOPERASI SINARA ARTHA NAYA</div>
+    <div class="card">
+        <img src="{{ public_path('images/logo_sinarartha_light.png') }}" alt="Logo" class="card-logo">
+        <div class="member-name">
+            {{ $tabungan->profile->first_name }} {{ $tabungan->profile->last_name }}
         </div>
-        
-        <div class="account-info">
-            <table>
-                <tr>
-                    <td>No. Rekening</td>
-                    <td>: {{ $tabungan->no_tabungan }}</td>
-                </tr>
-                <tr>
-                    <td>Nama Nasabah</td>
-                    <td>: {{ $tabungan->profile->first_name }} {{ $tabungan->profile->last_name }}</td>
-                </tr>
-                <tr>
-                    <td>Produk</td>
-                    <td>: {{ $tabungan->produkTabungan->nama_produk }}</td>
-                </tr>
-                {{-- <tr>
-                    <td>Saldo</td>
-                    <td>: {{ format_rupiah($tabungan->saldo) }}</td>
-                </tr> --}}
-                <tr>
-                    <td>Status</td>
-                    <td>: {{ ucfirst($tabungan->status_rekening) }}</td>
-                </tr>
-            </table>
-        </div>
-        
-        <div class="qr-code">
+
+        <div class="qr-wrapper">
             @if(isset($hasQrCode) && $hasQrCode && isset($qrCodePath))
-                <div style="text-align: center; margin: 20px 0;">
-                    <img src="{{ $qrCodePath }}" alt="QR Code" width="200" height="200" style="display: block; margin: 0 auto;">
-                </div>
+                <img src="{{ $qrCodePath }}" alt="QR Code">
             @else
-                <div style="width: 200px; height: 200px; border: 2px solid #333; margin: 20px auto; padding: 20px; text-align: center;">
-                    <div style="padding-top: 50px;">
-                        <strong>QR Code</strong><br><br>
-                        Scan untuk input<br>
-                        Makan Bergizi Gratis
-                    </div>
+                <div class="qr-placeholder">
+                    QR<br>CODE
                 </div>
-                @if(isset($error))
-                    <div style="color: #888; font-size: 10px; margin-top: 10px; text-align: center;">{{ $error }}</div>
-                @endif
             @endif
         </div>
-        
-        <div class="footer">
-            <div>Scan barcode untuk input data Makan Bergizi Gratis</div>
-            <div class="scan-url">Data QR: {{ $qrData }}</div>
-            <div style="margin-top: 10px;">
-                Dicetak pada: {{ date('d/m/Y H:i:s') }}
-            </div>
-        </div>
+
     </div>
 </body>
 </html>
