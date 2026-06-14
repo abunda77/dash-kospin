@@ -68,13 +68,13 @@
 <body>
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
-        <h1>FORMULIR PEMBUKAAN REKENING SIMPANAN HALLO SINARAN</h1>
+        <h1>FORMULIR PEMBUKAAN REKENING SIMPANAN KERTA SINARA</h1>
         <h1>KOPERASI SINARA ARTHA NAYA</h1>
     </div>
 
     <div class="section">
         <div class="form-group">
-            <span class="label">Nomor Rekening</span>:
+            <span class="label">Nomor Simpanan</span>:
             <span class="value">{{ $tabungan->no_tabungan }}</span>
         </div>
         <div class="form-group">
@@ -167,7 +167,7 @@
     <div class="section">
         <div class="section-title">INFORMASI LAINNYA</div>
         <div class="form-group">
-            <span class="label">1. Jenis Rekening</span>:
+            <span class="label">1. Jenis Simpanan</span>:
             <span class="value">{{ $tabungan->produkTabungan->nama_produk }}</span>
         </div>
     </div>
@@ -175,22 +175,20 @@
     <div class="section">
         <div class="section-title">KETENTUAN REKENING</div>
         <ol>
-            <li>Simpanan Hallo Sinaran dengan setoran awal minimal Rp 30.000 .</li>
-            <li>Pembukaan dan penarikan rekening dapat dilakukan kapan saja.</li>
+            <li>Simpanan Kerta Sinara dengan setoran awal minimal Rp 30.000 .</li>
+            <li>Pembukaan dan penarikan rekening dapat dilakukan kapan saja selama jam operasional koperasi.</li>
             <li>Proses penarikan dilakukan dalam waktu 1x24 jam </li>
-            <li>Penutupan Rekening akan dikenakan biaya sebesar 2% dari saldo yang ditarik.</li>
-            <li>Rekening yang tidak aktif selama 12 bulan berturut-turut dan atau saldo minimal Rp.30.000 akan dinyatakan dormant.</li>
             <li>Nasabah wajib memberitahukan koperasi jika ada perubahan data pribadi.</li>
             <li>Program simpanan fleksibel untuk transaksi sehari-hari dengan kemudahan akses dan hadiah menarik.</li>
             <li>Kemudahan Akses: Dilayani langsung oleh marketing (bisa collect) dan dilengkapi akses ke Mobile Apps Sinaran.</li>
-            <li>Keuntungan: Suku bunga \(2\%\) p.a., mendapat kartu anggota, merchandise, serta poin setiap transaksi di Sinaran Mart.</li>
-            <li>Fitur Spesial: Berhak mengikuti undian tahunan dan mendapat akses untuk menjual produk anggota di Sinaran Mart &amp; mobile apps.</li>
+            <li>Keuntungan: Suku bunga \(2\%\) p.a., mendapat kartu anggota, merchandise.</li>
+            <li>Fitur Spesial: Berhak mengikuti undian dan mendapat akses untuk menjual produk anggota di Sinaran Mart &amp; mobile apps.</li>
         </ol>
     </div>
 
     <div class="footer">
         <div class="signature">
-            <p>Surabaya, {{ now()->format('d F Y') }}</p>
+            <p>Bali, {{ now()->format('d F Y') }}</p>
             <p>Yang bertanda tangan,</p>
             <div class="signature-box"></div>
             <p>({{ $tabungan->profile->first_name }} {{ $tabungan->profile->last_name }})</p>

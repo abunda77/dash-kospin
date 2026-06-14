@@ -68,13 +68,13 @@
 <body>
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
-        <h1>FORMULIR PEMBUKAAN REKENING SIMPANAN SUPER SINARAN</h1>
+        <h1>FORMULIR PEMBUKAAN REKENING SIMPANAN KERTA ARTHA</h1>
         <h1>KOPERASI SINARA ARTHA NAYA</h1>
     </div>
 
     <div class="section">
         <div class="form-group">
-            <span class="label">Nomor Rekening</span>:
+            <span class="label">Nomor Simpanan</span>:
             <span class="value">{{ $tabungan->no_tabungan }}</span>
         </div>
         <div class="form-group">
@@ -167,7 +167,7 @@
     <div class="section">
         <div class="section-title">INFORMASI LAINNYA</div>
         <div class="form-group">
-            <span class="label">1. Jenis Rekening</span>:
+            <span class="label">1. Jenis Simpanan</span>:
             <span class="value">{{ $tabungan->produkTabungan->nama_produk }}</span>
         </div>
     </div>
@@ -185,14 +185,14 @@
             <li>Program simpanan berjangka bersifat tetap dengan bunga lebih tinggi dan fasilitas keanggotaan prioritas.</li>
             <li>Biaya &amp; Setoran: Tanpa biaya administrasi. Simpanan Rp50.000 - Rp10.000.000 dengan tenor minimal (sesuai tabel ketentuan).</li>
             <li>Ketentuan Penarikan: Bersifat mengikat. Penarikan sebelum masa kontrak selesai dikenakan penalti sebesar \(1\%\) dari jumlah tabungan yang sudah disetorkan.</li>
-            <li>Keuntungan: Suku bunga menarik \(6\%\) p.a., didatangi marketing untuk setor tunai, serta mendapat kartu anggota, merchandise, dan poin belanja.</li>
+            <li>Keuntungan: Suku bunga menarik \(6\%\) p.a., didatangi marketing untuk setor tunai, serta mendapat kartu anggota, merchandise.</li>
             <li>Fitur Spesial: Kuota pembelian paket sembako Eco Sinaran (maksimal 1 paket) dan tabungan dapat dijadikan jaminan pinjaman.</li>
         </ol>
     </div>
 
     <div class="footer">
         <div class="signature">
-            <p>Surabaya, {{ now()->format('d F Y') }}</p>
+            <p>Bali, {{ now()->format('d F Y') }}</p>
             <p>Yang bertanda tangan,</p>
             <div class="signature-box"></div>
             <p>({{ $tabungan->profile->first_name }} {{ $tabungan->profile->last_name }})</p>

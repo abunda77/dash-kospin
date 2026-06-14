@@ -68,13 +68,13 @@
 <body>
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
-        <h1>FORMULIR PEMBUKAAN REKENING SIMPANAN VP SINARAN</h1>
+        <h1>FORMULIR PEMBUKAAN REKENING KERTA NAYA</h1>
         <h1>KOPERASI SINARA ARTHA NAYA</h1>
     </div>
 
     <div class="section">
         <div class="form-group">
-            <span class="label">Nomor Rekening</span>:
+            <span class="label">Nomor Simpanan</span>:
             <span class="value">{{ $tabungan->no_tabungan }}</span>
         </div>
         <div class="form-group">
@@ -167,7 +167,7 @@
     <div class="section">
         <div class="section-title">INFORMASI LAINNYA</div>
         <div class="form-group">
-            <span class="label">1. Jenis Rekening</span>:
+            <span class="label">1. Jenis Simpanan</span>:
             <span class="value">{{ $tabungan->produkTabungan->nama_produk }}</span>
         </div>
     </div>
@@ -184,18 +184,18 @@
             <li>Nasabah wajib memberitahukan koperasi jika ada perubahan data pribadi.</li>
             <li>Setoran &amp; Tenor: Minimal Rp5.000.000 - Maksimal Rp500.000.000 (Tenor: 3 hingga 24 bulan).</li>
             <li>Sifat Simpanan: Tetap dan mengikat, tidak dapat dicairkan sebelum tanggal jatuh tempo.</li>
-            <li>Suku Bunga: Mengikuti tabel yang berlaku pada Koperasi Sinara Artha.</li>
+            <li>Suku Bunga: Mengikuti tabel yang berlaku pada Koperasi Sinara Artha Naya.</li>
             <li>Keuntungan Fisik: Kartu anggota Sinaran, merchandise, dan kuota pembelian paket sembako Eco Sinaran.</li>
             <li>Fasilitas Digital: Akses aplikasi mobile, serta akses penjualan produk ke Sinara Mart &amp; aplikasi.</li>
-            <li>Manfaat Lain: Dapat dijadikan agunan/jaminan pinjaman dan berhak mengikuti undian tahunan.</li>
-            <li>Asuransi &amp; Poin: Asuransi jiwa gratis (min. simpanan Rp50.000.000, tenor 12 bulan) &amp; poin belanja Sinara Mart.</li>
-            <li>Ketentuan Transfer: Simpanan wajib ditransfer ke rekening bank atas nama Koperasi Sinara Artha.</li>
+            <li>Manfaat Lain: Dapat dijadikan agunan/jaminan pinjaman dan berhak mengikuti undian.</li>
+            <li>Asuransi &amp; Poin: Asuransi jiwa gratis (min. simpanan Rp50.000.000, tenor 12 bulan) .</li>
+            <li>Ketentuan Transfer: Simpanan wajib ditransfer ke rekening bank atas nama Koperasi Sinara Artha Naya.</li>
         </ol>
     </div>
 
     <div class="footer">
         <div class="signature">
-            <p>Surabaya, {{ now()->format('d F Y') }}</p>
+            <p>Bali, {{ now()->format('d F Y') }}</p>
             <p>Yang bertanda tangan,</p>
             <div class="signature-box"></div>
             <p>({{ $tabungan->profile->first_name }} {{ $tabungan->profile->last_name }})</p>

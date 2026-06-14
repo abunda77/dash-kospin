@@ -144,7 +144,7 @@ class ViewTabungan extends ViewRecord
                     }),
 
                 Action::make('printHalloSinaran')
-                    ->label('Simpanan Hallo Sinaran')
+                    ->label('Simpanan Kerta Sinara')
                     ->icon('heroicon-o-printer')
                     ->color('success')
                     ->action(function () {
@@ -160,7 +160,7 @@ class ViewTabungan extends ViewRecord
                     }),
 
                 Action::make('printSuperSinaran')
-                    ->label('Simpanan Super Sinaran')
+                    ->label('Simpanan Kerta Artha')
                     ->icon('heroicon-o-printer')
                     ->color('primary')
                     ->action(function () {
@@ -176,7 +176,7 @@ class ViewTabungan extends ViewRecord
                     }),
 
                 Action::make('printVPSinaran')
-                    ->label('Simpanan VP Sinaran')
+                    ->label('Simpanan Kerta Naya')
                     ->icon('heroicon-o-printer')
                     ->color('gray')
                     ->action(function () {
