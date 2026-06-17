@@ -185,7 +185,7 @@
             <li>Setoran &amp; Tenor: Minimal Rp5.000.000 - Maksimal Rp500.000.000 (Tenor: 3 hingga 24 bulan).</li>
             <li>Sifat Simpanan: Tetap dan mengikat, tidak dapat dicairkan sebelum tanggal jatuh tempo.</li>
             <li>Suku Bunga: Mengikuti tabel yang berlaku pada Koperasi Sinara Artha Naya.</li>
-            <li>Keuntungan Fisik: Kartu anggota Sinaran, merchandise, dan kuota pembelian paket sembako Eco Sinaran.</li>
+            <li>Keuntungan Fisik: Kartu anggota Sinaran, merchandise, dan kuota pembelian paket sembako Eco Sinaran (Max 2 paket)</li>
             <li>Fasilitas Digital: Akses aplikasi mobile, serta akses penjualan produk ke Sinara Mart &amp; aplikasi.</li>
             <li>Manfaat Lain: Dapat dijadikan agunan/jaminan pinjaman dan berhak mengikuti undian.</li>
             <li>Asuransi &amp; Poin: Asuransi jiwa gratis (min. simpanan Rp50.000.000, tenor 12 bulan) .</li>

@@ -44,3 +44,7 @@ frankenphp-worker.php
 PENTING.txt
 .kilo
 
+# Filament published package assets
+public/css
+public/js
+
