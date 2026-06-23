@@ -254,7 +254,7 @@
 
     <div class="footer">
         <div class="signature">
-            <p>Surabaya, {{ now()->format('d F Y') }}</p>
+            <p>Denpasar, {{ now()->format('d F Y') }}</p>
             <p>Yang bertanda tangan,</p>
             <div class="signature-box"></div>
             <p>({{ $deposito->profile->first_name }} {{ $deposito->profile->last_name }})</p>
