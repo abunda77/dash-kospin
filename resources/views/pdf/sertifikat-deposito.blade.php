@@ -282,7 +282,7 @@
             </div>
 
             <div class="signature">
-                <p>Surabaya, {{ \Carbon\Carbon::parse($deposito->tanggal_pembukaan)->format('d F Y') }}</p>
+                <p>Denpasar, {{ \Carbon\Carbon::parse($deposito->tanggal_pembukaan)->format('d F Y') }}</p>
                 <p>Ketua / Pengurus</p>
                 <p>KOPERASI SINARA ARTHA NAYA</p>
                 <img src="{{ public_path('images/ttd_andesta_nobg.png') }}" alt="Tanda Tangan">

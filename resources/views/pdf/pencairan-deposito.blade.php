@@ -112,7 +112,7 @@
     </div>
 
     <div class="date">
-        Surabaya, {{ date('d/m/Y') }}
+        Denpasar, {{ date('d/m/Y') }}
     </div>
 
     <div class="signature">
