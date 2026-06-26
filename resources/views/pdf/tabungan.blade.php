@@ -185,7 +185,7 @@
 
     <div class="footer">
         <div class="signature">
-            <p>Surabaya, {{ now()->format('d F Y') }}</p>
+            <p>Denpasar, {{ now()->format('d F Y') }}</p>
             <p>Yang bertanda tangan,</p>
             <div class="signature-box"></div>
             <p>({{ $tabungan->profile->first_name }} {{ $tabungan->profile->last_name }})</p>
