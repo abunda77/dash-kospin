@@ -30,7 +30,8 @@
             width: 85.6mm;
             height: 53.98mm;
             overflow: hidden;
-            background: #ffffff;
+           background: #ffffff url('{{ public_path('images/bg_kartu_simpanan.jpg') }}') no-repeat center center;
+            background-size: cover;
             
         }
         .card-logo {
@@ -59,18 +60,32 @@
             font-weight: normal;
             letter-spacing: 0.25mm;
             text-transform: uppercase;
-            color: #111;
+            color: #ffffff;
 
             white-space: normal;
             overflow: hidden;
         }
 
+        .product-name {
+            position: absolute;
+            left: 6mm;
+            bottom: 15mm;
+            width: 48mm;
+
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 2.2mm;
+            line-height: 3mm;
+            font-weight: bold;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
         .qr-wrapper {
             position: absolute;
-            right: 5mm;
-            bottom: 4mm;
-            width: 21mm;
-            height: 21mm;
+            right: 2mm;
+            bottom: 3mm;
+            width: 12mm;
+            height: 12mm;
             background: #ffffff;
             padding: 1.2mm;
         }
@@ -108,10 +123,16 @@
 
 <body>
     <div class="card">
-        <img src="{{ public_path('images/logo_sinarartha_light.png') }}" alt="Logo" class="card-logo">
+        <!-- <img src="{{ public_path('images/logo_sinarartha_light.png') }}" alt="Logo" class="card-logo"> -->
         <div class="member-name">
             {{ $tabungan->profile->first_name }} {{ $tabungan->profile->last_name }}
         </div>
+
+        @if(isset($namaProduk) && $namaProduk)
+        <div class="product-name">
+            {{ $namaProduk }}
+        </div>
+        @endif
 
         <div class="qr-wrapper">
             @if(isset($hasQrCode) && $hasQrCode && isset($qrCodePath))

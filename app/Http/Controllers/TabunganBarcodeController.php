@@ -80,7 +80,8 @@ class TabunganBarcodeController extends Controller
             'qrCodePath' => $qrCodePath,
             'qrData' => $qrData,
             'hasQrCode' => $hasQrCode,
-            'error' => $error
+            'error' => $error,
+            'namaProduk' => $tabungan->produkTabungan->nama_produk ?? null,
         ]);
 
         // Set paper size dan options
