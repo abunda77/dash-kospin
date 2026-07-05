@@ -1,9 +1,11 @@
 {
     "agents": [
-        "gemini"
+        "claude_code"
     ],
     "editors": [
-        "gemini"
+        "claude_code"
     ],
-    "guidelines": []
+    "guidelines": [
+        "filament/filament"
+    ]
 }
