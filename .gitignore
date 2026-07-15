@@ -48,3 +48,5 @@ PENTING.txt
 public/css
 public/js
 
+.claude/
+boost.json
