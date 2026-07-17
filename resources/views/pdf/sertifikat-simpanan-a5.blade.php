@@ -205,7 +205,7 @@
                     <th>Jangka Waktu</th>
                     <th>Akhir Kontrak</th>
                     <th>Bunga</th>
-                    <th>Produk Tabungan</th>
+                    <th>Produk Simpanan</th>
                 </tr>
                 <tr>
                     <td>{{ $tabungan->no_tabungan }}</td>
