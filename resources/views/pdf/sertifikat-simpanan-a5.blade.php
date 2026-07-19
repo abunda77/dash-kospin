@@ -257,7 +257,7 @@
                 <p>Ketua / Pengurus</p>
                 <p>KOPERASI SINARA ARTHA NAYA</p>
                 <img src="{{ public_path('images/ttd_andesta_nobg.png') }}" alt="Tanda Tangan">
-                <p class="name">JIMMY TANDIONO</p>
+                <p class="name">VAN JIMMY TANDIONO</p>
             </div>
         </div>
     </div>
