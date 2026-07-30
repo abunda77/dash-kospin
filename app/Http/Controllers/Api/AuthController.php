@@ -129,7 +129,7 @@ class AuthController extends Controller
         try {
             $validatedData = $request->validate([
                 'old_password' => ['required', 'string'],
-                'new_password' => ['required', 'string', 'min:8', 'confirmed', Password::defaults()],
+                'new_password' => ['required', 'string', 'min:8', 'confirmed', PasswordRules::defaults()],
                 'new_password_confirmation' => ['required', 'string'],
             ], [
                 'old_password.required' => 'Password lama wajib diisi',

@@ -25,6 +25,23 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Throwable $e, $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
+                // Biarkan Laravel menangani validasi (422) dengan format standar
+                if ($e instanceof \Illuminate\Validation\ValidationException) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Validasi gagal',
+                        'errors' => $e->errors()
+                    ], 422);
+                }
+
+                // Token tidak valid / tidak ada -> 401, bukan 500
+                if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Unauthenticated'
+                    ], 401);
+                }
+
                 // Tentukan status code dengan fallback
                 $statusCode = $e instanceof \Symfony\Component\HttpKernel\Exception\HttpException
                     ? $e->getStatusCode()
