@@ -1,9 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use App\Http\Controllers\WelcomeController;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', [WelcomeController::class, 'index']);
 
@@ -22,18 +21,17 @@ Route::post('/reset-password', [App\Http\Controllers\Api\AuthController::class, 
 
 // PDF Report download routes
 Route::get('/download-report/{filename}', function (string $filename) {
-    $filepath = storage_path('app/public/reports/' . basename($filename));
-    
-    if (!file_exists($filepath)) {
-        abort(404, 'File not found');
-    }
-    
-    // Security check - only allow PDF files
-    if (!str_ends_with(strtolower($filename), '.pdf')) {
+    $filename = basename($filename);
+
+    if (! str_ends_with(strtolower($filename), '.pdf')) {
         abort(403, 'Invalid file type');
     }
-    
-    return response()->download($filepath, $filename, [
+
+    if (! \Illuminate\Support\Facades\Storage::disk('public')->exists('reports/'.$filename)) {
+        abort(404, 'File not found');
+    }
+
+    return \Illuminate\Support\Facades\Storage::disk('public')->download('reports/'.$filename, $filename, [
         'Content-Type' => 'application/pdf',
     ]);
 })->name('report.download');
@@ -46,11 +44,11 @@ Route::get('/export-monitor', function () {
 // Progress check route for AJAX monitoring
 Route::get('/export-progress/{key}', function (string $key) {
     $progress = \Illuminate\Support\Facades\Cache::get($key);
-    
-    if (!$progress) {
+
+    if (! $progress) {
         return response()->json(['error' => 'Progress not found'], 404);
     }
-    
+
     return response()->json($progress);
 })->name('export.progress');
 
@@ -77,4 +75,3 @@ Route::get('/qris-generator', App\Livewire\QrisPublicGenerator::class)
 // Mobile App Request - Public page for closed beta access request
 Route::get('/mobile-app', App\Livewire\MobileAppRequest::class)
     ->name('mobile-app.request');
-

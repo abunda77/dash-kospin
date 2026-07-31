@@ -90,14 +90,14 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($saldoTabungans as $index => $saldo)
+            @foreach($tabungans as $index => $tabungan)
                 <tr>
                     <td>{{ $index + 1 }}</td>
-                    <td>{{ $saldo->tabungan->profile->first_name }} {{ $saldo->tabungan->profile->last_name }}</td>
-                    <td>{{ $saldo->tabungan->profile->first_name }}</td>
-                    <td>{{ $saldo->tabungan->profile->last_name }}</td>
-                    <td>{{ $saldo->tabungan->no_tabungan }}</td>
-                    <td>Rp {{ number_format($saldo->saldo_akhir, 2, ',', '.') }}</td>
+                    <td>{{ $tabungan->profile->first_name ?? '-' }} {{ $tabungan->profile->last_name ?? '' }}</td>
+                    <td>{{ $tabungan->profile->first_name ?? '-' }}</td>
+                    <td>{{ $tabungan->profile->last_name ?? '-' }}</td>
+                    <td>{{ $tabungan->no_tabungan }}</td>
+                    <td>Rp {{ number_format($tabungan->saldo_akhir_computed ?? $tabungan->saldo_akhir, 2, ',', '.') }}</td>
                 </tr>
             @endforeach
         </tbody>

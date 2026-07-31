@@ -2,9 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\MutasiTabungan;
+use App\Filament\Widgets\StatistikNasabahWidget;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -16,17 +19,13 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Rupadana\ApiService\ApiServicePlugin;
-use App\Filament\Pages\MutasiTabungan;
-use App\Filament\Widgets\StatistikNasabahWidget;
-use Rmsramos\Activitylog\ActivitylogPlugin;
-use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
-// use Mvenghaus\FilamentScheduleMonitor\FilamentPlugin;
-use Filament\Navigation\NavigationItem;
-use Joaopaulolndev\FilamentEditEnv\FilamentEditEnvPlugin;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Joaopaulolndev\FilamentEditEnv\FilamentEditEnvPlugin;
+// use Mvenghaus\FilamentScheduleMonitor\FilamentPlugin;
+use Rmsramos\Activitylog\ActivitylogPlugin;
+use Rupadana\ApiService\ApiServicePlugin;
+use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -54,13 +53,13 @@ class AdminPanelProvider extends PanelProvider
                 'Deposito',
                 'Pinjaman',
                 'Laporan',
-                'Settings'
+                'Settings',
             ])
             ->navigationItems([
                 NavigationItem::make('Whatsapp Gateway')
                     ->group('Settings')
                     ->icon('heroicon-o-chat-bubble-left-right')
-                    ->url('http://admin:sinara123@46.102.156.214:3003/', shouldOpenInNewTab: true)
+                    ->url('http://admin:sinara123@46.102.156.214:3003/', shouldOpenInNewTab: true),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -71,7 +70,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                //Widgets\AccountWidget::class,
+                // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
                 StatistikNasabahWidget::class,
                 \App\Filament\Widgets\CriticalOverdueWidget::class,
@@ -103,7 +102,7 @@ class AdminPanelProvider extends PanelProvider
                     ->setIcon('heroicon-o-cog'),
             ])
             ->plugin(FilamentSpatieLaravelHealthPlugin::make())
-            ->plugin(\Mvenghaus\FilamentScheduleMonitor\FilamentPlugin::make());
-            //->databaseNotifications();
+            ->plugin(\Mvenghaus\FilamentScheduleMonitor\FilamentPlugin::make())
+            ->databaseNotifications();
     }
 }
