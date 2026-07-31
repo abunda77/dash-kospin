@@ -18,7 +18,8 @@ class Tabungan extends Model
         'produk_tabungan',
         'saldo',
         'tanggal_buka_rekening',
-        'status_rekening'
+        'status_rekening',
+        'notes'
     ];
 
     protected $casts = [
@@ -50,7 +51,8 @@ class Tabungan extends Model
                 'produk_tabungan',
                 'saldo',
                 'tanggal_buka_rekening',
-                'status_rekening'
+                'status_rekening',
+                'notes'
             ]);
     }
 }

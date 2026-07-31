@@ -45,9 +45,12 @@ class ViewTabungan extends ViewRecord
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'aktif' => 'success',
-                                'tidak_aktif' => 'danger',
-                                'blokir' => 'warning',
-                            })
+                                'ditutup' => 'danger',
+                                default => 'warning',
+                            }),
+                        TextEntry::make('notes')
+                            ->label('Catatan')
+                            ->placeholder('Tidak ada catatan'),
                     ])
             ]);
     }

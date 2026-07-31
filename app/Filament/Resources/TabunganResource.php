@@ -112,6 +112,10 @@ class TabunganResource extends Resource
                         'ditutup' => 'Ditutup',
                     ])
                     ->required(),
+                Forms\Components\Textarea::make('notes')
+                    ->label('Catatan')
+                    ->rows(3)
+                    ->nullable(),
                 Forms\Components\Fieldset::make('Kode Teller')
                     ->schema([
                         Forms\Components\TextInput::make('kode_teller')
@@ -176,6 +180,11 @@ class TabunganResource extends Resource
                         'aktif' => 'success',
                         'ditutup' => 'danger',
                     }),
+                Tables\Columns\TextColumn::make('notes')
+                    ->label('Catatan')
+                    ->limit(50)
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime()
