@@ -19,6 +19,19 @@ Route::post('/reset-password', [App\Http\Controllers\Api\AuthController::class, 
     ->middleware('guest')
     ->name('password.update');
 
+// Modern minimalis login page
+Route::get('/login', \App\Livewire\Auth\ModernLogin::class)
+    ->middleware('guest')
+    ->name('login.modern');
+
+Route::get('/register', \App\Livewire\Auth\ModernRegister::class)
+    ->middleware('guest')
+    ->name('register');
+
+Route::get('/forgot-password', \App\Livewire\Auth\ModernForgotPassword::class)
+    ->middleware('guest')
+    ->name('password.request');
+
 // PDF Report download routes
 Route::get('/download-report/{filename}', function (string $filename) {
     $filename = basename($filename);

@@ -6,6 +6,13 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-08-02]
+
+### Added
+- Custom halaman autentikasi: Login, Register, dan Lupa Password (/login, /register, /forgot-password)
+- Livewire komponen: ModernLogin, ModernRegister, ModernForgotPassword
+- Halaman autentikasi dengan branding Kospin, dark mode, dan validasi Bahasa Indonesia
+
 ## [Unreleased]
 
 ### Added
