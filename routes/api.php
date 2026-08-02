@@ -66,6 +66,21 @@ Route::prefix('barcode')->group(function () {
     });
 });
 
+// Payment / QRIS API
+Route::prefix('payment')->group(function () {
+    Route::get('/qris', [App\Http\Controllers\Api\PaymentController::class, 'listQris'])
+        ->middleware('throttle:60,1');
+
+    Route::get('/qris/{id}', [App\Http\Controllers\Api\PaymentController::class, 'showQris'])
+        ->middleware('throttle:60,1');
+
+    Route::post('/qris/validate', [App\Http\Controllers\Api\PaymentController::class, 'validateQris'])
+        ->middleware('throttle:30,1');
+
+    Route::post('/qris/generate-dynamic', [App\Http\Controllers\Api\PaymentController::class, 'generateDynamic'])
+        ->middleware('throttle:30,1');
+});
+
 // Makan Bergizi Gratis API
 Route::prefix('makan-bergizi-gratis')->group(function () {
     Route::get('/', [MakanBergizisGratisController::class, 'index'])
