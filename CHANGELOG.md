@@ -12,11 +12,8 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Custom halaman autentikasi: Login, Register, dan Lupa Password (/login, /register, /forgot-password)
 - Livewire komponen: ModernLogin, ModernRegister, ModernForgotPassword
 - Halaman autentikasi dengan branding Kospin, dark mode, dan validasi Bahasa Indonesia
-
-## [Unreleased]
-
-### Added
-- Note column pada model Tabungan
+- Payment API group: endpoint QRIS statis, detail, validasi, dan generate dinamis
+- File dokumentasi PaymentQR.md: workflow dan referensi endpoint Payment API
 
 ---
 
