@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>Formulir Pembukaan Deposito</title>
+    <title>Formulir Pembukaan Simpanan Artha Naya</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -69,7 +69,7 @@
 <body>
     <div class="header">
         <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
-        <h1>FORMULIR PEMBUKAAN REKENING DEPOSITO</h1>
+        <h1>FORMULIR PEMBUKAAN REKENING SIMPANAN ARTHA NAYA</h1>
         <h1>KOPERASI SINARA ARTHA NAYA</h1>
     </div>
 
@@ -93,7 +93,7 @@
     </div>
 
     <div class="section">
-        <div class="section-title">DATA NASABAH</div>
+        <div class="section-title">DATA ANGGOTA</div>
         <div class="form-group">
             <span class="label">1. Nama Lengkap</span>:
             <span class="value">{{ $deposito->profile->first_name }} {{ $deposito->profile->last_name }}</span>
@@ -182,7 +182,7 @@
     </div>
 
     <div class="section">
-        <div class="section-title">INFORMASI DEPOSITO</div>
+        <div class="section-title">INFORMASI SIMPANAN ARTHA NAYA</div>
         <div class="form-group">
             <span class="label">1. Nominal Penempatan</span>:
             <span class="value">Rp {{ number_format($deposito->nominal_penempatan, 0, ',', '.') }}</span>
@@ -233,12 +233,12 @@
     </div>
 
     <div class="section">
-        <div class="section-title">KETENTUAN DEPOSITO</div>
+        <div class="section-title">KETENTUAN SIMPANAN ARTHA NAYA</div>
         <ol>
-            {{-- <li>Pencairan deposito sebelum jatuh tempo akan dikenakan penalti sebesar 0.5% dari nominal deposito.</li> --}}
+            {{-- <li>Pencairan simpanan sebelum jatuh tempo akan dikenakan penalti sebesar 0.5% dari nominal simpanan.</li> --}}
             <li>Perpanjangan otomatis akan mengikuti suku bunga yang berlaku saat perpanjangan.</li>
-            <li>Bunga deposito akan dibayarkan setiap bulan ke rekening tabungan yang ditunjuk.</li>
-            <li>Deposito dapat dijadikan jaminan kredit dengan nilai maksimal 80% dari nominal deposito.</li>
+            <li>Bunga simpanan akan dibayarkan setiap bulan ke rekening simpanan yang ditunjuk.</li>
+            <li>Deposito dapat dijadikan jaminan kredit dengan nilai maksimal 80% dari nominal deposito.*</li>
             <li>Nasabah wajib memberitahukan koperasi jika ada perubahan data pribadi.</li>
         </ol>
 
