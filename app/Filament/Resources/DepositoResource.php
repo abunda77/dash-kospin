@@ -19,8 +19,8 @@ class DepositoResource extends Resource
     protected static ?string $model = Deposito::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = 'Rekening Deposito';
-    protected static ?string $title = 'Rekening Deposito';
+    protected static ?string $navigationLabel = 'Rekening Artha Naya';
+    protected static ?string $title = 'Rekening Artha Naya';
 
     public static function getNavigationGroup(): ?string
             {
