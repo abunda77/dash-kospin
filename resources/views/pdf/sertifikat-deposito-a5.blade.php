@@ -200,7 +200,7 @@
                 <img src="{{ public_path('images/logo_koperasi.jpg') }}" alt="Logo Koperasi">
             </div>
 
-            <div class="certificate-title">SERTIFIKAT DEPOSITO</div>
+            <div class="certificate-title">SERTIFIKAT SIMPANAN ARTHA NAYA</div>
 
             <div class="nominal">Rp. {{ number_format($deposito->nominal_penempatan, 0, ',', '.') }}</div>
             <div class="terbilang">Terbilang: {{ ucwords(terbilang($deposito->nominal_penempatan)) }} Rupiah</div>
@@ -288,7 +288,7 @@
                 <p>Ketua / Pengurus</p>
                 <p>KOPERASI SINARA ARTHA NAYA</p>
                 <img src="{{ public_path('images/ttd_andesta_nobg.png') }}" alt="Tanda Tangan">
-                <p class="name">JIMMY TANDIONO</p>
+                <p class="name">VAN JIMMY TANDIONO</p>
             </div>
         </div>
     </div>
