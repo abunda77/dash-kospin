@@ -14,12 +14,12 @@ class Karyawan extends Model
 
     protected $fillable = [
         'nik_karyawan',
-        'nama',
+        'first_name',
+        'last_name',
         'alamat',
         'tempat_lahir',
         'tanggal_lahir',
         'no_telepon',
-        'no_telepon_keluarga',
         'foto_profil',
         'is_active',
     ];
@@ -31,6 +31,11 @@ class Karyawan extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function getNamaAttribute(): string
+    {
+        return trim($this->first_name.' '.$this->last_name);
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

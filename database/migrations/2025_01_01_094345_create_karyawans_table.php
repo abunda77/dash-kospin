@@ -13,20 +13,20 @@ return new class extends Migration
     {
         Schema::create('karyawans', function (Blueprint $table) {
             $table->id();
-            
+
             // Data Esensial
             $table->string('nik_karyawan')->unique();
-            $table->string('nama');
+            $table->string('first_name');
+            $table->string('last_name');
             $table->text('alamat');
             $table->string('tempat_lahir');
             $table->date('tanggal_lahir');
             $table->string('no_telepon');
-            $table->string('no_telepon_keluarga')->nullable();
             $table->json('foto_profil')->nullable();
-            
+
             // Status
             $table->boolean('is_active')->default(true);
-            
+
             $table->timestamps();
         });
     }

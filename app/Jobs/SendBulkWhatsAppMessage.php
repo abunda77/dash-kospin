@@ -27,26 +27,17 @@ class SendBulkWhatsAppMessage implements ShouldQueue
 
             // Ganti variabel placeholder
             $messageText = str_replace(
-                ['{nama}', '{nik_karyawan}'],
-                [$karyawan->nama, $karyawan->nik_karyawan],
+                ['{nama}', '{first_name}', '{last_name}', '{nik_karyawan}'],
+                [$karyawan->nama, $karyawan->first_name, $karyawan->last_name, $karyawan->nik_karyawan],
                 $messageText
             );
 
-            // Format nomor telepon (pastikan menggunakan kode negara 62)
+            // Format nomor telepon menjadi 62xxx
             $whatsappNumber = preg_replace('/^(\+62|62|0)/', '', $karyawan->no_telepon);
-            $whatsappNumber = '62' . $whatsappNumber;
+            $whatsappNumber = '62'.$whatsappNumber;
 
             try {
-                $response = Http::withHeaders([
-                    'Authorization' => 'Bearer ' . env('WHATSAPP_AUTH_BEARER')
-                ])->post(env('WHATSAPP_API_URL'), [
-                    'recipient_type' => 'individual',
-                    'to' => $whatsappNumber,
-                    'type' => 'text',
-                    'text' => [
-                        'body' => $messageText
-                    ]
-                ]);
+                $response = send_whatsapp_api($whatsappNumber, $messageText);
 
                 // Kirim data ke webhook N8N apapun status kode pengiriman WhatsApp
                 $this->sendToWebhook($whatsappNumber, $messageText, $karyawan, $response->status());
@@ -56,12 +47,13 @@ class SendBulkWhatsAppMessage implements ShouldQueue
             } catch (\Exception $e) {
                 // Kirim data ke webhook N8N meskipun ada error
                 $this->sendToWebhook($whatsappNumber, $messageText, $karyawan, null);
-                
+
                 // Log error jika diperlukan
-                Log::error('Error sending bulk WhatsApp message: ' . $e->getMessage(), [
+                Log::error('Error sending bulk WhatsApp message: '.$e->getMessage(), [
                     'karyawan_id' => $karyawan->id,
-                    'whatsapp' => $whatsappNumber
+                    'whatsapp' => $whatsappNumber,
                 ]);
+
                 continue;
             }
         }
@@ -71,9 +63,10 @@ class SendBulkWhatsAppMessage implements ShouldQueue
     {
         try {
             $webhookUrl = env('WEBHOOK_WA_N8N');
-            
+
             if (empty($webhookUrl)) {
                 Log::warning('WEBHOOK_WA_N8N tidak dikonfigurasi di .env');
+
                 return;
             }
 
@@ -86,7 +79,7 @@ class SendBulkWhatsAppMessage implements ShouldQueue
                 'source' => 'send_bulk_whatsapp_message_job',
                 'whatsapp_status_code' => $whatsappStatus,
                 'whatsapp_sent_successfully' => $whatsappStatus === 200,
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ];
 
             $response = Http::timeout(30)->post($webhookUrl, $payload);
@@ -95,21 +88,21 @@ class SendBulkWhatsAppMessage implements ShouldQueue
                 Log::info('Data berhasil dikirim ke webhook N8N dari SendBulkWhatsAppMessage Job', [
                     'karyawan_id' => $karyawan->id,
                     'webhook_url' => $webhookUrl,
-                    'status_code' => $response->status()
+                    'status_code' => $response->status(),
                 ]);
             } else {
                 Log::warning('Gagal mengirim data ke webhook N8N dari SendBulkWhatsAppMessage Job', [
                     'karyawan_id' => $karyawan->id,
                     'webhook_url' => $webhookUrl,
                     'status_code' => $response->status(),
-                    'response_body' => $response->body()
+                    'response_body' => $response->body(),
                 ]);
             }
 
         } catch (\Exception $e) {
-            Log::error('Error mengirim data ke webhook N8N dari SendBulkWhatsAppMessage Job: ' . $e->getMessage(), [
+            Log::error('Error mengirim data ke webhook N8N dari SendBulkWhatsAppMessage Job: '.$e->getMessage(), [
                 'karyawan_id' => $karyawan->id,
-                'webhook_url' => $webhookUrl ?? 'tidak tersedia'
+                'webhook_url' => $webhookUrl ?? 'tidak tersedia',
             ]);
         }
     }

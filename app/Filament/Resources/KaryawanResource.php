@@ -39,9 +39,12 @@ class KaryawanResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true)
                     ->maxLength(255),
-                Forms\Components\TextInput::make('nama')
-                    ->label('Nama')
+                Forms\Components\TextInput::make('first_name')
+                    ->label('Nama Depan')
                     ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('last_name')
+                    ->label('Nama Belakang')
                     ->maxLength(255),
                 Forms\Components\Textarea::make('alamat')
                     ->label('Alamat')
@@ -61,9 +64,6 @@ class KaryawanResource extends Resource
                     ->defaultCountry('ID')
                     ->label('No. Telepon')
                     ->required(),
-                PhoneInput::make('no_telepon_keluarga')
-                    ->defaultCountry('ID')
-                    ->label('No. HP Keluarga'),
                 Forms\Components\FileUpload::make('foto_profil')
                     ->label('Foto Profile')
                     ->image(),
@@ -106,10 +106,6 @@ class KaryawanResource extends Resource
                 Tables\Columns\TextColumn::make('no_telepon')
                     ->label('No. Telepon')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('no_telepon_keluarga')
-                    ->label('No. HP Keluarga')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Status')
                     ->boolean()
@@ -188,9 +184,6 @@ class KaryawanResource extends Resource
                             ->date('d F Y'),
                         TextEntry::make('no_telepon')
                             ->label('No. Telepon'),
-                        TextEntry::make('no_telepon_keluarga')
-                            ->label('No. HP Keluarga')
-                            ->placeholder('-'),
                         TextEntry::make('is_active')
                             ->label('Status')
                             ->badge()

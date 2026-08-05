@@ -162,12 +162,6 @@
                 <td class="label">No. Telepon</td>
                 <td class="value">{{ $karyawan->no_telepon }}</td>
             </tr>
-            @if ($karyawan->no_telepon_keluarga)
-                <tr>
-                    <td class="label">No. HP Keluarga</td>
-                    <td class="value">{{ $karyawan->no_telepon_keluarga }}</td>
-                </tr>
-            @endif
             <tr>
                 <td class="label">Status</td>
                 <td class="value">

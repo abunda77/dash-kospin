@@ -2,38 +2,39 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Page;
 use App\Models\Pinjaman;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Illuminate\Database\Eloquent\Builder;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Filament\Pages\Page;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
-class ListKeterlambatan extends Page implements HasTable, HasForms
+class ListKeterlambatan extends Page implements HasForms, HasTable
 {
-    use InteractsWithTable;
-    use InteractsWithForms;
     use HasPageShield;
+    use InteractsWithForms;
+    use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-exclamation-triangle';
+
     protected static ?string $navigationLabel = 'List Telat Bulan Ini';
+
     protected static ?string $title = 'List Telat Bulan Ini';
 
     public static function getNavigationGroup(): ?string
-            {
-                return 'Pinjaman';
-            }
+    {
+        return 'Pinjaman';
+    }
 
     public static function getNavigationBadge(): ?string
     {
@@ -43,21 +44,21 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
             ->where('status_pinjaman', 'approved')
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
-                  ->whereYear('tanggal_pembayaran', $today->year);
+                    ->whereYear('tanggal_pembayaran', $today->year);
             })
             ->where(function ($query) use ($today) {
                 $query->whereHas('transaksiPinjaman', function ($q) use ($today) {
                     $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 0', [$today])
-                      ->whereRaw('DATE_FORMAT(tanggal_jatuh_tempo, "%Y-%m") < ?',
-                          [$today->format('Y-m')]);
+                        ->whereRaw('DATE_FORMAT(tanggal_jatuh_tempo, "%Y-%m") < ?',
+                            [$today->format('Y-m')]);
                 })
-                ->orWhere(function ($q) use ($today) {
-                    $q->whereDoesntHave('transaksiPinjaman')
-                      ->whereRaw('DATE_FORMAT(tanggal_pinjaman, "%Y-%m") < ?',
-                          [$today->format('Y-m')])
-                      ->whereRaw('DATEDIFF(?, DATE_ADD(tanggal_pinjaman, INTERVAL 1 MONTH)) > 0',
-                          [$today]);
-                });
+                    ->orWhere(function ($q) use ($today) {
+                        $q->whereDoesntHave('transaksiPinjaman')
+                            ->whereRaw('DATE_FORMAT(tanggal_pinjaman, "%Y-%m") < ?',
+                                [$today->format('Y-m')])
+                            ->whereRaw('DATEDIFF(?, DATE_ADD(tanggal_pinjaman, INTERVAL 1 MONTH)) > 0',
+                                [$today]);
+                    });
             })
             ->count();
     }
@@ -78,21 +79,21 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
             ->where('status_pinjaman', 'approved')
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
-                  ->whereYear('tanggal_pembayaran', $today->year);
+                    ->whereYear('tanggal_pembayaran', $today->year);
             })
             ->where(function ($query) use ($today) {
                 $query->whereHas('transaksiPinjaman', function ($q) use ($today) {
                     $q->whereRaw('DATEDIFF(?, tanggal_jatuh_tempo) > 0', [$today])
-                      ->whereRaw('DATE_FORMAT(tanggal_jatuh_tempo, "%Y-%m") < ?',
-                          [$today->format('Y-m')]);
+                        ->whereRaw('DATE_FORMAT(tanggal_jatuh_tempo, "%Y-%m") < ?',
+                            [$today->format('Y-m')]);
                 })
-                ->orWhere(function ($q) use ($today) {
-                    $q->whereDoesntHave('transaksiPinjaman')
-                      ->whereRaw('DATE_FORMAT(tanggal_pinjaman, "%Y-%m") < ?',
-                          [$today->format('Y-m')])
-                      ->whereRaw('DATEDIFF(?, DATE_ADD(tanggal_pinjaman, INTERVAL 1 MONTH)) > 0',
-                          [$today]);
-                });
+                    ->orWhere(function ($q) use ($today) {
+                        $q->whereDoesntHave('transaksiPinjaman')
+                            ->whereRaw('DATE_FORMAT(tanggal_pinjaman, "%Y-%m") < ?',
+                                [$today->format('Y-m')])
+                            ->whereRaw('DATEDIFF(?, DATE_ADD(tanggal_pinjaman, INTERVAL 1 MONTH)) > 0',
+                                [$today]);
+                    });
             });
     }
 
@@ -159,7 +160,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
         $whatsapp = preg_replace('/[^0-9]/', '', $whatsapp);
 
         if (substr($whatsapp, 0, 1) === '0') {
-            $whatsapp = '62' . substr($whatsapp, 1);
+            $whatsapp = '62'.substr($whatsapp, 1);
         }
 
         return $whatsapp;
@@ -172,7 +173,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
         $jangkaWaktu = $record->jangka_waktu;
 
         // Hitung bunga per bulan (total bunga setahun dibagi jangka waktu)
-        return ($pokok * ($bungaPerTahun/100)) / $jangkaWaktu;
+        return ($pokok * ($bungaPerTahun / 100)) / $jangkaWaktu;
     }
 
     public function table(Table $table): Table
@@ -188,8 +189,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
 
                 TextColumn::make('profile.first_name')
                     ->label('Nama')
-                    ->formatStateUsing(fn ($record) =>
-                        trim("{$record->profile->first_name} {$record->profile->last_name}")
+                    ->formatStateUsing(fn ($record) => trim("{$record->profile->first_name} {$record->profile->last_name}")
                     )
                     ->searchable()
                     ->sortable(),
@@ -203,14 +203,16 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                     ->label('Angsuran Pokok')
                     ->formatStateUsing(function ($record) {
                         $angsuranPokok = $this->calculateAngsuranPokok($record);
-                        return 'Rp.' . number_format($angsuranPokok, 2, ',', '.');
+
+                        return 'Rp.'.number_format($angsuranPokok, 2, ',', '.');
                     }),
 
                 TextColumn::make('beaya_bunga_pinjaman_id')
                     ->label('Bunga')
                     ->formatStateUsing(function ($record) {
                         $bunga = $this->calculateBungaPerBulan($record);
-                        return 'Rp.' . number_format($bunga, 2, ',', '.');
+
+                        return 'Rp.'.number_format($bunga, 2, ',', '.');
                     }),
 
                 TextColumn::make('denda_id')
@@ -220,9 +222,11 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                         try {
                             $hariTerlambat = $this->calculateHariTerlambat($record, $today);
                             $denda = abs($this->calculateDenda($record, $hariTerlambat));
-                            return 'Rp.' . number_format($denda, 2, ',', '.');
+
+                            return 'Rp.'.number_format($denda, 2, ',', '.');
                         } catch (\Exception $e) {
-                            Log::error('Error calculating denda: ' . $e->getMessage());
+                            Log::error('Error calculating denda: '.$e->getMessage());
+
                             return 'Rp.0,00';
                         }
                     }),
@@ -237,9 +241,10 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                             $denda = abs($this->calculateDenda($record, $hariTerlambat));
                             $totalBayar = $angsuranPokok + $bunga + $denda;
 
-                            return 'Rp.' . number_format($totalBayar, 2, ',', '.');
+                            return 'Rp.'.number_format($totalBayar, 2, ',', '.');
                         } catch (\Exception $e) {
-                            Log::error('Error calculating total bayar: ' . $e->getMessage());
+                            Log::error('Error calculating total bayar: '.$e->getMessage());
+
                             return 'Rp.0,00';
                         }
                     })
@@ -254,7 +259,8 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                     ->label('Hari Terlambat')
                     ->formatStateUsing(function ($record) use ($today) {
                         $hariTerlambat = $this->calculateHariTerlambat($record, $today);
-                        return abs($hariTerlambat) . ' hari';
+
+                        return abs($hariTerlambat).' hari';
                     })
                     ->sortable(),
 
@@ -269,10 +275,11 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
 
                             return view('tables.columns.whatsapp-link', [
                                 'url' => $url,
-                                'whatsapp' => $record->profile->whatsapp
+                                'whatsapp' => $record->profile->whatsapp,
                             ]);
                         } catch (\Exception $e) {
-                            Log::error('Error formatting WhatsApp link: ' . $e->getMessage());
+                            Log::error('Error formatting WhatsApp link: '.$e->getMessage());
+
                             return '-';
                         }
                     })
@@ -294,29 +301,20 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                         $totalBayar = $angsuranPokok + $bunga + $denda;
 
                         $message = "Halo {$nama},\n\n"
-                            . "Ini adalah pengingat untuk pembayaran angsuran pinjaman Anda bulan ini:\n\n"
-                            . "No Pinjaman: {$record->no_pinjaman}\n"
-                            . "Angsuran Pokok: Rp." . number_format($angsuranPokok, 2, ',', '.') . "\n"
-                            . "Bunga: Rp." . number_format($bunga, 2, ',', '.') . "\n"
-                            . "Denda: Rp." . number_format($denda, 2, ',', '.') . "\n"
-                            . "Total Bayar: Rp." . number_format($totalBayar, 2, ',', '.') . "\n"
-                            . "Keterlambatan: " . abs($hariTerlambat) . " hari\n\n"
-                            . "Mohon segera melakukan pembayaran. Terima kasih.\n\n"
-                            . "Salam,\n"
-                            . "Koperasi SinaraArtha";
+                            ."Ini adalah pengingat untuk pembayaran angsuran pinjaman Anda bulan ini:\n\n"
+                            ."No Pinjaman: {$record->no_pinjaman}\n"
+                            .'Angsuran Pokok: Rp.'.number_format($angsuranPokok, 2, ',', '.')."\n"
+                            .'Bunga: Rp.'.number_format($bunga, 2, ',', '.')."\n"
+                            .'Denda: Rp.'.number_format($denda, 2, ',', '.')."\n"
+                            .'Total Bayar: Rp.'.number_format($totalBayar, 2, ',', '.')."\n"
+                            .'Keterlambatan: '.abs($hariTerlambat)." hari\n\n"
+                            ."Mohon segera melakukan pembayaran. Terima kasih.\n\n"
+                            ."Salam,\n"
+                            .'Koperasi SinaraArtha';
 
                         $whatsapp = $this->formatWhatsAppNumber($record->profile->whatsapp);
 
-                        $response = Http::withHeaders([
-                            'Authorization' => 'Bearer u489f486268ed444.f51e76d509f94b93855bb8bc61521f93'
-                        ])->post('http://46.102.156.214:3001/api/v1/messages', [
-                            'recipient_type' => 'individual',
-                            'to' => $whatsapp,
-                            'type' => 'text',
-                            'text' => [
-                                'body' => $message
-                            ]
-                        ]);
+                        $response = send_whatsapp_api($whatsapp, $message);
 
                         // Kirim data ke webhook N8N apapun status kode pengiriman WhatsApp
                         $this->sendToWebhook($whatsapp, $message, $record, $response->status());
@@ -334,8 +332,8 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                         'x-data' => '{ spinning: false }',
                         'x-on:spin-start' => 'spinning = true',
                         'x-on:spin-stop' => 'spinning = false',
-                        'x-bind:class' => "{ 'animate-spin': spinning }"
-                    ])
+                        'x-bind:class' => "{ 'animate-spin': spinning }",
+                    ]),
             ]);
     }
 
@@ -349,14 +347,15 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                     ->title('Tidak ada data keterlambatan')
                     ->warning()
                     ->send();
+
                 return;
             }
 
-            $options = new Options();
+            $options = new Options;
             $options->set([
                 'isHtml5ParserEnabled' => true,
                 'isPhpEnabled' => true,
-                'defaultFont' => 'Arial'
+                'defaultFont' => 'Arial',
             ]);
 
             $dompdf = new Dompdf($options);
@@ -364,40 +363,42 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
 
             $html = view('pdf.keterlambatan', [
                 'data' => $data,
-                'today' => Carbon::today()
+                'today' => Carbon::today(),
             ])->render();
 
             $dompdf->loadHtml($html);
             $dompdf->render();
 
             return response()->streamDownload(
-                fn () => print($dompdf->output()),
+                fn () => print ($dompdf->output()),
                 $this->generatePdfFilename(),
                 ['Content-Type' => 'application/pdf']
             );
 
         } catch (\Exception $e) {
-            Log::error('Error in print: ' . $e->getMessage());
+            Log::error('Error in print: '.$e->getMessage());
             Notification::make()
                 ->title('Terjadi kesalahan saat mencetak')
                 ->danger()
                 ->send();
+
             return null;
         }
     }
 
     private function generatePdfFilename()
     {
-        return 'laporan_keterlambatan_' . date('Y-m-d_H-i-s') . '.pdf';
+        return 'laporan_keterlambatan_'.date('Y-m-d_H-i-s').'.pdf';
     }
 
     private function sendToWebhook($whatsapp, $message, $record, $whatsappStatus = null)
     {
         try {
             $webhookUrl = env('WEBHOOK_WA_N8N');
-            
+
             if (empty($webhookUrl)) {
                 Log::warning('WEBHOOK_WA_N8N tidak dikonfigurasi di .env');
+
                 return;
             }
 
@@ -409,7 +410,7 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                 'source' => 'list_keterlambatan',
                 'whatsapp_status_code' => $whatsappStatus,
                 'whatsapp_sent_successfully' => $whatsappStatus === 200,
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ];
 
             $response = Http::timeout(30)->post($webhookUrl, $payload);
@@ -418,21 +419,21 @@ class ListKeterlambatan extends Page implements HasTable, HasForms
                 Log::info('Data berhasil dikirim ke webhook N8N dari List Keterlambatan', [
                     'pinjaman_id' => $record->id,
                     'webhook_url' => $webhookUrl,
-                    'status_code' => $response->status()
+                    'status_code' => $response->status(),
                 ]);
             } else {
                 Log::warning('Gagal mengirim data ke webhook N8N dari List Keterlambatan', [
                     'pinjaman_id' => $record->id,
                     'webhook_url' => $webhookUrl,
                     'status_code' => $response->status(),
-                    'response_body' => $response->body()
+                    'response_body' => $response->body(),
                 ]);
             }
 
         } catch (\Exception $e) {
-            Log::error('Error mengirim data ke webhook N8N dari List Keterlambatan: ' . $e->getMessage(), [
+            Log::error('Error mengirim data ke webhook N8N dari List Keterlambatan: '.$e->getMessage(), [
                 'pinjaman_id' => $record->id,
-                'webhook_url' => $webhookUrl ?? 'tidak tersedia'
+                'webhook_url' => $webhookUrl ?? 'tidak tersedia',
             ]);
         }
     }

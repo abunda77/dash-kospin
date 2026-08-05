@@ -2,17 +2,17 @@
 
 namespace App\Livewire\Filament\Pages\Birthday;
 
+use App\Models\BirthdayGreeting;
+use App\Models\BirthdayLog;
 use App\Models\Profile;
 use Carbon\Carbon;
+use Filament\Notifications\Notification;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
-use App\Models\BirthdayLog;
-use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use App\Models\BirthdayGreeting;
 
 class TodayTable extends \Filament\Tables\TableComponent
 {
@@ -27,7 +27,7 @@ class TodayTable extends \Filament\Tables\TableComponent
         $number = preg_replace('/^(\+62|62|0)/', '', $number);
 
         // Pastikan nomor dimulai dengan 62
-        return '62' . $number;
+        return '62'.$number;
     }
 
     public function table(Table $table): Table
@@ -43,7 +43,7 @@ class TodayTable extends \Filament\Tables\TableComponent
             ->columns([
                 TextColumn::make('first_name')
                     ->label('Full Name')
-                    ->formatStateUsing(fn ($record) => $record->first_name . ' ' . $record->last_name)
+                    ->formatStateUsing(fn ($record) => $record->first_name.' '.$record->last_name)
                     ->sortable(),
                 TextColumn::make('birthday')
                     ->label('Birthday')
@@ -51,7 +51,7 @@ class TodayTable extends \Filament\Tables\TableComponent
                     ->sortable(),
                 TextColumn::make('whatsapp')
                     ->label('Whatsapp')
-                    ->url(fn ($record) => "https://wa.me/" . $record->whatsapp)
+                    ->url(fn ($record) => 'https://wa.me/'.$record->whatsapp)
                     ->openUrlInNewTab(),
             ])
             ->actions([
@@ -71,16 +71,7 @@ class TodayTable extends \Filament\Tables\TableComponent
 
                         $whatsapp = $this->formatWhatsAppNumber($record->whatsapp);
 
-                        $response = Http::withHeaders([
-                            'Authorization' => 'Bearer u489f486268ed444.f51e76d509f94b93855bb8bc61521f93'
-                        ])->post('http://46.102.156.214:3001/api/v1/messages', [
-                            'recipient_type' => 'individual',
-                            'to' => $whatsapp,
-                            'type' => 'text',
-                            'text' => [
-                                'body' => $message
-                            ]
-                        ]);
+                        $response = send_whatsapp_api($whatsapp, $message);
 
                         // Kirim data ke webhook N8N apapun status kode pengiriman WhatsApp
                         $this->sendToWebhook($whatsapp, $message, $record, $response->status());
@@ -88,7 +79,7 @@ class TodayTable extends \Filament\Tables\TableComponent
                         BirthdayLog::create([
                             'id_profile' => $record->id_user,
                             'status_sent' => $response->status() === 200 ? 1 : 0,
-                            'date_sent' => now()
+                            'date_sent' => now(),
                         ]);
 
                         $this->dispatch('birthday-log-updated');
@@ -106,8 +97,8 @@ class TodayTable extends \Filament\Tables\TableComponent
                         'x-data' => '{ spinning: false }',
                         'x-on:spin-start' => 'spinning = true',
                         'x-on:spin-stop' => 'spinning = false',
-                        'x-bind:class' => "{ 'animate-spin': spinning }"
-                    ])
+                        'x-bind:class' => "{ 'animate-spin': spinning }",
+                    ]),
             ])
             ->heading('Ulang Tahun Hari Ini')
             ->defaultSort('first_name')
@@ -118,16 +109,17 @@ class TodayTable extends \Filament\Tables\TableComponent
     {
         try {
             $webhookUrl = env('WEBHOOK_WA_N8N');
-            
+
             // Debug: log nilai yang diterima
             Log::info('Debug webhook URL', [
                 'webhook_url' => $webhookUrl,
                 'is_empty' => empty($webhookUrl),
-                'env_value' => env('WEBHOOK_WA_N8N', 'NOT_FOUND')
+                'env_value' => env('WEBHOOK_WA_N8N', 'NOT_FOUND'),
             ]);
-            
+
             if (empty($webhookUrl)) {
                 Log::warning('WEBHOOK_WA_N8N tidak dikonfigurasi di .env');
+
                 return;
             }
 
@@ -135,12 +127,12 @@ class TodayTable extends \Filament\Tables\TableComponent
                 'whatsapp' => $whatsapp,
                 'message' => $message,
                 'profile_id' => $record->id_user,
-                'full_name' => $record->first_name . ' ' . $record->last_name,
+                'full_name' => $record->first_name.' '.$record->last_name,
                 'birthday' => $record->birthday->format('Y-m-d'),
                 'source' => 'birthday_greeting',
                 'whatsapp_status_code' => $whatsappStatus,
                 'whatsapp_sent_successfully' => $whatsappStatus === 200,
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ];
 
             $response = Http::timeout(30)->post($webhookUrl, $payload);
@@ -149,21 +141,21 @@ class TodayTable extends \Filament\Tables\TableComponent
                 Log::info('Data berhasil dikirim ke webhook N8N dari Birthday Greeting', [
                     'profile_id' => $record->id_user,
                     'webhook_url' => $webhookUrl,
-                    'status_code' => $response->status()
+                    'status_code' => $response->status(),
                 ]);
             } else {
                 Log::warning('Gagal mengirim data ke webhook N8N dari Birthday Greeting', [
                     'profile_id' => $record->id_user,
                     'webhook_url' => $webhookUrl,
                     'status_code' => $response->status(),
-                    'response_body' => $response->body()
+                    'response_body' => $response->body(),
                 ]);
             }
 
         } catch (\Exception $e) {
-            Log::error('Error mengirim data ke webhook N8N dari Birthday Greeting: ' . $e->getMessage(), [
+            Log::error('Error mengirim data ke webhook N8N dari Birthday Greeting: '.$e->getMessage(), [
                 'profile_id' => $record->id_user,
-                'webhook_url' => $webhookUrl ?? 'tidak tersedia'
+                'webhook_url' => $webhookUrl ?? 'tidak tersedia',
             ]);
         }
     }

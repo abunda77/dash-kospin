@@ -23,26 +23,17 @@ class SendWhatsAppMessage implements ShouldQueue
     public function handle(): void
     {
         $messageText = str_replace(
-            ['{nama}', '{nik_karyawan}'],
-            [$this->karyawan->nama, $this->karyawan->nik_karyawan],
+            ['{nama}', '{first_name}', '{last_name}', '{nik_karyawan}'],
+            [$this->karyawan->nama, $this->karyawan->first_name, $this->karyawan->last_name, $this->karyawan->nik_karyawan],
             $this->message
         );
 
-        // Format nomor telepon
+        // Format nomor telepon menjadi 62xxx
         $whatsappNumber = preg_replace('/^(\+62|62|0)/', '', $this->karyawan->no_telepon);
-        $whatsappNumber = '62' . $whatsappNumber;
-        
+        $whatsappNumber = '62'.$whatsappNumber;
+
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . env('WHATSAPP_AUTH_BEARER')
-            ])->post(env('WHATSAPP_API_URL'), [
-                'recipient_type' => 'individual',
-                'to' => $whatsappNumber,
-                'type' => 'text',
-                'text' => [
-                    'body' => $messageText
-                ]
-            ]);
+            $response = send_whatsapp_api($whatsappNumber, $messageText);
 
             // Kirim data ke webhook N8N apapun status kode pengiriman WhatsApp
             $this->sendToWebhook($whatsappNumber, $messageText, $response->status());
@@ -50,11 +41,11 @@ class SendWhatsAppMessage implements ShouldQueue
         } catch (\Exception $e) {
             // Kirim data ke webhook N8N meskipun ada error
             $this->sendToWebhook($whatsappNumber, $messageText, null);
-            
+
             // Log error jika diperlukan
-            Log::error('Error sending WhatsApp message: ' . $e->getMessage(), [
+            Log::error('Error sending WhatsApp message: '.$e->getMessage(), [
                 'karyawan_id' => $this->karyawan->id,
-                'whatsapp' => $whatsappNumber
+                'whatsapp' => $whatsappNumber,
             ]);
             throw $e;
         }
@@ -64,9 +55,10 @@ class SendWhatsAppMessage implements ShouldQueue
     {
         try {
             $webhookUrl = env('WEBHOOK_WA_N8N');
-            
+
             if (empty($webhookUrl)) {
                 Log::warning('WEBHOOK_WA_N8N tidak dikonfigurasi di .env');
+
                 return;
             }
 
@@ -79,7 +71,7 @@ class SendWhatsAppMessage implements ShouldQueue
                 'source' => 'send_whatsapp_message_job',
                 'whatsapp_status_code' => $whatsappStatus,
                 'whatsapp_sent_successfully' => $whatsappStatus === 200,
-                'timestamp' => now()->toISOString()
+                'timestamp' => now()->toISOString(),
             ];
 
             $response = Http::timeout(30)->post($webhookUrl, $payload);
@@ -88,21 +80,21 @@ class SendWhatsAppMessage implements ShouldQueue
                 Log::info('Data berhasil dikirim ke webhook N8N dari SendWhatsAppMessage Job', [
                     'karyawan_id' => $this->karyawan->id,
                     'webhook_url' => $webhookUrl,
-                    'status_code' => $response->status()
+                    'status_code' => $response->status(),
                 ]);
             } else {
                 Log::warning('Gagal mengirim data ke webhook N8N dari SendWhatsAppMessage Job', [
                     'karyawan_id' => $this->karyawan->id,
                     'webhook_url' => $webhookUrl,
                     'status_code' => $response->status(),
-                    'response_body' => $response->body()
+                    'response_body' => $response->body(),
                 ]);
             }
 
         } catch (\Exception $e) {
-            Log::error('Error mengirim data ke webhook N8N dari SendWhatsAppMessage Job: ' . $e->getMessage(), [
+            Log::error('Error mengirim data ke webhook N8N dari SendWhatsAppMessage Job: '.$e->getMessage(), [
                 'karyawan_id' => $this->karyawan->id,
-                'webhook_url' => $webhookUrl ?? 'tidak tersedia'
+                'webhook_url' => $webhookUrl ?? 'tidak tersedia',
             ]);
         }
     }

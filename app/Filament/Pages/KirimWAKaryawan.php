@@ -2,24 +2,25 @@
 
 namespace App\Filament\Pages;
 
+use App\Jobs\SendBulkWhatsAppMessage;
 use App\Models\Karyawan;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
-use App\Jobs\SendBulkWhatsAppMessage;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Concerns\InteractsWithForms;
 
 class KirimWAKaryawan extends Page
 {
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left';
+
     protected static ?string $navigationGroup = 'Data Karyawan';
+
     protected static ?string $navigationLabel = 'Kirim WA Karyawan';
+
     protected static string $view = 'filament.pages.kirim-w-a-karyawan';
 
     public ?array $data = [];
@@ -36,8 +37,8 @@ class KirimWAKaryawan extends Page
                 Textarea::make('message')
                     ->label('Pesan WhatsApp')
                     ->required()
-                    ->hint('Variabel yang tersedia: {nama}, {nik_karyawan}')
-                    ->rows(5)
+                    ->hint('Variabel yang tersedia: {nama}, {first_name}, {last_name}, {nik_karyawan}')
+                    ->rows(5),
             ])
             ->statePath('data');
     }
@@ -57,6 +58,7 @@ class KirimWAKaryawan extends Page
                 ->body('Tidak ada nomor WhatsApp karyawan aktif yang ditemukan')
                 ->danger()
                 ->send();
+
             return;
         }
 

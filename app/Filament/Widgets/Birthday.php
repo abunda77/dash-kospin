@@ -2,21 +2,19 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\BirthdayGreeting;
+use App\Models\BirthdayLog;
 use App\Models\Profile;
 use Carbon\Carbon;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Actions\Action;
-use Filament\Widgets\TableWidget as BaseWidget;
-use App\Models\BirthdayLog;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Http;
-use App\Models\BirthdayGreeting;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Filament\Widgets\TableWidget as BaseWidget;
 
 class Birthday extends BaseWidget
 {
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -31,7 +29,7 @@ class Birthday extends BaseWidget
             ->columns([
                 TextColumn::make('first_name')
                     ->label('Nama Lengkap')
-                    ->formatStateUsing(fn ($record) => $record->first_name . ' ' . $record->last_name)
+                    ->formatStateUsing(fn ($record) => $record->first_name.' '.$record->last_name)
                     ->sortable(),
                 TextColumn::make('birthday')
                     ->label('Tanggal Lahir')
@@ -39,7 +37,7 @@ class Birthday extends BaseWidget
                     ->sortable(),
                 TextColumn::make('whatsapp')
                     ->label('Whatsapp')
-                    ->url(fn ($record) => "https://wa.me/" . $record->whatsapp)
+                    ->url(fn ($record) => 'https://wa.me/'.$record->whatsapp)
                     ->openUrlInNewTab(),
             ])
             ->actions([
@@ -57,21 +55,15 @@ class Birthday extends BaseWidget
                             $greeting->message
                         );
 
-                        $response = Http::withHeaders([
-                            'Authorization' => 'Bearer u489f486268ed444.f51e76d509f94b93855bb8bc61521f93'
-                        ])->post('http://46.102.156.214:3001/api/v1/messages', [
-                            'recipient_type' => 'individual',
-                            'to' => $record->whatsapp,
-                            'type' => 'text',
-                            'text' => [
-                                'body' => $message
-                            ]
-                        ]);
+                        $whatsapp = preg_replace('/^(\+62|62|0)/', '', $record->whatsapp);
+                        $whatsapp = '62'.$whatsapp;
+
+                        $response = send_whatsapp_api($whatsapp, $message);
 
                         BirthdayLog::create([
                             'id_profile' => $record->id_user,
                             'status_sent' => $response->status() === 200 ? 1 : 0,
-                            'date_sent' => now()
+                            'date_sent' => now(),
                         ]);
 
                         $this->dispatch('birthday-log-updated');
@@ -89,8 +81,8 @@ class Birthday extends BaseWidget
                         'x-data' => '{ spinning: false }',
                         'x-on:spin-start' => 'spinning = true',
                         'x-on:spin-stop' => 'spinning = false',
-                        'x-bind:class' => "{ 'animate-spin': spinning }"
-                    ])
+                        'x-bind:class' => "{ 'animate-spin': spinning }",
+                    ]),
             ])
             ->heading('Ulang Tahun Hari Ini')
             ->defaultSort('first_name')
