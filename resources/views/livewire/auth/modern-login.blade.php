@@ -1,140 +1,130 @@
-<div class="min-h-screen flex">
-    <!-- Left Side - Branding -->
-    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-30"></div>
-        <div class="relative z-10 flex flex-col justify-center items-center w-full p-12 text-white">
-            <img src="{{ asset('images/logo_kospin.png') }}" alt="Kospin Sinara Artha" class="w-32 h-32 object-contain mb-8 drop-shadow-lg">
-            <h1 class="text-3xl font-bold mb-3 text-center">Koperasi Sinara Artha Naya</h1>
-            <p class="text-green-100 text-center max-w-sm leading-relaxed">
-                Koperasi Anggota yang amanah, modern, dan terpercaya untuk masa depan finansial Anda.
-            </p>
-            <div class="mt-12 flex items-center gap-2 text-green-200 text-sm">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+<div class="relative min-h-screen overflow-hidden">
+    <div class="auth-glow pointer-events-none fixed -right-32 -top-32 h-96 w-96 rounded-full bg-green-500/[.09] blur-3xl"></div>
+    <div class="auth-glow pointer-events-none fixed -bottom-40 -left-40 h-96 w-96 rounded-full bg-yellow-400/[.05] blur-3xl" style="animation-delay: -6s"></div>
+
+    <header class="relative z-20 border-b border-white/[.07] bg-[#0a0f0c]/80 backdrop-blur-xl">
+        <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
+            <a href="{{ url('/') }}" class="flex items-center gap-3" aria-label="Kembali ke halaman utama">
+                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1.5">
+                    <img src="{{ asset('images/logo_kospin.png') }}" alt="" class="h-full w-full object-contain">
+                </span>
+                <span class="auth-brand-font hidden text-sm font-bold tracking-tight text-white sm:block">SINARA ARTHA NAYA</span>
+            </a>
+            <a href="{{ url('/') }}" class="group inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[.03] px-4 py-2.5 text-sm font-semibold text-[#a3c9b0] transition duration-300 hover:border-green-400/30 hover:bg-white/[.06] hover:text-white">
+                <svg class="h-4 w-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
-                <span>Terdaftar dan diawasi oleh Dinas Koperasi</span>
-            </div>
-        </div>
-    </div>
+                Beranda
+            </a>
+        </nav>
+    </header>
 
-    <!-- Right Side - Login Form -->
-    <div class="flex-1 flex items-center justify-center p-6 sm:p-12 bg-gray-50 dark:bg-gray-900">
-        <div class="w-full max-w-md">
-            <!-- Mobile Logo -->
-            <div class="lg:hidden flex justify-center mb-8">
-                <img src="{{ asset('images/logo_kospin.png') }}" alt="Kospin Sinara Artha" class="w-20 h-20 object-contain">
-            </div>
-
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Selamat Datang</h2>
-                <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">Masuk ke akun anggota Anda</p>
-            </div>
-
-            <form wire:submit="login" class="space-y-5">
-                <!-- Email -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        Email
-                    </label>
-                    <input
-                        wire:model="email"
-                        id="email"
-                        type="email"
-                        autocomplete="email"
-                        placeholder="nama@email.com"
-                        class="block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 @error('email') border-red-400 dark:border-red-500 @enderror"
-                    >
-                    @error('email')
-                        <p class="mt-1.5 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Password -->
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        Password
-                    </label>
-                    <div class="relative">
-                        <input
-                            wire:model="password"
-                            id="password"
-                            type="password"
-                            autocomplete="current-password"
-                            placeholder="Masukkan password"
-                            class="block w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition duration-200 @error('password') border-red-400 dark:border-red-500 @enderror"
-                        >
-                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition">
-                            <svg id="eye-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                            <svg id="eye-closed" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
-                            </svg>
-                        </button>
-                    </div>
-                    @error('password')
-                        <p class="mt-1.5 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <!-- Remember & Forgot -->
-                <div class="flex items-center justify-between">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input wire:model="remember" type="checkbox" class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-green-600 focus:ring-green-500 dark:bg-gray-800">
-                        <span class="text-sm text-gray-600 dark:text-gray-400">Ingat saya</span>
-                    </label>
-                    <a href="{{ route('password.request') }}" wire:navigate class="text-sm text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 font-medium transition">
-                        Lupa password?
-                    </a>
-                </div>
-
-                <!-- Submit -->
-                <button
-                    type="submit"
-                    wire:loading.attr="disabled"
-                    class="w-full py-3 px-4 rounded-xl bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-white font-semibold text-sm transition duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                    <svg wire:loading wire:target="login" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
-                    </svg>
-                    <span wire:loading.remove wire:target="login">Masuk</span>
-                    <span wire:loading wire:target="login">Memproses...</span>
-                </button>
-            </form>
-
-            <!-- Register Link -->
-            <p class="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                Belum punya akun?
-                <a href="{{ route('register') }}" wire:navigate class="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 font-semibold transition">
-                    Daftar sekarang
-                </a>
-            </p>
-
-            <!-- Footer -->
-            <div class="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800">
-                <p class="text-center text-xs text-gray-400 dark:text-gray-500">
-                    &copy; {{ date('Y') }} Kospin Sinara Artha. Seluruh hak cipta dilindungi.
+    <main class="relative z-10 mx-auto grid min-h-[calc(100vh-73px)] max-w-7xl items-stretch lg:grid-cols-[.94fr_1.06fr]">
+        <section class="auth-visual relative hidden overflow-hidden border-r border-white/[.07] p-12 lg:flex lg:flex-col lg:justify-between">
+            <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,.16),transparent_35%)]"></div>
+            <div class="relative">
+                <span class="inline-flex items-center gap-2 rounded-full border border-yellow-400/25 bg-yellow-400/[.08] px-3 py-2 text-[10px] font-bold uppercase tracking-[.16em] text-yellow-300">
+                    <span class="h-1.5 w-1.5 rounded-full bg-yellow-300"></span>
+                    Portal Anggota
+                </span>
+                <h1 class="auth-brand-font mt-7 max-w-md text-4xl font-bold leading-tight tracking-[-.035em] text-white">
+                    Kelola simpanan dengan <span class="text-green-400">aman dan terencana.</span>
+                </h1>
+                <p class="mt-5 max-w-md text-base leading-7 text-[#a3c9b0]">
+                    Satu akses untuk layanan koperasi yang jelas, mudah digunakan, dan terpercaya.
                 </p>
             </div>
-        </div>
-    </div>
+
+            <div class="relative rounded-2xl border border-white/[.08] bg-[#111a14]/85 p-6 backdrop-blur-xl">
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <p class="font-bold text-white">Aman</p>
+                        <p class="mt-1 text-xs text-[#73937d]">Data terlindungi</p>
+                    </div>
+                    <div class="border-x border-white/[.08] px-4">
+                        <p class="font-bold text-white">Mudah</p>
+                        <p class="mt-1 text-xs text-[#73937d]">Akses sederhana</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-white">Terbuka</p>
+                        <p class="mt-1 text-xs text-[#73937d]">Informasi jelas</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="flex items-center justify-center px-5 py-10 sm:px-10 lg:px-16">
+            <div class="auth-reveal w-full max-w-md" style="animation-delay: .12s">
+                <div class="mb-8 lg:hidden">
+                    <span class="inline-flex items-center gap-2 text-xs font-semibold text-green-400">
+                        <span class="h-1.5 w-1.5 rounded-full bg-green-400"></span>
+                        Portal Anggota
+                    </span>
+                </div>
+
+                <div class="mb-8">
+                    <span class="text-[10px] font-bold uppercase tracking-[.18em] text-yellow-300">Selamat datang kembali</span>
+                    <h2 class="auth-brand-font mt-3 text-3xl font-bold tracking-tight text-white">Masuk ke akun Anda</h2>
+                    <p class="mt-3 text-sm leading-6 text-[#8cb399]">Gunakan email dan password yang terdaftar untuk melanjutkan.</p>
+                </div>
+
+                <form wire:submit="login" class="space-y-5">
+                    <div>
+                        <label for="email" class="mb-2 block text-sm font-semibold text-[#cce6d4]">Email</label>
+                        <input wire:model="email" id="email" type="email" autocomplete="email" autofocus placeholder="nama@email.com" class="block w-full rounded-xl border bg-[#0d1510] px-4 py-3.5 text-sm text-white outline-none transition duration-200 placeholder:text-[#577060] focus:border-green-400 focus:ring-4 focus:ring-green-500/10 @error('email') border-red-400 @else border-white/10 @enderror">
+                        @error('email')
+                            <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="password" class="mb-2 block text-sm font-semibold text-[#cce6d4]">Password</label>
+                        <div class="relative">
+                            <input wire:model="password" id="password" type="password" autocomplete="current-password" placeholder="Masukkan password" class="block w-full rounded-xl border bg-[#0d1510] px-4 py-3.5 pr-12 text-sm text-white outline-none transition duration-200 placeholder:text-[#577060] focus:border-green-400 focus:ring-4 focus:ring-green-500/10 @error('password') border-red-400 @else border-white/10 @enderror">
+                            <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#6f947a] transition hover:bg-white/[.05] hover:text-white" aria-label="Tampilkan atau sembunyikan password">
+                                <svg id="eye-open" class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                <svg id="eye-closed" class="hidden h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                            </button>
+                        </div>
+                        @error('password')
+                            <p class="mt-2 text-xs text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="flex items-center justify-between gap-4">
+                        <label class="flex cursor-pointer items-center gap-2.5 text-sm text-[#8cb399]">
+                            <input wire:model="remember" type="checkbox" class="h-4 w-4 rounded border-white/20 bg-[#0d1510] text-green-500 focus:ring-green-500 focus:ring-offset-[#0a0f0c]">
+                            Ingat saya
+                        </label>
+                        <a href="{{ route('password.request') }}" wire:navigate class="text-sm font-semibold text-green-400 transition hover:text-green-300">Lupa password?</a>
+                    </div>
+
+                    <button type="submit" wire:loading.attr="disabled" class="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 px-4 py-3.5 text-sm font-bold text-[#08110b] transition duration-300 hover:-translate-y-0.5 hover:bg-green-400 hover:shadow-xl hover:shadow-green-500/20 disabled:cursor-not-allowed disabled:opacity-60">
+                        <svg wire:loading wire:target="login" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+                        <span wire:loading.remove wire:target="login">Masuk ke akun</span>
+                        <span wire:loading wire:target="login">Memproses...</span>
+                    </button>
+                </form>
+
+                <p class="mt-7 text-center text-sm text-[#789b83]">
+                    Belum punya akun?
+                    <a href="{{ route('register') }}" wire:navigate class="font-bold text-green-400 transition hover:text-green-300">Daftar sekarang</a>
+                </p>
+
+                <p class="mt-8 border-t border-white/[.07] pt-6 text-center text-xs text-[#55705e]">&copy; {{ date('Y') }} Koperasi Sinara Artha Naya</p>
+            </div>
+        </section>
+    </main>
 
     <script>
         function togglePassword() {
             const input = document.getElementById('password');
             const eyeOpen = document.getElementById('eye-open');
             const eyeClosed = document.getElementById('eye-closed');
-            if (input.type === 'password') {
-                input.type = 'text';
-                eyeOpen.classList.add('hidden');
-                eyeClosed.classList.remove('hidden');
-            } else {
-                input.type = 'password';
-                eyeOpen.classList.remove('hidden');
-                eyeClosed.classList.add('hidden');
-            }
+
+            input.type = input.type === 'password' ? 'text' : 'password';
+            eyeOpen.classList.toggle('hidden');
+            eyeClosed.classList.toggle('hidden');
         }
     </script>
 </div>
