@@ -6,6 +6,21 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-08-05]
+
+### Fixed
+- Form karyawan: kolom `nama` dan `no_telepon_keluarga` tidak valid pada tabel `karyawans`
+- Model Karyawan: `nama` → `first_name` + `last_name`; hapus `no_telepon_keluarga` dari `$fillable`
+- Tambah accessor `nama` untuk backward compatibility
+- Update form, table, infolist KaryawanResource: ganti `nama` → `first_name` + `last_name`, hapus field `no_telepon_keluarga`
+- Update Job SendWhatsAppMessage dan SendBulkWhatsAppMessage: tambah variabel `{first_name}`, `{last_name}`
+- Update PDF view karyawan dan KirimWAKaryawan: sesuaikan dengan field baru
+
+### Changed
+- Migrasi `create_karyawans_table`: `nama` → `first_name` + `last_name`; hapus `no_telepon_keluarga`
+
+---
+
 ## [2026-08-02]
 
 ### Added
