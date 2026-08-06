@@ -2,15 +2,14 @@
 
 namespace App\Filament\User\Pages;
 
-use Filament\Pages\Page;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\Grid;
-use App\Models\Profile as ProfileModel;
+use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 
 class Profile extends Page implements HasInfolists
@@ -18,13 +17,13 @@ class Profile extends Page implements HasInfolists
     use InteractsWithInfolists;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
-    
-    protected static ?string $navigationLabel = 'Profile Saya';
-    
-    protected static ?string $title = 'Profile Saya';
+
+    protected static ?string $navigationLabel = 'Profile';
+
+    protected static ?string $title = 'Profile';
 
     protected static string $view = 'filament.user.pages.profile';
-    
+
     protected static ?int $navigationSort = 100;
 
     public function profileInfolist(Infolist $infolist): Infolist
@@ -42,11 +41,11 @@ class Profile extends Page implements HasInfolists
                                 TextEntry::make('first_name')
                                     ->label('Nama Depan')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('last_name')
                                     ->label('Nama Belakang')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('gender')
                                     ->label('Jenis Kelamin')
                                     ->placeholder('-')
@@ -56,12 +55,12 @@ class Profile extends Page implements HasInfolists
                                         'Perempuan' => 'danger',
                                         default => 'gray',
                                     }),
-                                
+
                                 TextEntry::make('birthday')
                                     ->label('Tanggal Lahir')
                                     ->date('d F Y')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('ibu_kandung')
                                     ->label('Nama Ibu Kandung')
                                     ->placeholder('-'),
@@ -78,14 +77,14 @@ class Profile extends Page implements HasInfolists
                                     ->label('Jenis Identitas')
                                     ->badge()
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('no_identity')
                                     ->label('Nomor Identitas')
                                     ->placeholder('-')
                                     ->copyable()
                                     ->copyMessage('Nomor identitas disalin!'),
                             ]),
-                        
+
                         ImageEntry::make('image_identity')
                             ->label('Foto Identitas')
                             ->placeholder('Tidak ada foto')
@@ -112,12 +111,12 @@ class Profile extends Page implements HasInfolists
                                     ->icon('heroicon-o-envelope')
                                     ->copyable()
                                     ->copyMessage('Email disalin!'),
-                                
+
                                 TextEntry::make('phone')
                                     ->label('Nomor Telepon')
                                     ->placeholder('-')
                                     ->icon('heroicon-o-phone'),
-                                
+
                                 TextEntry::make('whatsapp')
                                     ->label('Nomor WhatsApp')
                                     ->placeholder('-')
@@ -135,21 +134,21 @@ class Profile extends Page implements HasInfolists
                             ->label('Alamat Lengkap')
                             ->placeholder('-')
                             ->columnSpanFull(),
-                        
+
                         Grid::make(4)
                             ->schema([
                                 TextEntry::make('province_id')
                                     ->label('ID Provinsi')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('city_id')
                                     ->label('ID Kota/Kabupaten')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('district_id')
                                     ->label('ID Kecamatan')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('village_id')
                                     ->label('ID Kelurahan/Desa')
                                     ->placeholder('-'),
@@ -165,7 +164,7 @@ class Profile extends Page implements HasInfolists
                                 TextEntry::make('job')
                                     ->label('Pekerjaan')
                                     ->placeholder('-'),
-                                
+
                                 TextEntry::make('mariage')
                                     ->label('Status Pernikahan')
                                     ->placeholder('-')
@@ -176,12 +175,12 @@ class Profile extends Page implements HasInfolists
                                         'Cerai' => 'danger',
                                         default => 'gray',
                                     }),
-                                
+
                                 TextEntry::make('monthly_income')
                                     ->label('Penghasilan Bulanan')
                                     ->placeholder('-')
                                     ->money('IDR', locale: 'id'),
-                                
+
                                 TextEntry::make('type_member')
                                     ->label('Tipe Anggota')
                                     ->placeholder('-')
@@ -210,7 +209,7 @@ class Profile extends Page implements HasInfolists
                             ->label('Catatan')
                             ->placeholder('-')
                             ->markdown(),
-                        
+
                         TextEntry::make('remote_url')
                             ->label('URL Remote')
                             ->placeholder('-')

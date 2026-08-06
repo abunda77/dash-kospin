@@ -2,36 +2,36 @@
 
 namespace App\Filament\User\Pages;
 
-use Filament\Pages\Page;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
+use App\Models\Deposito;
+use Carbon\Carbon;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\IconEntry;
-use App\Models\Deposito;
-use Illuminate\Support\Facades\Auth;
+use Filament\Pages\Page;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
-class DepositoSaya extends Page implements HasTable, HasInfolists
+class DepositoSaya extends Page implements HasInfolists, HasTable
 {
-    use InteractsWithTable, InteractsWithInfolists;
+    use InteractsWithInfolists, InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-library';
-    
-    protected static ?string $navigationLabel = 'Deposito Saya';
-    
-    protected static ?string $title = 'Deposito Saya';
+
+    protected static ?string $navigationLabel = 'Deposito';
+
+    protected static ?string $title = 'Deposito';
 
     protected static string $view = 'filament.user.pages.deposito-saya';
-    
+
     protected static ?int $navigationSort = 30;
 
     public ?Deposito $selectedDeposito = null;
@@ -57,13 +57,13 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
 
                 TextColumn::make('jangka_waktu')
                     ->label('Tenor')
-                    ->formatStateUsing(fn ($state) => $state . ' Bulan')
+                    ->formatStateUsing(fn ($state) => $state.' Bulan')
                     ->badge()
                     ->color('info'),
 
                 TextColumn::make('rate_bunga')
                     ->label('Bunga')
-                    ->formatStateUsing(fn ($state) => $state . '%')
+                    ->formatStateUsing(fn ($state) => $state.'%')
                     ->badge()
                     ->color('warning'),
 
@@ -108,8 +108,8 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
     protected function getTableQuery(): Builder
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return Deposito::query()->whereRaw('1 = 0');
         }
 
@@ -165,7 +165,7 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
 
                                 TextEntry::make('jangka_waktu')
                                     ->label('Jangka Waktu')
-                                    ->formatStateUsing(fn ($state) => $state . ' Bulan')
+                                    ->formatStateUsing(fn ($state) => $state.' Bulan')
                                     ->badge()
                                     ->color('info'),
                             ]),
@@ -178,7 +178,7 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
                             ->schema([
                                 TextEntry::make('rate_bunga')
                                     ->label('Suku Bunga')
-                                    ->formatStateUsing(fn ($state) => $state . '% per tahun')
+                                    ->formatStateUsing(fn ($state) => $state.'% per tahun')
                                     ->badge()
                                     ->color('warning'),
 
@@ -218,16 +218,17 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
                                     ->state(function ($record) {
                                         $jatuhTempo = Carbon::parse($record->tanggal_jatuh_tempo);
                                         $now = Carbon::now();
-                                        
+
                                         if ($jatuhTempo->isPast()) {
-                                            return 'Sudah jatuh tempo ' . $now->diffInDays($jatuhTempo) . ' hari lalu';
+                                            return 'Sudah jatuh tempo '.$now->diffInDays($jatuhTempo).' hari lalu';
                                         }
-                                        
+
                                         $days = $now->diffInDays($jatuhTempo);
                                         if ($days > 30) {
-                                            return floor($days / 30) . ' bulan ' . ($days % 30) . ' hari lagi';
+                                            return floor($days / 30).' bulan '.($days % 30).' hari lagi';
                                         }
-                                        return $days . ' hari lagi';
+
+                                        return $days.' hari lagi';
                                     })
                                     ->badge()
                                     ->color(fn ($state) => str_contains($state, 'Sudah') ? 'danger' : 'success'),
@@ -279,8 +280,8 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
     public function getTotalDeposito(): string
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return format_rupiah(0);
         }
 
@@ -294,8 +295,8 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
     public function getTotalBunga(): string
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return format_rupiah(0);
         }
 
@@ -309,8 +310,8 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
     public function getJumlahDeposito(): int
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return 0;
         }
 
@@ -320,8 +321,8 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
     public function getDepositoAktif(): int
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return 0;
         }
 
@@ -333,8 +334,8 @@ class DepositoSaya extends Page implements HasTable, HasInfolists
     public function getDepositoJatuhTempoBulanIni(): int
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return 0;
         }
 

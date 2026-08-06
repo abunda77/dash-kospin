@@ -2,12 +2,11 @@
 
 namespace App\Filament\User\Pages;
 
-use App\Enums\StatusSetoran;
-use App\Models\SetoranTabungan;
+use App\Enums\StatusPenarikan;
+use App\Models\PenarikanTabungan;
 use App\Models\Tabungan;
-use App\Services\BuatSetoranTabunganService;
-use App\Services\KirimKlaimPembayaranService;
-use Filament\Forms\Components\DateTimePicker;
+use App\Services\BuatPenarikanTabunganService;
+use App\Services\KirimRevisiPenarikanService;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
@@ -19,57 +18,54 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
 
-class SetoranSimpanan extends Page implements HasForms
+class PenarikanSimpanan extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-qr-code';
+    protected static ?string $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static ?string $navigationLabel = 'Setoran Simpanan';
+    protected static ?string $navigationLabel = 'Penarikan Simpanan';
 
-    protected static ?string $title = 'Setoran Simpanan via QRIS';
+    protected static ?string $title = 'Penarikan Simpanan';
 
-    protected static string $view = 'filament.user.pages.setoran-simpanan';
+    protected static string $view = 'filament.user.pages.penarikan-simpanan';
 
-    protected static ?int $navigationSort = 15;
+    protected static ?int $navigationSort = 16;
 
     public static function getNavigationGroup(): ?string
     {
         return 'Simpanan';
     }
 
-    public ?array $generateData = [];
+    public ?array $createData = [];
 
-    public ?array $claimData = [];
+    public ?array $revisiData = [];
 
     public function mount(): void
     {
-        $this->generateForm->fill();
-        $this->claimForm->fill([
-            'waktu_klaim_bayar' => now()->format('Y-m-d H:i:s'),
-        ]);
+        $this->createForm->fill();
+        $this->revisiForm->fill();
     }
 
     protected function getForms(): array
     {
         return [
-            'generateForm',
-            'claimForm',
+            'createForm',
+            'revisiForm',
         ];
     }
 
-    public function generateForm(Form $form): Form
+    public function createForm(Form $form): Form
     {
         $user = Auth::user();
 
         return $form
             ->schema([
                 Select::make('id_tabungan')
-                    ->label('Rekening Tabungan Tujuan')
+                    ->label('Rekening Tabungan Sumber')
                     ->options(fn () => Tabungan::query()
                         ->whereHas('profile', fn ($query) => $query
                             ->where('id_user', $user->getKey())
@@ -84,7 +80,7 @@ class SetoranSimpanan extends Page implements HasForms
                     ->required(),
 
                 Radio::make('preset_jumlah')
-                    ->label('Pilih Nominal Setoran')
+                    ->label('Pilih Nominal Penarikan')
                     ->options([
                         '10000' => 'Rp 10.000',
                         '25000' => 'Rp 25.000',
@@ -107,30 +103,59 @@ class SetoranSimpanan extends Page implements HasForms
                     ->required(fn ($get) => $get('preset_jumlah') === 'custom')
                     ->minValue(10000)
                     ->maxValue(100000000),
-            ])
-            ->statePath('generateData');
-    }
 
-    public function claimForm(Form $form): Form
-    {
-        return $form
-            ->schema([
-                DateTimePicker::make('waktu_klaim_bayar')
-                    ->label('Waktu Bayar')
-                    ->default(now())
+                Select::make('bank')
+                    ->label('Bank')
+                    ->options([
+                        'BRI' => 'Bank Rakyat Indonesia (BRI)',
+                        'BNI' => 'Bank Negara Indonesia (BNI)',
+                        'BCA' => 'Bank Central Asia (BCA)',
+                        'MANDIRI' => 'Bank Mandiri',
+                        'BSI' => 'Bank Syariah Indonesia (BSI)',
+                        'BTPN' => 'Bank BTPN',
+                        'LAINNYA' => 'Bank Lainnya',
+                    ])
+                    ->placeholder('Pilih bank tujuan')
+                    ->searchable()
                     ->required(),
 
-                TextInput::make('nama_pembayar')
-                    ->label('Nama Pengirim / Pembayar')
-                    ->placeholder('Nama sesuai pada rekening pengirim')
+                TextInput::make('nama_bank')
+                    ->label('Nama Bank')
+                    ->placeholder('Contoh: BRI Unit Kota / BCA KCU Sudirman')
                     ->required(),
 
-                TextInput::make('referensi_pembayaran')
+                TextInput::make('nama_nasabah')
+                    ->label('Nama Nasabah')
+                    ->placeholder('Nama sesuai pada rekening bank tujuan')
+                    ->required(),
+
+                TextInput::make('referensi_penarikan')
                     ->label('Nomor Referensi (Opsional)')
                     ->placeholder('Contoh: Ref-123456...'),
 
-                FileUpload::make('bukti_pembayaran')
-                    ->label('Bukti Pembayaran (Opsional)')
+                FileUpload::make('bukti_penarikan')
+                    ->label('Dokumen Pendukung (Opsional)')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
+                    ->maxSize(4096)
+                    ->storeFiles(false),
+
+                Textarea::make('catatan_pengguna')
+                    ->label('Catatan Tambahan (Opsional)')
+                    ->placeholder('Tulis pesan atau catatan di sini...'),
+            ])
+            ->statePath('createData');
+    }
+
+    public function revisiForm(Form $form): Form
+    {
+        return $form
+            ->schema([
+                TextInput::make('referensi_penarikan')
+                    ->label('Nomor Referensi (Opsional)')
+                    ->placeholder('Contoh: Ref-123456...'),
+
+                FileUpload::make('bukti_penarikan')
+                    ->label('Dokumen Pendukung (Opsional)')
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'application/pdf'])
                     ->maxSize(4096)
                     ->storeFiles(false),
@@ -139,13 +164,13 @@ class SetoranSimpanan extends Page implements HasForms
                     ->label('Catatan Tambahan (Opsional)')
                     ->placeholder('Tulis pesan atau catatan revisi di sini...'),
             ])
-            ->statePath('claimData');
+            ->statePath('revisiData');
     }
 
-    public function generateQris(): void
+    public function ajukanPenarikan(): void
     {
         try {
-            $data = $this->generateForm->getState();
+            $data = $this->createForm->getState();
             $jumlah = $data['preset_jumlah'] === 'custom'
                 ? (int) $data['custom_jumlah']
                 : (int) $data['preset_jumlah'];
@@ -163,14 +188,30 @@ class SetoranSimpanan extends Page implements HasForms
                 throw new \InvalidArgumentException('Rekening tidak valid atau tidak aktif.');
             }
 
-            $buatService = app(BuatSetoranTabunganService::class);
-            $buatService->execute($user, $tabungan, $jumlah);
+            $uploadedFile = $data['bukti_penarikan'] ?? null;
 
-            $this->generateForm->fill();
+            if ($uploadedFile && ! $uploadedFile instanceof UploadedFile) {
+                throw new \InvalidArgumentException('Dokumen pendukung tidak valid.');
+            }
+
+            $buatService = app(BuatPenarikanTabunganService::class);
+            $buatService->execute(
+                $user,
+                $tabungan,
+                $jumlah,
+                $data['bank'],
+                $data['nama_bank'],
+                $data['nama_nasabah'],
+                $data['referensi_penarikan'] ?? null,
+                $data['catatan_pengguna'] ?? null,
+                $uploadedFile
+            );
+
+            $this->createForm->fill();
 
             Notification::make()
                 ->title('Sukses')
-                ->body('QRIS berhasil di-generate.')
+                ->body('Permohonan penarikan berhasil diajukan dan menunggu verifikasi.')
                 ->success()
                 ->send();
         } catch (\InvalidArgumentException|\RuntimeException $e) {
@@ -188,43 +229,37 @@ class SetoranSimpanan extends Page implements HasForms
         }
     }
 
-    public function claimPayment(int $setoranId): void
+    public function kirimRevisi(int $penarikanId): void
     {
         try {
-            $data = $this->claimForm->getState();
+            $data = $this->revisiForm->getState();
             $user = Auth::user();
-            $setoran = SetoranTabungan::findOrFail($setoranId);
+            $penarikan = PenarikanTabungan::findOrFail($penarikanId);
 
-            if ($setoran->user_id !== $user->id) {
+            if ($penarikan->user_id !== $user->id) {
                 throw new \RuntimeException('Akses ditolak.');
             }
 
-            $uploadedFile = $data['bukti_pembayaran'] ?? null;
+            $uploadedFile = $data['bukti_penarikan'] ?? null;
 
             if ($uploadedFile && ! $uploadedFile instanceof UploadedFile) {
-                throw new \InvalidArgumentException('Bukti pembayaran tidak valid.');
+                throw new \InvalidArgumentException('Dokumen pendukung tidak valid.');
             }
 
-            $waktuKlaim = Carbon::parse($data['waktu_klaim_bayar']);
-            $klaimService = app(KirimKlaimPembayaranService::class);
-
-            $klaimService->execute(
+            $revisiService = app(KirimRevisiPenarikanService::class);
+            $revisiService->execute(
                 $user,
-                $setoran,
-                $waktuKlaim,
-                $data['nama_pembayar'],
-                $data['referensi_pembayaran'] ?? null,
+                $penarikan,
+                $data['referensi_penarikan'] ?? null,
                 $data['catatan_pengguna'] ?? null,
                 $uploadedFile
             );
 
-            $this->claimForm->fill([
-                'waktu_klaim_bayar' => now()->format('Y-m-d H:i:s'),
-            ]);
+            $this->revisiForm->fill();
 
             Notification::make()
                 ->title('Sukses')
-                ->body('Konfirmasi pembayaran berhasil dikirim.')
+                ->body('Revisi penarikan berhasil dikirim.')
                 ->success()
                 ->send();
         } catch (\InvalidArgumentException|\RuntimeException $e) {
@@ -236,33 +271,32 @@ class SetoranSimpanan extends Page implements HasForms
         } catch (Throwable $e) {
             Notification::make()
                 ->title('Kesalahan')
-                ->body('Gagal memverifikasi bukti. Silakan periksa kembali berkas Anda.')
+                ->body('Gagal memverifikasi berkas. Silakan periksa kembali berkas Anda.')
                 ->danger()
                 ->send();
         }
     }
 
-    public function getActiveSetoran()
+    public function getActivePenarikan()
     {
         $user = Auth::user();
 
-        return SetoranTabungan::where('user_id', $user->id)
+        return PenarikanTabungan::where('user_id', $user->id)
             ->whereIn('status', [
-                StatusSetoran::MENUNGGU_PEMBAYARAN,
-                StatusSetoran::MENUNGGU_VERIFIKASI,
-                StatusSetoran::SEDANG_DIPERIKSA,
-                StatusSetoran::PERLU_REVISI,
-                StatusSetoran::DISETUJUI,
+                StatusPenarikan::MENUNGGU_VERIFIKASI,
+                StatusPenarikan::SEDANG_DIPERIKSA,
+                StatusPenarikan::PERLU_REVISI,
+                StatusPenarikan::DISETUJUI,
             ])
             ->with('tabungan')
             ->first();
     }
 
-    public function getHistorySetoran()
+    public function getHistoryPenarikan()
     {
         $user = Auth::user();
 
-        return SetoranTabungan::where('user_id', $user->id)
+        return PenarikanTabungan::where('user_id', $user->id)
             ->with('tabungan')
             ->orderBy('created_at', 'desc')
             ->get();

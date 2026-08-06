@@ -2,35 +2,35 @@
 
 namespace App\Filament\User\Pages;
 
-use Filament\Pages\Page;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
+use App\Models\Pinjaman;
+use Carbon\Carbon;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\RepeatableEntry;
-use App\Models\Pinjaman;
-use Illuminate\Support\Facades\Auth;
+use Filament\Pages\Page;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
-class PinjamanSaya extends Page implements HasTable, HasInfolists
+class PinjamanSaya extends Page implements HasInfolists, HasTable
 {
-    use InteractsWithTable, InteractsWithInfolists;
+    use InteractsWithInfolists, InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
-    
-    protected static ?string $navigationLabel = 'Pinjaman Saya';
-    
-    protected static ?string $title = 'Pinjaman Saya';
+
+    protected static ?string $navigationLabel = 'Pinjaman';
+
+    protected static ?string $title = 'Pinjaman';
 
     protected static string $view = 'filament.user.pages.pinjaman-saya';
-    
+
     protected static ?int $navigationSort = 20;
 
     public ?Pinjaman $selectedPinjaman = null;
@@ -62,7 +62,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
 
                 TextColumn::make('jangka_waktu')
                     ->label('Tenor')
-                    ->formatStateUsing(fn ($state, $record) => $state . ' ' . $record->jangka_waktu_satuan)
+                    ->formatStateUsing(fn ($state, $record) => $state.' '.$record->jangka_waktu_satuan)
                     ->badge()
                     ->color('gray'),
 
@@ -111,8 +111,8 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
     protected function getTableQuery(): Builder
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return Pinjaman::query()->whereRaw('1 = 0');
         }
 
@@ -185,7 +185,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
 
                                 TextEntry::make('jangka_waktu')
                                     ->label('Jangka Waktu')
-                                    ->formatStateUsing(fn ($state, $record) => $state . ' ' . $record->jangka_waktu_satuan),
+                                    ->formatStateUsing(fn ($state, $record) => $state.' '.$record->jangka_waktu_satuan),
 
                                 TextEntry::make('tanggal_jatuh_tempo')
                                     ->label('Jatuh Tempo')
@@ -197,12 +197,12 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
                                     ->state(function ($record) {
                                         $jatuhTempo = Carbon::parse($record->tanggal_jatuh_tempo);
                                         $now = Carbon::now();
-                                        
+
                                         if ($jatuhTempo->isPast()) {
-                                            return 'Lewat ' . $now->diffInDays($jatuhTempo) . ' hari';
+                                            return 'Lewat '.$now->diffInDays($jatuhTempo).' hari';
                                         }
-                                        
-                                        return $now->diffInDays($jatuhTempo) . ' hari lagi';
+
+                                        return $now->diffInDays($jatuhTempo).' hari lagi';
                                     })
                                     ->badge()
                                     ->color(fn ($state) => str_contains($state, 'Lewat') ? 'danger' : 'success'),
@@ -228,6 +228,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
                                     ->label('Total Sudah Dibayar')
                                     ->state(function ($record) {
                                         $total = $record->transaksiPinjaman->sum('total_pembayaran');
+
                                         return $total;
                                     })
                                     ->money('IDR', locale: 'id')
@@ -240,6 +241,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
                                     ->label('Sisa Pinjaman')
                                     ->state(function ($record) {
                                         $lastTransaksi = $record->transaksiPinjaman->sortByDesc('id')->first();
+
                                         return $lastTransaksi ? $lastTransaksi->sisa_pinjaman : $record->jumlah_pinjaman;
                                     })
                                     ->money('IDR', locale: 'id')
@@ -250,7 +252,8 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
                                     ->label('Angsuran Terakhir')
                                     ->state(function ($record) {
                                         $lastTransaksi = $record->transaksiPinjaman->sortByDesc('id')->first();
-                                        return $lastTransaksi ? 'Ke-' . $lastTransaksi->angsuran_ke : 'Belum ada pembayaran';
+
+                                        return $lastTransaksi ? 'Ke-'.$lastTransaksi->angsuran_ke : 'Belum ada pembayaran';
                                     })
                                     ->badge()
                                     ->color('info'),
@@ -268,7 +271,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
                                     ->schema([
                                         TextEntry::make('angsuran_ke')
                                             ->label('Angsuran')
-                                            ->formatStateUsing(fn ($state) => 'Ke-' . $state)
+                                            ->formatStateUsing(fn ($state) => 'Ke-'.$state)
                                             ->badge()
                                             ->color('primary'),
 
@@ -295,7 +298,7 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
                                             ->weight('bold'),
                                     ]),
                             ])
-                            ->contained(false)
+                            ->contained(false),
                     ])
                     ->collapsible(),
             ]);
@@ -309,8 +312,8 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
     public function getTotalPinjaman(): string
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return format_rupiah(0);
         }
 
@@ -324,8 +327,8 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
     public function getSisaPinjaman(): string
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return format_rupiah(0);
         }
 
@@ -346,8 +349,8 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
     public function getJumlahPinjaman(): int
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return 0;
         }
 
@@ -357,8 +360,8 @@ class PinjamanSaya extends Page implements HasTable, HasInfolists
     public function getPinjamanAktif(): int
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return 0;
         }
 

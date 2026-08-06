@@ -67,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
         // Activity Log
         Gate::policy(Activity::class, \App\Policies\ActivityLogPolicy::class);
         Gate::policy(\App\Models\SetoranTabungan::class, \App\Policies\SetoranTabunganPolicy::class);
+        Gate::policy(\App\Models\PenarikanTabungan::class, \App\Policies\PenarikanTabunganPolicy::class);
 
         Health::checks([
             OptimizedAppCheck::new(),

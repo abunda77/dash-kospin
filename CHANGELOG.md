@@ -6,6 +6,25 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-08-06]
+
+### Added
+- Fitur Penarikan Simpanan (analogi Setoran Simpanan, tanpa QRIS dinamis)
+- Halaman user `/user/penarikan-simpanan`: form pengajuan dengan kolom Bank, Nama Bank, dan Nama Nasabah; nominal preset/kustom; referensi, bukti pendukung, dan catatan; panel status, form revisi, dan riwayat penarikan
+- Resource admin `/admin/penarikan-tabungans`: tabel dengan tabs (Perlu Tindakan, Selesai, Ditolak/Batal), filter, infolist detail, dan aksi Mulai Review, Minta Revisi, Tolak, Setujui, Coba Ulang Posting
+- Migrasi: tabel `penarikan_tabungans`, `riwayat_status_penarikans`, `bukti_penarikans`, dan kolom `penarikan_id` pada `transaksi_tabungans`
+- Enum `StatusPenarikan` (menunggu_verifikasi s.d. dibatalkan)
+- Service workflow: `BuatPenarikanTabungan`, `KirimRevisiPenarikan`, `MulaiReviewPenarikan`, `MintaRevisiPenarikan`, `SetujuiPenarikan`, `TolakPenarikan`, `PostingPenarikanKeTabungan`, `CatatRiwayatStatusPenarikan`
+- Job `SendPenarikanNotificationJob` (notifikasi WhatsApp admin) + notifikasi database Filament
+- Policy `PenarikanTabunganPolicy` terdaftar di `AppServiceProvider`
+- Config `config/penarikan.php` dengan env `PENARIKAN_MINIMAL`, `PENARIKAN_MAKSIMAL`, `PENARIKAN_BATAS_AKTIF`
+- Feature test `PenarikanSimpananWorkflowTest` (5 skenario: workflow lengkap, penolakan, limit saldo, limit transaksi aktif, coba ulang posting)
+
+### Changed
+- Model `TransaksiTabungan`: tambah `penarikan_id` pada `$fillable` dan relasi `penarikan()`; penarikan yang disetujui diposting sebagai transaksi `kredit` (mengurangi saldo)
+
+---
+
 ## [2026-08-05]
 
 ### Fixed

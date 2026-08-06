@@ -18,6 +18,7 @@ class TransaksiTabungan extends Model
     protected $fillable = [
         'id_tabungan',
         'setoran_id',
+        'penarikan_id',
         'jenis_transaksi',
         'jumlah',
         'tanggal_transaksi',
@@ -49,6 +50,11 @@ class TransaksiTabungan extends Model
     public function setoran()
     {
         return $this->belongsTo(SetoranTabungan::class, 'setoran_id');
+    }
+
+    public function penarikan()
+    {
+        return $this->belongsTo(PenarikanTabungan::class, 'penarikan_id');
     }
 
     public function admin()

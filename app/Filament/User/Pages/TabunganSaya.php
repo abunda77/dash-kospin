@@ -2,36 +2,40 @@
 
 namespace App\Filament\User\Pages;
 
-use Filament\Pages\Page;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
+use App\Models\Tabungan;
+use App\Models\TransaksiTabungan;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Grid;
-use Filament\Infolists\Components\RepeatableEntry;
-use App\Models\Tabungan;
-use App\Models\TransaksiTabungan;
-use Illuminate\Support\Facades\Auth;
+use Filament\Pages\Page;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
-class TabunganSaya extends Page implements HasTable, HasInfolists
+class TabunganSaya extends Page implements HasInfolists, HasTable
 {
-    use InteractsWithTable, InteractsWithInfolists;
+    use InteractsWithInfolists, InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-banknotes';
-    
-    protected static ?string $navigationLabel = 'Tabungan Saya';
-    
-    protected static ?string $title = 'Tabungan Saya';
+
+    protected static ?string $navigationLabel = 'Simpanan';
+
+    protected static ?string $title = 'Simpanan';
 
     protected static string $view = 'filament.user.pages.tabungan-saya';
-    
+
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Simpanan';
+    }
+
     protected static ?int $navigationSort = 10;
 
     public ?Tabungan $selectedTabungan = null;
@@ -115,7 +119,7 @@ class TabunganSaya extends Page implements HasTable, HasInfolists
     {
         $profile = Auth::user()->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             return Tabungan::query()->whereRaw('1 = 0'); // Return empty query
         }
 
@@ -213,7 +217,7 @@ class TabunganSaya extends Page implements HasTable, HasInfolists
                                             ->placeholder('-'),
                                     ]),
                             ])
-                            ->contained(false)
+                            ->contained(false),
                     ])
                     ->collapsible(),
             ]);
@@ -228,7 +232,7 @@ class TabunganSaya extends Page implements HasTable, HasInfolists
     {
         $profile = Auth::user()->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             return format_rupiah(0);
         }
 
@@ -248,7 +252,7 @@ class TabunganSaya extends Page implements HasTable, HasInfolists
     {
         $profile = Auth::user()->profile;
 
-        if (!$profile) {
+        if (! $profile) {
             return 0;
         }
 
