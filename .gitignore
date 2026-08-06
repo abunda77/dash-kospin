@@ -50,3 +50,6 @@ public/js
 
 .claude/
 boost.json
+.agent/*
+.kilocode/*
+

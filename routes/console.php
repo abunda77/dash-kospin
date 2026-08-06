@@ -11,7 +11,7 @@ Artisan::command('inspire', function () {
 // Jalankan setiap akhir bulan pukul 23:59
 Schedule::command('tabungan:hitung-bunga --all')
     ->monthlyOn(date('t'), '23:59')
-    ->after(function() {
+    ->after(function () {
         Artisan::call('tabungan:hitung-bunga --hapus-duplikat');
     });
 // Jalankan backup database setiap hari pukul 00:00
@@ -23,3 +23,7 @@ Schedule::command('barcode:cleanup-logs --days=90')
     ->sundays()
     ->at('02:00')
     ->description('Cleanup barcode scan logs older than 90 days');
+
+Schedule::command('setorans:kadaluarsa-tidak-dibayar')
+    ->everyMinute()
+    ->withoutOverlapping();

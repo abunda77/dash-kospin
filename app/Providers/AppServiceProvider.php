@@ -2,31 +2,28 @@
 
 namespace App\Providers;
 
-use Carbon\Carbon;
-use App\Models\Admin;
-use App\Models\Pinjaman;
-use App\Models\TransaksiPinjaman;
 use App\Models\Deposito;
+use App\Models\Pinjaman;
 use App\Models\Tabungan;
+use App\Models\TransaksiPinjaman;
 use App\Models\TransaksiTabungan;
-use App\Observers\PinjamanObserver;
-use App\Observers\TransaksiPinjamanObserver;
 use App\Observers\DepositoObserver;
+use App\Observers\PinjamanObserver;
 use App\Observers\TabunganObserver;
+use App\Observers\TransaksiPinjamanObserver;
 use App\Observers\TransaksiTabunganObserver;
+use Carbon\Carbon;
 use Dedoc\Scramble\Scramble;
-use App\Policies\ActivityPolicy;
-use Spatie\Health\Facades\Health;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
-use Spatie\Activitylog\Models\Activity;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Health\Checks\Checks\DebugModeCheck;
 use Spatie\Health\Checks\Checks\EnvironmentCheck;
 use Spatie\Health\Checks\Checks\OptimizedAppCheck;
-use TomatoPHP\FilamentLogger\Filament\Resources\ActivityResource;
+use Spatie\Health\Facades\Health;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -65,11 +62,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\TomatoPHP\FilamentLogger\Models\Activity::class, \App\Policies\ActivityPolicy::class);
         Gate::policy(\TomatoPHP\FilamentLogger\Filament\Resources\ActivityResource::class, \App\Policies\ActivityPolicy::class);
 
-
         // Filament Artisan
         Gate::policy(\TomatoPHP\FilamentArtisan\Pages\Artisan::class, \App\Policies\ArtisanPolicy::class);
         // Activity Log
         Gate::policy(Activity::class, \App\Policies\ActivityLogPolicy::class);
+        Gate::policy(\App\Models\SetoranTabungan::class, \App\Policies\SetoranTabunganPolicy::class);
 
         Health::checks([
             OptimizedAppCheck::new(),

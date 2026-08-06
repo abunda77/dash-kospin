@@ -94,19 +94,19 @@ if (! function_exists('format_hari_lalu')) {
 if (! function_exists('send_whatsapp_api')) {
     function send_whatsapp_api(string $phone, string $message): \Illuminate\Http\Client\Response
     {
-        $url = sprintf('http://%s:%s/send/message', env('WHATSAPP_IP'), env('WHATSAPP_PORT'));
+        $url = sprintf('http://%s:%s/send/message', config('whatsapp_gateway.legacy_ip'), config('whatsapp_gateway.legacy_port'));
 
         return \Illuminate\Support\Facades\Http::withHeaders([
-            'Authorization' => 'Basic '.base64_encode(env('WHATSAPP_AUTH')),
-            'X-Device-Id' => env('WHATSAPP_DEVICE_ID'),
+            'Authorization' => 'Basic '.base64_encode(config('whatsapp_gateway.legacy_auth')),
+            'X-Device-Id' => config('whatsapp_gateway.legacy_device_id'),
             'Content-Type' => 'application/json',
         ])->post($url, [
             'phone' => $phone.'@s.whatsapp.net',
             'message' => $message,
             'reply_message_id' => '',
             'is_forwarded' => false,
-            'action' => env('WHATSAPP_ACTION', 'stop'),
-            'duration' => (int) env('WHATSAPP_DURATION', 86400),
+            'action' => config('whatsapp_gateway.legacy_action', 'stop'),
+            'duration' => (int) config('whatsapp_gateway.legacy_duration', 86400),
         ]);
     }
 }
