@@ -2,20 +2,20 @@
 
 namespace App\Filament\User\Widgets;
 
+use App\Models\Tabungan;
+use App\Models\TransaksiTabungan;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use App\Models\Tabungan;
-use App\Models\TransaksiTabungan;
 use Illuminate\Support\Facades\Auth;
 
 class TabunganWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
-    
-    protected int | string | array $columnSpan = 'full';
 
-    protected static ?string $heading = '💰 Tabungan Saya';
+    protected int|string|array $columnSpan = 'full';
+
+    protected static ?string $heading = 'Tabungan Saya';
 
     /**
      * Hitung saldo akhir tabungan berdasarkan saldo awal + transaksi
@@ -77,8 +77,8 @@ class TabunganWidget extends BaseWidget
     protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return Tabungan::query()->whereRaw('1 = 0');
         }
 

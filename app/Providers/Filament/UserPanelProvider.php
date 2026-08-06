@@ -17,16 +17,15 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Spatie\Permission\Models\Role;
 use Rupadana\ApiService\ApiServicePlugin;
+use Spatie\Permission\Models\Role;
 
 class UserPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
-
     {
         // Dapatkan role_id
-    // $roleId = Role::where('name', 'panel_user')->first()->id;
+        // $roleId = Role::where('name', 'panel_user')->first()->id;
         return $panel
             ->id('user')
             ->path('user')
@@ -43,6 +42,7 @@ class UserPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Green,
             ])
+            ->viteTheme('resources/css/filament/user/theme.css')
             ->discoverResources(in: app_path('Filament/User/Resources'), for: 'App\\Filament\\User\\Resources')
             ->discoverPages(in: app_path('Filament/User/Pages'), for: 'App\\Filament\\User\\Pages')
             ->pages([
@@ -50,8 +50,8 @@ class UserPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/User/Widgets'), for: 'App\\Filament\\User\\Widgets')
             ->widgets([
-                //Widgets\AccountWidget::class,
-                //Widgets\FilamentInfoWidget::class,
+                // Widgets\AccountWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -68,10 +68,9 @@ class UserPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                //\BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
-                //ApiServicePlugin::make()
-            ])
-            ;
+                // \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                // ApiServicePlugin::make()
+            ]);
 
     }
 }

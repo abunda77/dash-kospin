@@ -2,23 +2,23 @@
 
 namespace App\Filament\User\Widgets;
 
+use App\Models\Pinjaman;
+use Carbon\Carbon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use App\Models\Pinjaman;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class PinjamanWidget extends BaseWidget
 {
     protected static ?int $sort = 3;
-    
-    protected int | string | array $columnSpan = [
+
+    protected int|string|array $columnSpan = [
         'default' => 'full',
         'md' => 1,
     ];
 
-    protected static ?string $heading = '💳 Pinjaman Aktif';
+    protected static ?string $heading = 'Pinjaman Aktif';
 
     public function table(Table $table): Table
     {
@@ -39,6 +39,7 @@ class PinjamanWidget extends BaseWidget
                     ->label('Sisa')
                     ->state(function (Pinjaman $record) {
                         $lastTransaksi = $record->transaksiPinjaman->sortByDesc('id')->first();
+
                         return $lastTransaksi ? $lastTransaksi->sisa_pinjaman : $record->jumlah_pinjaman;
                     })
                     ->money('IDR', locale: 'id')
@@ -58,8 +59,8 @@ class PinjamanWidget extends BaseWidget
     protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return Pinjaman::query()->whereRaw('1 = 0');
         }
 

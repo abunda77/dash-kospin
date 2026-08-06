@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0a0f0c">
+    <meta name="theme-color" content="#e7eee8" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#203426" media="(prefers-color-scheme: dark)">
     <meta name="description" content="Portal anggota Koperasi Sinara Artha Naya yang aman, modern, dan terpercaya.">
     <title>Koperasi Sinara Artha Naya</title>
 
@@ -34,19 +35,35 @@
 
         .page-pattern {
             background-image:
-                radial-gradient(circle at 12% 5%, rgba(34, 197, 94, .11), transparent 28rem),
-                radial-gradient(circle at 90% 28%, rgba(250, 204, 21, .07), transparent 25rem),
-                linear-gradient(rgba(255, 255, 255, .018) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, .018) 1px, transparent 1px);
+                radial-gradient(circle at 12% 5%, rgba(34, 197, 94, .13), transparent 28rem),
+                radial-gradient(circle at 90% 28%, rgba(250, 204, 21, .1), transparent 25rem),
+                linear-gradient(rgba(22, 101, 52, .04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(22, 101, 52, .04) 1px, transparent 1px);
             background-size: auto, auto, 48px 48px, 48px 48px;
         }
 
         .hero-surface {
             background-image:
-                linear-gradient(145deg, rgba(17, 26, 20, .86), rgba(10, 15, 12, .97)),
+                linear-gradient(145deg, rgba(20, 58, 33, .76), rgba(12, 38, 22, .88)),
                 url('{{ asset('images/bg_kartu_simpanan.jpg') }}');
             background-position: center;
             background-size: cover;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .page-pattern {
+                background-image:
+                    radial-gradient(circle at 12% 5%, rgba(74, 222, 128, .12), transparent 28rem),
+                    radial-gradient(circle at 90% 28%, rgba(250, 204, 21, .08), transparent 25rem),
+                    linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+            }
+
+            .hero-surface {
+                background-image:
+                    linear-gradient(145deg, rgba(27, 51, 34, .76), rgba(20, 32, 25, .9)),
+                    url('{{ asset('images/bg_kartu_simpanan.jpg') }}');
+            }
         }
 
         .glow-orb {
@@ -63,7 +80,7 @@
         }
     </style>
 </head>
-<body class="page-pattern min-h-screen overflow-x-hidden bg-[#0a0f0c] font-sans text-[#f0faf4] antialiased">
+<body class="public-theme page-pattern min-h-screen overflow-x-hidden bg-[#0a0f0c] font-sans text-[#f0faf4] antialiased">
     <div class="glow-orb pointer-events-none fixed -left-48 top-20 h-96 w-96 rounded-full bg-green-500/[.08] blur-3xl"></div>
     <div class="glow-orb pointer-events-none fixed -right-48 top-1/2 h-96 w-96 rounded-full bg-yellow-400/[.05] blur-3xl" style="animation-delay: -6s"></div>
 

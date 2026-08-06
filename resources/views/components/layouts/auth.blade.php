@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="theme-color" content="#0a0f0c">
+    <meta name="theme-color" content="#e7eee8" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#203426" media="(prefers-color-scheme: dark)">
     <title>{{ $title ?? 'Masuk' }} - Kospin Sinara Artha</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -29,20 +30,36 @@
         }
 
         .auth-page {
-            background-color: #0a0f0c;
+            background-color: #e7eee8;
             background-image:
-                radial-gradient(circle at 82% 10%, rgba(34, 197, 94, .09), transparent 25rem),
-                linear-gradient(rgba(255, 255, 255, .018) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, .018) 1px, transparent 1px);
+                radial-gradient(circle at 82% 10%, rgba(34, 197, 94, .14), transparent 25rem),
+                linear-gradient(rgba(22, 101, 52, .04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(22, 101, 52, .04) 1px, transparent 1px);
             background-size: auto, 48px 48px, 48px 48px;
         }
 
         .auth-visual {
             background-image:
-                linear-gradient(145deg, rgba(17, 26, 20, .84), rgba(10, 15, 12, .97)),
+                linear-gradient(145deg, rgba(20, 58, 33, .76), rgba(12, 38, 22, .88)),
                 url('{{ asset('images/bg_kartu_simpanan.jpg') }}');
             background-position: center;
             background-size: cover;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .auth-page {
+                background-color: #203426;
+                background-image:
+                    radial-gradient(circle at 82% 10%, rgba(74, 222, 128, .12), transparent 25rem),
+                    linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+            }
+
+            .auth-visual {
+                background-image:
+                    linear-gradient(145deg, rgba(27, 51, 34, .76), rgba(20, 32, 25, .9)),
+                    url('{{ asset('images/bg_kartu_simpanan.jpg') }}');
+            }
         }
 
         .auth-reveal {
@@ -64,7 +81,7 @@
         }
     </style>
 </head>
-<body class="auth-page min-h-screen overflow-x-hidden font-sans text-[#f0faf4] antialiased">
+<body class="public-theme auth-page min-h-screen overflow-x-hidden font-sans text-[#f0faf4] antialiased">
     {{ $slot }}
     @livewireScripts
 </body>

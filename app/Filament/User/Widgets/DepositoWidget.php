@@ -2,24 +2,24 @@
 
 namespace App\Filament\User\Widgets;
 
-use Filament\Tables\Columns\TextColumn;
+use App\Models\Deposito;
+use Carbon\Carbon;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use App\Models\Deposito;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class DepositoWidget extends BaseWidget
 {
     protected static ?int $sort = 4;
-    
-    protected int | string | array $columnSpan = [
+
+    protected int|string|array $columnSpan = [
         'default' => 'full',
         'md' => 1,
     ];
 
-    protected static ?string $heading = '🏦 Deposito Aktif';
+    protected static ?string $heading = 'Deposito Aktif';
 
     public function table(Table $table): Table
     {
@@ -38,7 +38,7 @@ class DepositoWidget extends BaseWidget
 
                 TextColumn::make('rate_bunga')
                     ->label('Bunga')
-                    ->formatStateUsing(fn ($state) => $state . '%')
+                    ->formatStateUsing(fn ($state) => $state.'%')
                     ->badge()
                     ->color('warning'),
 
@@ -63,8 +63,8 @@ class DepositoWidget extends BaseWidget
     protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $profile = Auth::user()->profile;
-        
-        if (!$profile) {
+
+        if (! $profile) {
             return Deposito::query()->whereRaw('1 = 0');
         }
 

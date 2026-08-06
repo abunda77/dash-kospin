@@ -64,3 +64,74 @@
     @apply bg-background text-foreground;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  .public-theme [class*="bg-[#0a0f0c]"] {
+    background-color: #203426 !important;
+  }
+
+  .public-theme [class*="bg-[#0d1510]"] {
+    background-color: #2a4030 !important;
+  }
+
+  .public-theme [class*="bg-[#111a14]"] {
+    background-color: #2d4433 !important;
+  }
+
+  .public-theme [class*="bg-[#182118]"] {
+    background-color: #385240 !important;
+  }
+
+  .public-theme [class*="bg-[#1c291e]"] {
+    background-color: #46634d !important;
+  }
+
+  .public-theme [class*="bg-[#080d0a]"] {
+    background-color: #1a2b1f !important;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .public-theme [class*="bg-[#0a0f0c]"],
+  .public-theme [class*="bg-[#0d1510]"] {
+    background-color: #e7eee8 !important;
+  }
+
+  .public-theme [class*="bg-[#111a14]"] {
+    background-color: #dce7de !important;
+  }
+
+  .public-theme [class*="bg-[#182118]"],
+  .public-theme [class*="bg-[#1c291e]"] {
+    background-color: #d1dfd4 !important;
+  }
+
+  .public-theme [class*="bg-[#080d0a]"] {
+    background-color: #c4d5c8 !important;
+  }
+
+  .public-theme .text-white,
+  .public-theme [class*="text-[#f0faf4]"] {
+    color: #18251b !important;
+  }
+
+  .public-theme [class*="text-[#a3c9b0]"],
+  .public-theme [class*="text-[#cce6d4]"],
+  .public-theme [class*="text-[#8cb399]"],
+  .public-theme [class*="text-[#789b83]"],
+  .public-theme [class*="text-[#73937d]"],
+  .public-theme [class*="text-[#6f947a]"],
+  .public-theme [class*="text-[#61866d]"],
+  .public-theme [class*="text-[#577060]"],
+  .public-theme [class*="text-[#55705e]"] {
+    color: #526957 !important;
+  }
+
+  .public-theme [class*="border-white"] {
+    border-color: rgb(22 101 52 / 0.14) !important;
+  }
+
+  .public-theme [class*="bg-white/"] {
+    background-color: rgb(237 244 238 / 0.78) !important;
+  }
+}
