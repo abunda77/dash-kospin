@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\StatusSetoran;
 use App\Models\Admin;
 use App\Models\SetoranTabungan;
 use App\Models\User;
@@ -69,7 +70,8 @@ class SetoranTabunganPolicy
     public function batalkan(Authenticatable $user, SetoranTabungan $setoran): bool
     {
         if ($user instanceof User) {
-            return $setoran->user_id === $user->id;
+            return $setoran->user_id === $user->id
+                && $setoran->status === StatusSetoran::MENUNGGU_PEMBAYARAN;
         }
 
         return false;

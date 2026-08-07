@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [PenarikanSimpananController::class, 'show']);
         Route::post('/', [PenarikanSimpananController::class, 'store']);
         Route::post('/{id}/revisi', [PenarikanSimpananController::class, 'kirimRevisi']);
+        Route::post('/{id}/batalkan', [PenarikanSimpananController::class, 'batalkan']);
     });
 
     // Setoran Simpanan (QRIS)
@@ -58,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [SetoranSimpananController::class, 'show']);
         Route::post('/', [SetoranSimpananController::class, 'store']);
         Route::post('/{id}/klaim', [SetoranSimpananController::class, 'klaimPembayaran']);
+        Route::post('/{id}/batalkan', [SetoranSimpananController::class, 'batalkan']);
     });
 });
 

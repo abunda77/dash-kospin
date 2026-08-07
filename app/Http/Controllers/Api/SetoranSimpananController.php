@@ -9,6 +9,7 @@ use App\Http\Requests\StoreSetoranRequest;
 use App\Models\SetoranTabungan;
 use App\Models\Tabungan;
 use App\Models\User;
+use App\Services\BatalkanSetoranService;
 use App\Services\BuatSetoranTabunganService;
 use App\Services\KirimKlaimPembayaranService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -187,6 +188,47 @@ class SetoranSimpananController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Gagal memverifikasi bukti. Silakan periksa kembali berkas Anda.',
+            ], 500);
+        }
+    }
+
+    public function batalkan(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        $setoran = SetoranTabungan::where('user_id', $user->id)->find($id);
+
+        if (! $setoran) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data setoran tidak ditemukan',
+            ], 404);
+        }
+
+        try {
+            $this->authorize('batalkan', $setoran);
+            $setoran = app(BatalkanSetoranService::class)->execute($user, $setoran);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Setoran berhasil dibatalkan.',
+                'data' => $this->mapSetoran($setoran),
+            ]);
+        } catch (AuthorizationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 403);
+        } catch (RuntimeException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (Throwable $e) {
+            Log::error('Error in SetoranSimpananController@batalkan: '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Setoran gagal dibatalkan. Silakan coba kembali.',
             ], 500);
         }
     }

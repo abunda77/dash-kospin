@@ -5,6 +5,7 @@ namespace App\Filament\User\Pages;
 use App\Enums\StatusSetoran;
 use App\Models\SetoranTabungan;
 use App\Models\Tabungan;
+use App\Services\BatalkanSetoranService;
 use App\Services\BuatSetoranTabunganService;
 use App\Services\KirimKlaimPembayaranService;
 use Filament\Forms\Components\DateTimePicker;
@@ -18,9 +19,12 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Throwable;
 
 class SetoranSimpanan extends Page implements HasForms
@@ -237,6 +241,39 @@ class SetoranSimpanan extends Page implements HasForms
             Notification::make()
                 ->title('Kesalahan')
                 ->body('Gagal memverifikasi bukti. Silakan periksa kembali berkas Anda.')
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function cancelSetoran(int $setoranId): void
+    {
+        try {
+            $user = Auth::user();
+            $setoran = SetoranTabungan::query()
+                ->where('user_id', $user->id)
+                ->findOrFail($setoranId);
+
+            Gate::authorize('batalkan', $setoran);
+            app(BatalkanSetoranService::class)->execute($user, $setoran);
+
+            Notification::make()
+                ->title('Setoran Dibatalkan')
+                ->body('Setoran berhasil dibatalkan. Anda dapat membuat setoran baru.')
+                ->success()
+                ->send();
+        } catch (AuthorizationException|ModelNotFoundException|\RuntimeException $e) {
+            Notification::make()
+                ->title('Pembatalan Gagal')
+                ->body($e instanceof ModelNotFoundException
+                    ? 'Data setoran tidak ditemukan.'
+                    : $e->getMessage())
+                ->danger()
+                ->send();
+        } catch (Throwable $e) {
+            Notification::make()
+                ->title('Kesalahan')
+                ->body('Setoran gagal dibatalkan. Silakan coba kembali.')
                 ->danger()
                 ->send();
         }

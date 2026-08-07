@@ -9,6 +9,7 @@ use App\Http\Requests\StorePenarikanRequest;
 use App\Models\PenarikanTabungan;
 use App\Models\Tabungan;
 use App\Models\User;
+use App\Services\BatalkanPenarikanService;
 use App\Services\BuatPenarikanTabunganService;
 use App\Services\KirimRevisiPenarikanService;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -188,6 +189,47 @@ class PenarikanSimpananController extends Controller
             return response()->json([
                 'status' => false,
                 'message' => 'Gagal memverifikasi berkas. Silakan periksa kembali berkas Anda.',
+            ], 500);
+        }
+    }
+
+    public function batalkan(Request $request, int $id): JsonResponse
+    {
+        $user = $request->user();
+        $penarikan = PenarikanTabungan::where('user_id', $user->id)->find($id);
+
+        if (! $penarikan) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data penarikan tidak ditemukan',
+            ], 404);
+        }
+
+        try {
+            $this->authorize('batalkan', $penarikan);
+            $penarikan = app(BatalkanPenarikanService::class)->execute($user, $penarikan);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Penarikan berhasil dibatalkan.',
+                'data' => $this->mapPenarikan($penarikan),
+            ]);
+        } catch (AuthorizationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 403);
+        } catch (RuntimeException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        } catch (Throwable $e) {
+            Log::error('Error in PenarikanSimpananController@batalkan: '.$e->getMessage());
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Penarikan gagal dibatalkan. Silakan coba kembali.',
             ], 500);
         }
     }

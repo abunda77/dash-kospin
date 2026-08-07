@@ -84,7 +84,21 @@
                             <form wire:submit.prevent="claimPayment({{ $activeSetoran->id }})" class="space-y-4">
                                 {{ $this->claimForm }}
 
-                                <div class="flex justify-end mt-4">
+                                <div class="flex flex-col-reverse justify-end gap-3 sm:flex-row">
+                                    @if ($activeSetoran->status === \App\Enums\StatusSetoran::MENUNGGU_PEMBAYARAN)
+                                        <x-filament::button
+                                            type="button"
+                                            color="danger"
+                                            size="lg"
+                                            wire:click="cancelSetoran({{ $activeSetoran->id }})"
+                                            wire:confirm="Batalkan setoran ini? QRIS tidak dapat digunakan kembali setelah setoran dibatalkan."
+                                            wire:loading.attr="disabled"
+                                            wire:target="cancelSetoran"
+                                        >
+                                            Batalkan Setoran
+                                        </x-filament::button>
+                                    @endif
+
                                     <x-filament::button type="submit" color="success" size="lg">
                                         Kirim Bukti Pembayaran
                                     </x-filament::button>
@@ -149,6 +163,7 @@
                                             'sedang_diperiksa' => 'primary',
                                             'perlu_revisi' => 'warning',
                                             'ditolak' => 'danger',
+                                            'dibatalkan' => 'gray',
                                             default => 'gray',
                                         };
                                     @endphp

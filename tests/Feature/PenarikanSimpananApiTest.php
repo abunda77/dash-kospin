@@ -298,9 +298,101 @@ class PenarikanSimpananApiTest extends TestCase
             ->assertJsonPath('status', false);
     }
 
+    public function test_pemilik_dapat_membatalkan_penarikan_yang_menunggu_verifikasi(): void
+    {
+        [$user, $tabungan] = $this->buatUserDenganTabungan(500000.00, 'API-PNK-012');
+
+        $penarikan = PenarikanTabungan::create([
+            'nomor_penarikan' => 'PNK-API-CANCEL-1',
+            'user_id' => $user->id,
+            'id_tabungan' => $tabungan->id,
+            'jenis_simpanan' => 'Simpanan Test API',
+            'jumlah' => 50000,
+            'bank' => 'BRI',
+            'nama_bank' => 'BRI Unit Kota',
+            'nama_nasabah' => 'Nasabah Uji',
+            'status' => StatusPenarikan::MENUNGGU_VERIFIKASI,
+            'dikirim_at' => Carbon::now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/penarikan/{$penarikan->id}/batalkan")
+            ->assertOk()
+            ->assertJsonPath('status', true)
+            ->assertJsonPath('data.status', StatusPenarikan::DIBATALKAN->value);
+
+        $this->assertEquals(StatusPenarikan::DIBATALKAN, $penarikan->fresh()->status);
+        $this->assertDatabaseHas('riwayat_status_penarikans', [
+            'penarikan_id' => $penarikan->id,
+            'status_sebelumnya' => StatusPenarikan::MENUNGGU_VERIFIKASI->value,
+            'status_baru' => StatusPenarikan::DIBATALKAN->value,
+            'diubah_oleh_type' => User::class,
+            'diubah_oleh_id' => $user->id,
+        ]);
+
+        $this->getJson('/api/penarikan/aktif')
+            ->assertOk()
+            ->assertJsonPath('data', null);
+    }
+
+    public function test_penarikan_orang_lain_tidak_dapat_dibatalkan(): void
+    {
+        [$pemilik, $tabungan] = $this->buatUserDenganTabungan(500000.00, 'API-PNK-013');
+        [$userLain] = $this->buatUserDenganTabungan(500000.00, 'API-PNK-014');
+
+        $penarikan = PenarikanTabungan::create([
+            'nomor_penarikan' => 'PNK-API-CANCEL-2',
+            'user_id' => $pemilik->id,
+            'id_tabungan' => $tabungan->id,
+            'jenis_simpanan' => 'Simpanan Test API',
+            'jumlah' => 50000,
+            'bank' => 'BRI',
+            'nama_bank' => 'BRI Unit Kota',
+            'nama_nasabah' => 'Nasabah Uji',
+            'status' => StatusPenarikan::MENUNGGU_VERIFIKASI,
+            'dikirim_at' => Carbon::now(),
+        ]);
+
+        Sanctum::actingAs($userLain);
+
+        $this->postJson("/api/penarikan/{$penarikan->id}/batalkan")
+            ->assertNotFound()
+            ->assertJsonPath('status', false);
+
+        $this->assertEquals(StatusPenarikan::MENUNGGU_VERIFIKASI, $penarikan->fresh()->status);
+    }
+
+    public function test_penarikan_yang_sedang_diperiksa_tidak_dapat_dibatalkan(): void
+    {
+        [$user, $tabungan] = $this->buatUserDenganTabungan(500000.00, 'API-PNK-015');
+
+        $penarikan = PenarikanTabungan::create([
+            'nomor_penarikan' => 'PNK-API-CANCEL-3',
+            'user_id' => $user->id,
+            'id_tabungan' => $tabungan->id,
+            'jenis_simpanan' => 'Simpanan Test API',
+            'jumlah' => 50000,
+            'bank' => 'BRI',
+            'nama_bank' => 'BRI Unit Kota',
+            'nama_nasabah' => 'Nasabah Uji',
+            'status' => StatusPenarikan::SEDANG_DIPERIKSA,
+            'dikirim_at' => Carbon::now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/penarikan/{$penarikan->id}/batalkan")
+            ->assertForbidden()
+            ->assertJsonPath('status', false);
+
+        $this->assertEquals(StatusPenarikan::SEDANG_DIPERIKSA, $penarikan->fresh()->status);
+    }
+
     public function test_endpoint_memerlukan_autentikasi(): void
     {
         $this->getJson('/api/penarikan/aktif')->assertStatus(401);
         $this->postJson('/api/penarikan', [])->assertStatus(401);
+        $this->postJson('/api/penarikan/1/batalkan')->assertStatus(401);
     }
 }

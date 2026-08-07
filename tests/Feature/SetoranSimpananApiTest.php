@@ -283,9 +283,96 @@ class SetoranSimpananApiTest extends TestCase
             ->assertJsonPath('status', false);
     }
 
+    public function test_pemilik_dapat_membatalkan_setoran_yang_menunggu_pembayaran(): void
+    {
+        [$user, $tabungan] = $this->buatUserDenganTabungan(100000.00, 'API-STR-010');
+
+        $setoran = SetoranTabungan::create([
+            'nomor_setoran' => 'STR-API-CANCEL-1',
+            'user_id' => $user->id,
+            'id_tabungan' => $tabungan->id,
+            'jenis_simpanan' => 'Simpanan Test API',
+            'jumlah' => 50000,
+            'kode_unik' => 40,
+            'jumlah_bayar' => 50040,
+            'status' => StatusSetoran::MENUNGGU_PEMBAYARAN,
+            'kedaluwarsa_at' => Carbon::now()->addMinutes(30),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/setoran/{$setoran->id}/batalkan")
+            ->assertOk()
+            ->assertJsonPath('status', true)
+            ->assertJsonPath('data.status', StatusSetoran::DIBATALKAN->value);
+
+        $this->assertEquals(StatusSetoran::DIBATALKAN, $setoran->fresh()->status);
+        $this->assertDatabaseHas('riwayat_status_setorans', [
+            'setoran_id' => $setoran->id,
+            'status_sebelumnya' => StatusSetoran::MENUNGGU_PEMBAYARAN->value,
+            'status_baru' => StatusSetoran::DIBATALKAN->value,
+            'diubah_oleh_type' => User::class,
+            'diubah_oleh_id' => $user->id,
+        ]);
+
+        $this->getJson('/api/setoran/aktif')
+            ->assertOk()
+            ->assertJsonPath('data', null);
+    }
+
+    public function test_setoran_orang_lain_tidak_dapat_dibatalkan(): void
+    {
+        [$pemilik, $tabungan] = $this->buatUserDenganTabungan(100000.00, 'API-STR-011');
+        [$userLain] = $this->buatUserDenganTabungan(100000.00, 'API-STR-012');
+
+        $setoran = SetoranTabungan::create([
+            'nomor_setoran' => 'STR-API-CANCEL-2',
+            'user_id' => $pemilik->id,
+            'id_tabungan' => $tabungan->id,
+            'jenis_simpanan' => 'Simpanan Test API',
+            'jumlah' => 50000,
+            'kode_unik' => 41,
+            'jumlah_bayar' => 50041,
+            'status' => StatusSetoran::MENUNGGU_PEMBAYARAN,
+        ]);
+
+        Sanctum::actingAs($userLain);
+
+        $this->postJson("/api/setoran/{$setoran->id}/batalkan")
+            ->assertNotFound()
+            ->assertJsonPath('status', false);
+
+        $this->assertEquals(StatusSetoran::MENUNGGU_PEMBAYARAN, $setoran->fresh()->status);
+    }
+
+    public function test_setoran_yang_sudah_diklaim_tidak_dapat_dibatalkan(): void
+    {
+        [$user, $tabungan] = $this->buatUserDenganTabungan(100000.00, 'API-STR-013');
+
+        $setoran = SetoranTabungan::create([
+            'nomor_setoran' => 'STR-API-CANCEL-3',
+            'user_id' => $user->id,
+            'id_tabungan' => $tabungan->id,
+            'jenis_simpanan' => 'Simpanan Test API',
+            'jumlah' => 50000,
+            'kode_unik' => 42,
+            'jumlah_bayar' => 50042,
+            'status' => StatusSetoran::MENUNGGU_VERIFIKASI,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/setoran/{$setoran->id}/batalkan")
+            ->assertForbidden()
+            ->assertJsonPath('status', false);
+
+        $this->assertEquals(StatusSetoran::MENUNGGU_VERIFIKASI, $setoran->fresh()->status);
+    }
+
     public function test_endpoint_memerlukan_autentikasi(): void
     {
         $this->getJson('/api/setoran/aktif')->assertStatus(401);
         $this->postJson('/api/setoran', [])->assertStatus(401);
+        $this->postJson('/api/setoran/1/batalkan')->assertStatus(401);
     }
 }

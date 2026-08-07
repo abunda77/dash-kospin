@@ -9,11 +9,12 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2026-08-07]
 
 ### Added
-- API endpoint Penarikan Simpanan untuk mobile: `GET /api/penarikan/rekening-options`, `POST /api/penarikan`, `GET /api/penarikan/aktif`, `GET /api/penarikan/history`, `GET /api/penarikan/{id}`, `POST /api/penarikan/{id}/revisi`
-- API endpoint Setoran Simpanan (QRIS) untuk mobile: `GET /api/setoran/rekening-options`, `POST /api/setoran` (generate QRIS), `GET /api/setoran/aktif`, `GET /api/setoran/history`, `GET /api/setoran/{id}`, `POST /api/setoran/{id}/klaim`
+- API endpoint Penarikan Simpanan untuk mobile: `GET /api/penarikan/rekening-options`, `POST /api/penarikan`, `GET /api/penarikan/aktif`, `GET /api/penarikan/history`, `GET /api/penarikan/{id}`, `POST /api/penarikan/{id}/revisi`, `POST /api/penarikan/{id}/batalkan`
+- API endpoint Setoran Simpanan (QRIS) untuk mobile: `GET /api/setoran/rekening-options`, `POST /api/setoran` (generate QRIS), `GET /api/setoran/aktif`, `GET /api/setoran/history`, `GET /api/setoran/{id}`, `POST /api/setoran/{id}/klaim`, `POST /api/setoran/{id}/batalkan`
 - Controller API `PenarikanSimpananController` dan `SetoranSimpananController` (auth Sanctum, validasi kepemilikan rekening & transaksi, menggunakan service workflow yang sama dengan halaman Filament user)
 - Form Request: `StorePenarikanRequest`, `KirimRevisiPenarikanRequest`, `StoreSetoranRequest`, `KlaimSetoranRequest` dengan pesan validasi Bahasa Indonesia
-- Feature test `PenarikanSimpananApiTest` (10 skenario) dan `SetoranSimpananApiTest` (9 skenario)
+- Fungsi Batalkan Setoran dan Batalkan Penarikan pada dashboard user, lengkap dengan konfirmasi, otorisasi kepemilikan, pencatatan riwayat status, dan pembaruan otomatis pada tab dashboard admin
+- Feature test API dan halaman Filament user untuk pembatalan Setoran Simpanan dan Penarikan Simpanan
 - File dokumentasi `SIMPANAN-SETORAN-API.md`: panduan integrasi untuk aplikasi mobile React Native
 
 ---

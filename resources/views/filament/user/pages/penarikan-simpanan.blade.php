@@ -92,6 +92,22 @@
                             <x-heroicon-o-clock class="w-12 h-12 text-gray-400 mx-auto mb-3" />
                             <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Penarikan Berhasil Diajukan</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Status saat ini sedang dalam proses verifikasi atau disetujui. Mohon menunggu informasi lebih lanjut.</p>
+
+                            @if ($activePenarikan->status === \App\Enums\StatusPenarikan::MENUNGGU_VERIFIKASI)
+                                <div class="mt-4 flex justify-center">
+                                    <x-filament::button
+                                        type="button"
+                                        color="danger"
+                                        size="lg"
+                                        wire:click="cancelPenarikan({{ $activePenarikan->id }})"
+                                        wire:confirm="Batalkan pengajuan penarikan ini? Pengajuan yang dibatalkan tidak dapat diproses kembali."
+                                        wire:loading.attr="disabled"
+                                        wire:target="cancelPenarikan"
+                                    >
+                                        Batalkan Penarikan
+                                    </x-filament::button>
+                                </div>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -144,6 +160,7 @@
                                             'sedang_diperiksa' => 'primary',
                                             'perlu_revisi' => 'warning',
                                             'ditolak' => 'danger',
+                                            'dibatalkan' => 'gray',
                                             default => 'gray',
                                         };
                                     @endphp

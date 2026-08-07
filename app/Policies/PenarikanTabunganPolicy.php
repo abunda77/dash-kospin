@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\StatusPenarikan;
 use App\Models\Admin;
 use App\Models\PenarikanTabungan;
 use App\Models\User;
@@ -51,7 +52,8 @@ class PenarikanTabunganPolicy
     public function batalkan(Authenticatable $user, PenarikanTabungan $penarikan): bool
     {
         if ($user instanceof User) {
-            return $penarikan->user_id === $user->id;
+            return $penarikan->user_id === $user->id
+                && $penarikan->status === StatusPenarikan::MENUNGGU_VERIFIKASI;
         }
 
         return false;

@@ -5,6 +5,7 @@ namespace App\Filament\User\Pages;
 use App\Enums\StatusPenarikan;
 use App\Models\PenarikanTabungan;
 use App\Models\Tabungan;
+use App\Services\BatalkanPenarikanService;
 use App\Services\BuatPenarikanTabunganService;
 use App\Services\KirimRevisiPenarikanService;
 use Filament\Forms\Components\FileUpload;
@@ -17,8 +18,11 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Throwable;
 
 class PenarikanSimpanan extends Page implements HasForms
@@ -272,6 +276,39 @@ class PenarikanSimpanan extends Page implements HasForms
             Notification::make()
                 ->title('Kesalahan')
                 ->body('Gagal memverifikasi berkas. Silakan periksa kembali berkas Anda.')
+                ->danger()
+                ->send();
+        }
+    }
+
+    public function cancelPenarikan(int $penarikanId): void
+    {
+        try {
+            $user = Auth::user();
+            $penarikan = PenarikanTabungan::query()
+                ->where('user_id', $user->id)
+                ->findOrFail($penarikanId);
+
+            Gate::authorize('batalkan', $penarikan);
+            app(BatalkanPenarikanService::class)->execute($user, $penarikan);
+
+            Notification::make()
+                ->title('Penarikan Dibatalkan')
+                ->body('Penarikan berhasil dibatalkan. Anda dapat membuat pengajuan baru.')
+                ->success()
+                ->send();
+        } catch (AuthorizationException|ModelNotFoundException|\RuntimeException $e) {
+            Notification::make()
+                ->title('Pembatalan Gagal')
+                ->body($e instanceof ModelNotFoundException
+                    ? 'Data penarikan tidak ditemukan.'
+                    : $e->getMessage())
+                ->danger()
+                ->send();
+        } catch (Throwable $e) {
+            Notification::make()
+                ->title('Kesalahan')
+                ->body('Penarikan gagal dibatalkan. Silakan coba kembali.')
                 ->danger()
                 ->send();
         }
