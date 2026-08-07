@@ -1,18 +1,20 @@
 <?php
 
+use App\Http\Controllers\Api\AngsuranController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BannerMobileController;
+use App\Http\Controllers\Api\ConfigController;
+use App\Http\Controllers\Api\DepositoController;
+use App\Http\Controllers\Api\MakanBergizisGratisController;
+use App\Http\Controllers\Api\MutasiTabunganController;
+use App\Http\Controllers\Api\PenarikanSimpananController;
+use App\Http\Controllers\Api\PinjamanController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\RegionController;
+use App\Http\Controllers\Api\SetoranSimpananController;
+use App\Http\Controllers\Api\TabunganController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\PinjamanController;
-use App\Http\Controllers\Api\TabunganController;
-use App\Http\Controllers\Api\DepositoController;
-use App\Http\Controllers\Api\BannerMobileController;
-use App\Http\Controllers\Api\RegionController;
-use App\Http\Controllers\Api\AngsuranController;
-use App\Http\Controllers\Api\MutasiTabunganController;
-use App\Http\Controllers\Api\ConfigController;
-use App\Http\Controllers\Api\MakanBergizisGratisController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -37,6 +39,26 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/angsuran/details', [AngsuranController::class, 'getAngsuranDetails']);
     Route::post('/angsuran/create', [AngsuranController::class, 'createTransaksiAngsuran']);
     Route::patch('/angsuran/{id}/update-status', [AngsuranController::class, 'updateStatusPembayaran']);
+
+    // Penarikan Simpanan
+    Route::prefix('penarikan')->group(function () {
+        Route::get('/rekening-options', [PenarikanSimpananController::class, 'rekeningOptions']);
+        Route::get('/aktif', [PenarikanSimpananController::class, 'aktif']);
+        Route::get('/history', [PenarikanSimpananController::class, 'history']);
+        Route::get('/{id}', [PenarikanSimpananController::class, 'show']);
+        Route::post('/', [PenarikanSimpananController::class, 'store']);
+        Route::post('/{id}/revisi', [PenarikanSimpananController::class, 'kirimRevisi']);
+    });
+
+    // Setoran Simpanan (QRIS)
+    Route::prefix('setoran')->group(function () {
+        Route::get('/rekening-options', [SetoranSimpananController::class, 'rekeningOptions']);
+        Route::get('/aktif', [SetoranSimpananController::class, 'aktif']);
+        Route::get('/history', [SetoranSimpananController::class, 'history']);
+        Route::get('/{id}', [SetoranSimpananController::class, 'show']);
+        Route::post('/', [SetoranSimpananController::class, 'store']);
+        Route::post('/{id}/klaim', [SetoranSimpananController::class, 'klaimPembayaran']);
+    });
 });
 
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -45,7 +67,6 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 Route::get('banner-mobile/type/{type?}', [BannerMobileController::class, 'getByType']);
 
 Route::apiResource('regions', RegionController::class);
-
 
 Route::get('/mutasi/{no_tabungan}/{periode}', [MutasiTabunganController::class, 'getMutasi']);
 
@@ -85,13 +106,13 @@ Route::prefix('payment')->group(function () {
 Route::prefix('makan-bergizi-gratis')->group(function () {
     Route::get('/', [MakanBergizisGratisController::class, 'index'])
         ->middleware('throttle:60,1');
-    
+
     Route::get('/{id}', [MakanBergizisGratisController::class, 'show'])
         ->middleware('throttle:60,1');
-    
+
     Route::post('/check-today', [MakanBergizisGratisController::class, 'checkToday'])
         ->middleware('throttle:60,1');
-    
+
     Route::post('/', [MakanBergizisGratisController::class, 'store'])
         ->middleware('throttle:60,1');
 });
