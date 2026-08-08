@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\MetodePembayaranSetoran;
 use App\Enums\StatusSetoran;
 use App\Models\QrisStatic;
 use App\Models\SetoranTabungan;
@@ -19,8 +20,12 @@ class BuatSetoranTabunganService
         $this->qrisGenerator = $qrisGenerator;
     }
 
-    public function execute(User $user, Tabungan $tabungan, int $jumlah): SetoranTabungan
-    {
+    public function execute(
+        User $user,
+        Tabungan $tabungan,
+        int $jumlah,
+        MetodePembayaranSetoran $metodePembayaran = MetodePembayaranSetoran::Qris
+    ): SetoranTabungan {
         $min = (int) config('setoran.minimal_jumlah', 10000);
         $max = (int) config('setoran.maksimal_jumlah', 100000000);
 
@@ -58,12 +63,15 @@ class BuatSetoranTabunganService
             throw new \RuntimeException('Masih memiliki transaksi setoran aktif untuk rekening ini.');
         }
 
-        $staticQris = QrisStatic::where('is_active', true)->first();
-        if (! $staticQris) {
+        $staticQris = $metodePembayaran === MetodePembayaranSetoran::Qris
+            ? QrisStatic::where('is_active', true)->first()
+            : null;
+
+        if ($metodePembayaran === MetodePembayaranSetoran::Qris && ! $staticQris) {
             throw new \RuntimeException('Layanan QRIS statis tidak tersedia saat ini.');
         }
 
-        return DB::transaction(function () use ($user, $tabungan, $jumlah, $staticQris) {
+        return DB::transaction(function () use ($user, $tabungan, $jumlah, $metodePembayaran, $staticQris) {
             $nomorSetoran = $this->generateNomorSetoran();
             $kodeUnik = $this->generateKodeUnik($jumlah);
             $jumlahBayar = $jumlah + $kodeUnik;
@@ -72,7 +80,9 @@ class BuatSetoranTabunganService
             $qrisDibuatAt = Carbon::now();
             $kedaluwarsaAt = $qrisDibuatAt->copy()->addMinutes($durationMinutes);
 
-            $qrisData = $this->qrisGenerator->generate($staticQris, $jumlahBayar);
+            $qrisData = $staticQris
+                ? $this->qrisGenerator->generate($staticQris, $jumlahBayar)
+                : ['payload' => null, 'image_path' => null];
 
             $setoran = SetoranTabungan::create([
                 'nomor_setoran' => $nomorSetoran,
@@ -82,9 +92,10 @@ class BuatSetoranTabunganService
                 'jumlah' => $jumlah,
                 'kode_unik' => $kodeUnik,
                 'jumlah_bayar' => $jumlahBayar,
+                'metode_pembayaran' => $metodePembayaran,
                 'qris_payload' => $qrisData['payload'],
                 'qris_image_path' => $qrisData['image_path'],
-                'qris_dibuat_at' => $qrisDibuatAt,
+                'qris_dibuat_at' => $staticQris ? $qrisDibuatAt : null,
                 'kedaluwarsa_at' => $kedaluwarsaAt,
                 'status' => StatusSetoran::MENUNGGU_PEMBAYARAN,
             ]);
@@ -95,7 +106,7 @@ class BuatSetoranTabunganService
                 StatusSetoran::MENUNGGU_PEMBAYARAN,
                 get_class($user),
                 $user->id,
-                'QRIS setoran berhasil dibuat'
+                'Setoran '.$metodePembayaran->label().' berhasil dibuat'
             );
 
             return $setoran;

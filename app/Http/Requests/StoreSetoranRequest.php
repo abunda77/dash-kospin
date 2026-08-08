@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\MetodePembayaranSetoran;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSetoranRequest extends FormRequest
 {
@@ -21,6 +23,7 @@ class StoreSetoranRequest extends FormRequest
                 'min:'.(int) config('setoran.minimal_jumlah', 10000),
                 'max:'.(int) config('setoran.maksimal_jumlah', 100000000),
             ],
+            'metode_pembayaran' => ['sometimes', 'required', Rule::enum(MetodePembayaranSetoran::class)],
         ];
     }
 
@@ -33,6 +36,7 @@ class StoreSetoranRequest extends FormRequest
             'jumlah.integer' => 'Nominal setoran harus berupa bilangan bulat.',
             'jumlah.min' => 'Nominal setoran minimal Rp '.number_format((int) config('setoran.minimal_jumlah', 10000), 0, ',', '.').'.',
             'jumlah.max' => 'Nominal setoran maksimal Rp '.number_format((int) config('setoran.maksimal_jumlah', 100000000), 0, ',', '.').'.',
+            'metode_pembayaran.enum' => 'Metode pembayaran tidak valid.',
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\StatusSetoran;
+use App\Models\Admin;
 use App\Models\SetoranTabungan;
 use App\Models\Tabungan;
 use App\Models\TransaksiTabungan;
@@ -44,7 +45,7 @@ class PostingSetoranKeTabunganService
                 'jenis_transaksi' => TransaksiTabungan::JENIS_SETORAN,
                 'jumlah' => $setoran->jumlah_bayar,
                 'tanggal_transaksi' => Carbon::now(),
-                'keterangan' => 'Setoran via QRIS - '.$setoran->nomor_setoran,
+                'keterangan' => 'Setoran via '.$setoran->metode_pembayaran->label().' - '.$setoran->nomor_setoran,
                 'kode_transaksi' => $setoran->nomor_setoran,
                 'kode_teller' => $adminId,
             ]);
@@ -60,7 +61,7 @@ class PostingSetoranKeTabunganService
                 $setoran,
                 $statusLama,
                 StatusSetoran::SELESAI,
-                \App\Models\Admin::class,
+                Admin::class,
                 $adminId,
                 'Saldo berhasil diposting ke tabungan'
             );

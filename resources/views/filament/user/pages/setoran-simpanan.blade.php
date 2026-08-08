@@ -6,22 +6,53 @@
 
         @if ($activeSetoran)
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center text-center">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Pindai QRIS untuk Bayar</h3>
-                    
-                    @if ($activeSetoran->qris_image_path)
-                        <div class="p-4 bg-white rounded-lg shadow-inner inline-block">
-                            <img src="{{ Storage::disk('public')->url($activeSetoran->qris_image_path) }}" alt="QRIS Setoran" class="w-64 h-64 md:w-80 md:h-80 mx-auto" />
+                <div class="flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                    @if ($activeSetoran->metode_pembayaran === \App\Enums\MetodePembayaranSetoran::TransferRekening)
+                        <div class="w-full max-w-md">
+                            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 text-primary-600 dark:bg-primary-950/40 dark:text-primary-400">
+                                <x-heroicon-o-building-library class="h-9 w-9" />
+                            </div>
+                            <h3 class="mt-4 text-lg font-bold text-gray-900 dark:text-white">Transfer ke Rekening Tujuan</h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Transfer tepat sesuai total pembayaran berikut.</p>
+
+                            <div class="mt-5 divide-y divide-gray-200 overflow-hidden rounded-xl border border-gray-200 text-left dark:divide-gray-700 dark:border-gray-700">
+                                <div class="flex justify-between gap-4 px-4 py-3">
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">Bank</span>
+                                    <span class="font-bold text-gray-900 dark:text-white">{{ config('setoran.rekening_transfer.bank') }}</span>
+                                </div>
+                                <div class="flex justify-between gap-4 px-4 py-3">
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">No. Rekening</span>
+                                    <span class="font-mono text-lg font-bold tracking-wide text-primary-600 dark:text-primary-400">{{ config('setoran.rekening_transfer.nomor_rekening') }}</span>
+                                </div>
+                                <div class="flex justify-between gap-4 px-4 py-3">
+                                    <span class="text-sm text-gray-500 dark:text-gray-400">Atas Nama</span>
+                                    <span class="text-right font-bold text-gray-900 dark:text-white">{{ config('setoran.rekening_transfer.atas_nama') }}</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 rounded-xl bg-success-50 px-4 py-4 dark:bg-success-950/30">
+                                <p class="text-xs font-semibold uppercase tracking-wide text-success-700 dark:text-success-400">Total Transfer</p>
+                                <p class="mt-1 text-2xl font-black text-success-700 dark:text-success-400">Rp {{ number_format($activeSetoran->jumlah_bayar, 0, ',', '.') }}</p>
+                            </div>
                         </div>
                     @else
-                        <div class="w-64 h-64 md:w-80 md:h-80 bg-gray-100 dark:bg-gray-700 flex items-center justify-center rounded-lg text-gray-400">
-                            QRIS Image tidak tersedia
-                        </div>
+                        <h3 class="mb-4 text-lg font-bold text-gray-900 dark:text-white">Pindai QRIS untuk Bayar</h3>
+
+                        @if ($activeSetoran->qris_image_path)
+                            <div class="inline-block rounded-lg bg-white p-4 shadow-inner">
+                                <img src="{{ Storage::disk('public')->url($activeSetoran->qris_image_path) }}" alt="QRIS Setoran" class="mx-auto h-64 w-64 md:h-80 md:w-80" />
+                            </div>
+                        @else
+                            <div class="flex h-64 w-64 items-center justify-center rounded-lg bg-gray-100 text-gray-400 dark:bg-gray-700 md:h-80 md:w-80">
+                                QRIS Image tidak tersedia
+                            </div>
+                        @endif
+
+                        <p class="mt-4 text-sm font-semibold text-gray-500 dark:text-gray-400">Scan QRIS menggunakan aplikasi pembayaran (GoPay, OVO, DANA, LinkAja, atau Mobile Banking)</p>
                     @endif
 
                     <div class="mt-4 space-y-2">
-                        <p class="text-sm font-semibold text-gray-500 dark:text-gray-400">Scan QRIS menggunakan aplikasi pembayaran (Gopay, OVO, Dana, LinkAja, atau Mobile Banking)</p>
-                        <div class="text-xs text-danger-600 dark:text-danger-400 font-bold bg-danger-50 dark:bg-danger-950/30 px-3 py-1 rounded inline-block">
+                        <div class="inline-block rounded bg-danger-50 px-3 py-1 text-xs font-bold text-danger-600 dark:bg-danger-950/30 dark:text-danger-400">
                             Kedaluwarsa pada: {{ $activeSetoran->kedaluwarsa_at->format('d M Y, H:i') }}
                         </div>
                         <div>
@@ -44,6 +75,10 @@
                         <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Detail Informasi Setoran</h3>
                         
                         <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <div class="flex justify-between py-2.5">
+                                <span class="text-sm text-gray-500 dark:text-gray-400">Metode Pembayaran</span>
+                                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ $activeSetoran->metode_pembayaran->label() }}</span>
+                            </div>
                             <div class="flex justify-between py-2.5">
                                 <span class="text-sm text-gray-500 dark:text-gray-400">Nomor Setoran</span>
                                 <span class="text-sm font-bold text-gray-900 dark:text-white">#{{ $activeSetoran->nomor_setoran }}</span>
@@ -91,7 +126,7 @@
                                             color="danger"
                                             size="lg"
                                             wire:click="cancelSetoran({{ $activeSetoran->id }})"
-                                            wire:confirm="Batalkan setoran ini? QRIS tidak dapat digunakan kembali setelah setoran dibatalkan."
+                                            wire:confirm="Batalkan setoran ini? Instruksi pembayaran tidak dapat digunakan kembali setelah setoran dibatalkan."
                                             wire:loading.attr="disabled"
                                             wire:target="cancelSetoran"
                                         >
@@ -116,14 +151,14 @@
             </div>
         @else
             <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Isi Formulir Setoran QRIS Baru</h3>
-                
-                <form wire:submit.prevent="generateQris" class="space-y-4">
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Isi Formulir Setoran Baru</h3>
+
+                <form wire:submit.prevent="createSetoran" class="space-y-4">
                     {{ $this->generateForm }}
 
                     <div class="flex justify-end mt-4">
                         <x-filament::button type="submit" color="primary" size="lg">
-                            Generate QRIS
+                            Lanjutkan Pembayaran
                         </x-filament::button>
                     </div>
                 </form>
@@ -131,7 +166,7 @@
         @endif
 
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mt-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Riwayat Setoran QRIS</h3>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Riwayat Setoran</h3>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -140,6 +175,7 @@
                             <th class="px-4 py-3">Tanggal Buat</th>
                             <th class="px-4 py-3">Nomor</th>
                             <th class="px-4 py-3">Rekening Tujuan</th>
+                            <th class="px-4 py-3">Metode</th>
                             <th class="px-4 py-3 text-right">Jumlah Setor</th>
                             <th class="px-4 py-3 text-right">Total Bayar</th>
                             <th class="px-4 py-3 text-center">Status</th>
@@ -152,7 +188,8 @@
                                 <td class="px-4 py-3">{{ $item->created_at->format('d M Y, H:i') }}</td>
                                 <td class="px-4 py-3 font-semibold text-gray-950 dark:text-white">#{{ $item->nomor_setoran }}</td>
                                 <td class="px-4 py-3">{{ $item->tabungan->no_tabungan ?? '-' }}</td>
-                                <td class="px-4 py-3 text-right font-semibold text-gray-950 dark:text-white">Rp {{ number_format($item->jumlah_bayar, 0, ',', '.') }}</td>
+                                <td class="px-4 py-3">{{ $item->metode_pembayaran->label() }}</td>
+                                <td class="px-4 py-3 text-right font-semibold text-gray-950 dark:text-white">Rp {{ number_format($item->jumlah, 0, ',', '.') }}</td>
                                 <td class="px-4 py-3 text-right font-semibold text-gray-950 dark:text-white">Rp {{ number_format($item->jumlah_bayar, 0, ',', '.') }}</td>
                                 <td class="px-4 py-3 text-center">
                                     @php
@@ -184,7 +221,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="py-8 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="8" class="py-8 text-center text-gray-500 dark:text-gray-400">
                                     Belum ada riwayat transaksi setoran.
                                 </td>
                             </tr>

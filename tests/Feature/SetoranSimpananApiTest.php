@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\MetodePembayaranSetoran;
 use App\Enums\StatusSetoran;
 use App\Models\ProdukTabungan;
 use App\Models\Profile;
@@ -156,6 +157,29 @@ class SetoranSimpananApiTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonPath('status', false);
+    }
+
+    public function test_transfer_rekening_dapat_dibuat_tanpa_qris_statis(): void
+    {
+        QrisStatic::query()->update(['is_active' => false]);
+
+        [$user, $tabungan] = $this->buatUserDenganTabungan(100000.00, 'API-STR-TRANSFER');
+
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/setoran', [
+            'id_tabungan' => $tabungan->id,
+            'jumlah' => 50000,
+            'metode_pembayaran' => MetodePembayaranSetoran::TransferRekening->value,
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.metode_pembayaran', MetodePembayaranSetoran::TransferRekening->value)
+            ->assertJsonPath('data.rekening_transfer.bank', 'BCA')
+            ->assertJsonPath('data.rekening_transfer.nomor_rekening', '0889333288')
+            ->assertJsonPath('data.rekening_transfer.atas_nama', 'KOPERASI SINARA ARTHA')
+            ->assertJsonPath('data.qris_payload', null)
+            ->assertJsonPath('data.qris_image_url', null);
     }
 
     public function test_setoran_aktif_dan_history(): void

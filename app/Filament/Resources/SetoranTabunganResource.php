@@ -2,19 +2,28 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\MetodePembayaranSetoran;
 use App\Enums\StatusSetoran;
 use App\Filament\Resources\SetoranTabunganResource\Pages;
 use App\Models\SetoranTabungan;
+use App\Services\MintaRevisiSetoranService;
+use App\Services\MulaiReviewSetoranService;
+use App\Services\PostingSetoranKeTabunganService;
+use App\Services\SetujuiSetoranService;
+use App\Services\TolakSetoranService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class SetoranTabunganResource extends Resource
 {
@@ -91,6 +100,16 @@ class SetoranTabunganResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('metode_pembayaran')
+                    ->label('Metode')
+                    ->badge()
+                    ->formatStateUsing(fn (MetodePembayaranSetoran $state): string => $state->label())
+                    ->color(fn (MetodePembayaranSetoran $state): string => match ($state) {
+                        MetodePembayaranSetoran::Qris => 'info',
+                        MetodePembayaranSetoran::TransferRekening => 'success',
+                    })
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('jumlah')
                     ->label('Nominal')
                     ->money('IDR')
@@ -149,6 +168,13 @@ class SetoranTabunganResource extends Resource
                     ->sortable(),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('metode_pembayaran')
+                    ->label('Metode Pembayaran')
+                    ->options([
+                        MetodePembayaranSetoran::Qris->value => MetodePembayaranSetoran::Qris->label(),
+                        MetodePembayaranSetoran::TransferRekening->value => MetodePembayaranSetoran::TransferRekening->label(),
+                    ]),
+
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'menunggu_pembayaran' => 'Menunggu Pembayaran',
@@ -180,13 +206,13 @@ class SetoranTabunganResource extends Resource
                     ->visible(fn (SetoranTabungan $record) => auth('admin')->user()->can('mulaiReview', $record) && $record->status === StatusSetoran::MENUNGGU_VERIFIKASI)
                     ->action(function (SetoranTabungan $record) {
                         try {
-                            app(\App\Services\MulaiReviewSetoranService::class)->execute(auth('admin')->user(), $record);
-                            \Filament\Notifications\Notification::make()
+                            app(MulaiReviewSetoranService::class)->execute(auth('admin')->user(), $record);
+                            Notification::make()
                                 ->title('Proses review dimulai')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal memulai review')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -206,13 +232,13 @@ class SetoranTabunganResource extends Resource
                     ])
                     ->action(function (SetoranTabungan $record, array $data) {
                         try {
-                            app(\App\Services\MintaRevisiSetoranService::class)->execute(auth('admin')->user(), $record, $data['catatan_verifikasi']);
-                            \Filament\Notifications\Notification::make()
+                            app(MintaRevisiSetoranService::class)->execute(auth('admin')->user(), $record, $data['catatan_verifikasi']);
+                            Notification::make()
                                 ->title('Permintaan revisi dikirim')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal mengirim permintaan revisi')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -232,13 +258,13 @@ class SetoranTabunganResource extends Resource
                     ])
                     ->action(function (SetoranTabungan $record, array $data) {
                         try {
-                            app(\App\Services\TolakSetoranService::class)->execute(auth('admin')->user(), $record, $data['alasan_penolakan']);
-                            \Filament\Notifications\Notification::make()
+                            app(TolakSetoranService::class)->execute(auth('admin')->user(), $record, $data['alasan_penolakan']);
+                            Notification::make()
                                 ->title('Setoran ditolak')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal menolak setoran')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -262,20 +288,20 @@ class SetoranTabunganResource extends Resource
                     ])
                     ->action(function (SetoranTabungan $record, array $data) {
                         try {
-                            app(\App\Services\SetujuiSetoranService::class)->execute(
+                            app(SetujuiSetoranService::class)->execute(
                                 auth('admin')->user(),
                                 $record,
                                 $data['referensi_transaksi_provider'] ?? null,
-                                $data['waktu_bayar_provider'] ? \Illuminate\Support\Carbon::parse($data['waktu_bayar_provider']) : null,
+                                $data['waktu_bayar_provider'] ? Carbon::parse($data['waktu_bayar_provider']) : null,
                                 $data['nama_pembayar_provider'] ?? null,
                                 $data['catatan_verifikasi'] ?? null
                             );
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Setoran disetujui')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal menyetujui setoran')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -289,13 +315,13 @@ class SetoranTabunganResource extends Resource
                     ->visible(fn (SetoranTabungan $record) => auth('admin')->user()->can('cobaUlangPosting', $record) && $record->status === StatusSetoran::DISETUJUI)
                     ->action(function (SetoranTabungan $record) {
                         try {
-                            app(\App\Services\PostingSetoranKeTabunganService::class)->execute($record->id, auth('admin')->user()->id);
-                            \Filament\Notifications\Notification::make()
+                            app(PostingSetoranKeTabunganService::class)->execute($record->id, auth('admin')->user()->id);
+                            Notification::make()
                                 ->title('Posting saldo berhasil')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal posting saldo')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -334,6 +360,10 @@ class SetoranTabunganResource extends Resource
                             ->label('Nomor Setoran'),
                         Infolists\Components\TextEntry::make('jenis_simpanan')
                             ->label('Jenis Simpanan'),
+                        Infolists\Components\TextEntry::make('metode_pembayaran')
+                            ->label('Metode Pembayaran')
+                            ->badge()
+                            ->formatStateUsing(fn (MetodePembayaranSetoran $state): string => $state->label()),
                         Infolists\Components\TextEntry::make('jumlah')
                             ->label('Nominal')
                             ->money('IDR'),
@@ -390,10 +420,10 @@ class SetoranTabunganResource extends Resource
                                     ->icon('heroicon-o-arrow-down-tray')
                                     ->visible(fn ($record) => ! empty($record->qris_image_path))
                                     ->action(function ($record) {
-                                        if ($record->qris_image_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($record->qris_image_path)) {
-                                            return \Illuminate\Support\Facades\Storage::disk('public')->download($record->qris_image_path);
+                                        if ($record->qris_image_path && Storage::disk('public')->exists($record->qris_image_path)) {
+                                            return Storage::disk('public')->download($record->qris_image_path);
                                         }
-                                        \Filament\Notifications\Notification::make()
+                                        Notification::make()
                                             ->title('File QRIS tidak ditemukan')
                                             ->danger()
                                             ->send();
@@ -405,7 +435,9 @@ class SetoranTabunganResource extends Resource
                         Infolists\Components\TextEntry::make('kedaluwarsa_at')
                             ->label('Kedaluwarsa Pada')
                             ->dateTime(),
-                    ])->columns(2),
+                    ])
+                    ->columns(2)
+                    ->visible(fn ($record) => $record?->metode_pembayaran === MetodePembayaranSetoran::Qris),
 
                 Infolists\Components\Section::make('Bukti & Data Klaim')
                     ->schema([
@@ -427,10 +459,10 @@ class SetoranTabunganResource extends Resource
                                     ->icon('heroicon-o-arrow-down-tray')
                                     ->visible(fn ($record) => ! empty($record->bukti_pembayaran_path))
                                     ->action(function ($record) {
-                                        if ($record->bukti_pembayaran_path && \Illuminate\Support\Facades\Storage::disk('private')->exists($record->bukti_pembayaran_path)) {
-                                            return \Illuminate\Support\Facades\Storage::disk('private')->download($record->bukti_pembayaran_path);
+                                        if ($record->bukti_pembayaran_path && Storage::disk('private')->exists($record->bukti_pembayaran_path)) {
+                                            return Storage::disk('private')->download($record->bukti_pembayaran_path);
                                         }
-                                        \Filament\Notifications\Notification::make()
+                                        Notification::make()
                                             ->title('File tidak ditemukan')
                                             ->danger()
                                             ->send();
@@ -460,10 +492,10 @@ class SetoranTabunganResource extends Resource
                                             ->label('Download')
                                             ->icon('heroicon-o-arrow-down-tray')
                                             ->action(function ($record) {
-                                                if ($record && $record->file_path && \Illuminate\Support\Facades\Storage::disk('private')->exists($record->file_path)) {
-                                                    return \Illuminate\Support\Facades\Storage::disk('private')->download($record->file_path, $record->nama_asli);
+                                                if ($record && $record->file_path && Storage::disk('private')->exists($record->file_path)) {
+                                                    return Storage::disk('private')->download($record->file_path, $record->nama_asli);
                                                 }
-                                                \Filament\Notifications\Notification::make()
+                                                Notification::make()
                                                     ->title('File tidak ditemukan')
                                                     ->danger()
                                                     ->send();

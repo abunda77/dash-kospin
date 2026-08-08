@@ -2,6 +2,7 @@
 
 namespace App\Filament\User\Pages;
 
+use App\Enums\MetodePembayaranSetoran;
 use App\Enums\StatusSetoran;
 use App\Models\SetoranTabungan;
 use App\Models\Tabungan;
@@ -35,7 +36,7 @@ class SetoranSimpanan extends Page implements HasForms
 
     protected static ?string $navigationLabel = 'Setoran Simpanan';
 
-    protected static ?string $title = 'Setoran Simpanan via QRIS';
+    protected static ?string $title = 'Setoran Simpanan';
 
     protected static string $view = 'filament.user.pages.setoran-simpanan';
 
@@ -111,6 +112,15 @@ class SetoranSimpanan extends Page implements HasForms
                     ->required(fn ($get) => $get('preset_jumlah') === 'custom')
                     ->minValue(10000)
                     ->maxValue(100000000),
+
+                Radio::make('metode_pembayaran')
+                    ->label('Pilih Metode Pembayaran')
+                    ->options([
+                        MetodePembayaranSetoran::Qris->value => MetodePembayaranSetoran::Qris->label(),
+                        MetodePembayaranSetoran::TransferRekening->value => MetodePembayaranSetoran::TransferRekening->label(),
+                    ])
+                    ->default(MetodePembayaranSetoran::Qris->value)
+                    ->required(),
             ])
             ->statePath('generateData');
     }
@@ -146,7 +156,7 @@ class SetoranSimpanan extends Page implements HasForms
             ->statePath('claimData');
     }
 
-    public function generateQris(): void
+    public function createSetoran(): void
     {
         try {
             $data = $this->generateForm->getState();
@@ -168,13 +178,15 @@ class SetoranSimpanan extends Page implements HasForms
             }
 
             $buatService = app(BuatSetoranTabunganService::class);
-            $buatService->execute($user, $tabungan, $jumlah);
+            $metodePembayaran = MetodePembayaranSetoran::from($data['metode_pembayaran']);
+
+            $buatService->execute($user, $tabungan, $jumlah, $metodePembayaran);
 
             $this->generateForm->fill();
 
             Notification::make()
                 ->title('Sukses')
-                ->body('QRIS berhasil di-generate.')
+                ->body('Instruksi pembayaran '.$metodePembayaran->label().' berhasil dibuat.')
                 ->success()
                 ->send();
         } catch (\InvalidArgumentException|\RuntimeException $e) {

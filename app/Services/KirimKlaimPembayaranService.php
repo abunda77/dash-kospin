@@ -9,9 +9,11 @@ use App\Models\BuktiSetoran;
 use App\Models\SetoranTabungan;
 use App\Models\User;
 use Filament\Notifications\Notification;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class KirimKlaimPembayaranService
 {
@@ -25,7 +27,7 @@ class KirimKlaimPembayaranService
         ?UploadedFile $buktiPembayaran
     ): SetoranTabungan {
         if ($setoran->user_id !== $user->id) {
-            throw new \Illuminate\Auth\Access\AuthorizationException('Anda tidak berhak mengakses transaksi ini.');
+            throw new AuthorizationException('Anda tidak berhak mengakses transaksi ini.');
         }
 
         if (! in_array($setoran->status, [StatusSetoran::MENUNGGU_PEMBAYARAN, StatusSetoran::PERLU_REVISI])) {
@@ -86,15 +88,15 @@ class KirimKlaimPembayaranService
 
                 try {
                     $notification = Notification::make()
-                        ->title('Klaim Setoran QRIS Baru')
-                        ->body("Klaim baru dari anggota {$setoran->user->name} sebesar Rp".number_format($setoran->jumlah, 0, ',', '.')." (#{$setoran->nomor_setoran})")
+                        ->title('Klaim Setoran Baru')
+                        ->body("Klaim {$setoran->metode_pembayaran->label()} dari anggota {$setoran->user->name} sebesar Rp".number_format($setoran->jumlah, 0, ',', '.')." (#{$setoran->nomor_setoran})")
                         ->info();
 
                     foreach (Admin::all() as $admin) {
                         $admin->notify($notification->toDatabase());
                     }
                 } catch (\Throwable $e) {
-                    \Illuminate\Support\Facades\Log::error('Fails to send Filament database notification to admins: '.$e->getMessage());
+                    Log::error('Fails to send Filament database notification to admins: '.$e->getMessage());
                 }
             });
 

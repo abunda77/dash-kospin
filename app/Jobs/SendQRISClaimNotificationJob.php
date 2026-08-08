@@ -35,11 +35,13 @@ class SendQRISClaimNotificationJob implements ShouldQueue
         $waktuKlaim = $this->setoran->waktu_klaim_bayar ? $this->setoran->waktu_klaim_bayar->format('d/m/Y H:i') : '-';
         $waktuKlaim .= ' WIB';
         $namaPembayar = $this->setoran->nama_pembayar ?? '-';
+        $metodePembayaran = $this->setoran->metode_pembayaran->label();
 
         $pesan = "[KLAIM SETORAN MASUK]\n\n"
             ."Nomor Setoran : {$this->setoran->nomor_setoran}\n"
             ."Nama Anggota  : {$userName}\n"
             ."No. Rekening  : {$noTabungan}\n"
+            ."Metode Bayar  : {$metodePembayaran}\n"
             ."Nominal       : {$nominal}\n"
             ."Kode Unik     : {$kodeUnik}\n"
             ."Total Bayar   : {$totalBayar}\n"

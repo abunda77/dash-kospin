@@ -3,10 +3,12 @@
 use App\Http\Controllers\Api\AngsuranController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerMobileController;
+use App\Http\Controllers\Api\BarcodeScanController;
 use App\Http\Controllers\Api\ConfigController;
 use App\Http\Controllers\Api\DepositoController;
 use App\Http\Controllers\Api\MakanBergizisGratisController;
 use App\Http\Controllers\Api\MutasiTabunganController;
+use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\PenarikanSimpananController;
 use App\Http\Controllers\Api\PinjamanController;
 use App\Http\Controllers\Api\ProfileController;
@@ -51,7 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{id}/batalkan', [PenarikanSimpananController::class, 'batalkan']);
     });
 
-    // Setoran Simpanan (QRIS)
+    // Setoran Simpanan (QRIS / Transfer Rekening)
     Route::prefix('setoran')->group(function () {
         Route::get('/rekening-options', [SetoranSimpananController::class, 'rekeningOptions']);
         Route::get('/aktif', [SetoranSimpananController::class, 'aktif']);
@@ -76,31 +78,31 @@ Route::get('/config/api-base-url', [ConfigController::class, 'getApiBaseUrl']);
 
 // Barcode Scan Statistics API (public)
 Route::prefix('barcode')->group(function () {
-    Route::get('/stats', [App\Http\Controllers\Api\BarcodeScanController::class, 'stats'])
+    Route::get('/stats', [BarcodeScanController::class, 'stats'])
         ->middleware('throttle:30,1');
 
-    Route::get('/recent-scans', [App\Http\Controllers\Api\BarcodeScanController::class, 'recentScans'])
+    Route::get('/recent-scans', [BarcodeScanController::class, 'recentScans'])
         ->middleware('throttle:30,1');
 
     // Protected routes (require authentication)
     Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/my-scans', [App\Http\Controllers\Api\BarcodeScanController::class, 'myScans']);
-        Route::get('/tabungan/{id}/scan-history', [App\Http\Controllers\Api\BarcodeScanController::class, 'scanHistory']);
+        Route::get('/my-scans', [BarcodeScanController::class, 'myScans']);
+        Route::get('/tabungan/{id}/scan-history', [BarcodeScanController::class, 'scanHistory']);
     });
 });
 
 // Payment / QRIS API
 Route::prefix('payment')->group(function () {
-    Route::get('/qris', [App\Http\Controllers\Api\PaymentController::class, 'listQris'])
+    Route::get('/qris', [PaymentController::class, 'listQris'])
         ->middleware('throttle:60,1');
 
-    Route::get('/qris/{id}', [App\Http\Controllers\Api\PaymentController::class, 'showQris'])
+    Route::get('/qris/{id}', [PaymentController::class, 'showQris'])
         ->middleware('throttle:60,1');
 
-    Route::post('/qris/validate', [App\Http\Controllers\Api\PaymentController::class, 'validateQris'])
+    Route::post('/qris/validate', [PaymentController::class, 'validateQris'])
         ->middleware('throttle:30,1');
 
-    Route::post('/qris/generate-dynamic', [App\Http\Controllers\Api\PaymentController::class, 'generateDynamic'])
+    Route::post('/qris/generate-dynamic', [PaymentController::class, 'generateDynamic'])
         ->middleware('throttle:30,1');
 });
 

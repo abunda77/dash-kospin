@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MetodePembayaranSetoran;
 use App\Enums\StatusSetoran;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,6 +23,7 @@ class SetoranTabungan extends Model
         'jumlah',
         'kode_unik',
         'jumlah_bayar',
+        'metode_pembayaran',
         'qris_payload',
         'qris_image_path',
         'qris_dibuat_at',
@@ -50,6 +52,7 @@ class SetoranTabungan extends Model
     ];
 
     protected $casts = [
+        'metode_pembayaran' => MetodePembayaranSetoran::class,
         'status' => StatusSetoran::class,
         'jumlah' => 'integer',
         'kode_unik' => 'integer',
@@ -117,6 +120,7 @@ class SetoranTabungan extends Model
                 'jumlah',
                 'kode_unik',
                 'jumlah_bayar',
+                'metode_pembayaran',
             ]);
     }
 }

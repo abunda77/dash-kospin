@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\MetodePembayaranSetoran;
 use App\Enums\StatusSetoran;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\KlaimSetoranRequest;
@@ -67,12 +68,13 @@ class SetoranSimpananController extends Controller
             $setoran = app(BuatSetoranTabunganService::class)->execute(
                 $user,
                 $tabungan,
-                (int) $request->validated('jumlah')
+                (int) $request->validated('jumlah'),
+                MetodePembayaranSetoran::from($request->validated('metode_pembayaran', MetodePembayaranSetoran::Qris->value))
             );
 
             return response()->json([
                 'status' => true,
-                'message' => 'QRIS berhasil di-generate.',
+                'message' => 'Instruksi pembayaran berhasil dibuat.',
                 'data' => $this->mapSetoran($setoran),
             ], 201);
         } catch (InvalidArgumentException|RuntimeException $e) {
@@ -255,6 +257,11 @@ class SetoranSimpananController extends Controller
             'jumlah' => $setoran->jumlah,
             'kode_unik' => $setoran->kode_unik,
             'jumlah_bayar' => $setoran->jumlah_bayar,
+            'metode_pembayaran' => $setoran->metode_pembayaran->value,
+            'metode_pembayaran_label' => $setoran->metode_pembayaran->label(),
+            'rekening_transfer' => $setoran->metode_pembayaran === MetodePembayaranSetoran::TransferRekening
+                ? config('setoran.rekening_transfer')
+                : null,
             'qris_payload' => $setoran->qris_payload,
             'qris_image_url' => $setoran->qris_image_path ? Storage::disk('public')->url($setoran->qris_image_path) : null,
             'qris_dibuat_at' => $setoran->qris_dibuat_at?->toIso8601String(),
