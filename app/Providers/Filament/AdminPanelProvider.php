@@ -2,13 +2,16 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Pages\MutasiTabungan;
+use App\Filament\Pages\Dashboard;
+use App\Filament\Widgets\Birthday;
+use App\Filament\Widgets\CriticalOverdueWidget;
 use App\Filament\Widgets\StatistikNasabahWidget;
+use App\Filament\Widgets\VerifikasiSimpananWidget;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationItem;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -21,11 +24,14 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Joaopaulolndev\FilamentEditEnv\FilamentEditEnvPlugin;
 // use Mvenghaus\FilamentScheduleMonitor\FilamentPlugin;
+use Joaopaulolndev\FilamentEditEnv\FilamentEditEnvPlugin;
+use Mvenghaus\FilamentScheduleMonitor\FilamentPlugin;
 use Rmsramos\Activitylog\ActivitylogPlugin;
 use Rupadana\ApiService\ApiServicePlugin;
 use ShuvroRoy\FilamentSpatieLaravelHealth\FilamentSpatieLaravelHealthPlugin;
+use TomatoPHP\FilamentArtisan\FilamentArtisanPlugin;
+use TomatoPHP\FilamentLogger\FilamentLoggerPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -64,7 +70,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
-                Pages\Dashboard::class,
+                Dashboard::class,
                 // MutasiTabungan::class,
 
             ])
@@ -72,8 +78,10 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
+                VerifikasiSimpananWidget::class,
                 StatistikNasabahWidget::class,
-                \App\Filament\Widgets\CriticalOverdueWidget::class,
+                CriticalOverdueWidget::class,
+                Birthday::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -90,10 +98,10 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make(),
                 ApiServicePlugin::make(),
-                \TomatoPHP\FilamentLogger\FilamentLoggerPlugin::make(),
-                \TomatoPHP\FilamentArtisan\FilamentArtisanPlugin::make(),
+                FilamentLoggerPlugin::make(),
+                FilamentArtisanPlugin::make(),
                 ActivitylogPlugin::make()
                     ->navigationIcon('heroicon-o-shield-check')
                     ->navigationCountBadge(true),
@@ -102,7 +110,7 @@ class AdminPanelProvider extends PanelProvider
                     ->setIcon('heroicon-o-cog'),
             ])
             ->plugin(FilamentSpatieLaravelHealthPlugin::make())
-            ->plugin(\Mvenghaus\FilamentScheduleMonitor\FilamentPlugin::make())
+            ->plugin(FilamentPlugin::make())
             ->databaseNotifications();
     }
 }

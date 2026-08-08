@@ -2,33 +2,41 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\Deposito;
-use App\Filament\Widgets\LaporanDepositoStatsWidget;
 use App\Filament\Widgets\DepositoChartWidget;
 use App\Filament\Widgets\DepositoJangkaWaktuWidget;
-use Filament\Pages\Page;
+use App\Filament\Widgets\LaporanDepositoStatsWidget;
+use App\Models\Deposito;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Carbon\Carbon;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Forms\Form;
+use Filament\Pages\Page;
 
 class LaporanDeposito extends Page implements HasForms
 {
     use InteractsWithForms;
 
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+
     protected static string $view = 'filament.pages.laporan-deposito';
+
     protected static ?string $navigationGroup = 'Laporan';
+
     protected static ?string $title = 'Laporan Deposito';
+
     protected static ?string $navigationLabel = 'Laporan Deposito';
 
     public ?array $data = [];
+
     public $tanggal_mulai;
+
     public $tanggal_akhir;
+
     public $status = 'all';
+
     public $jangka_waktu = 'all';
 
     public function mount(): void
@@ -52,13 +60,13 @@ class LaporanDeposito extends Page implements HasForms
                     ->label('Tanggal Mulai')
                     ->default(now()->startOfMonth())
                     ->live()
-                    ->afterStateUpdated(fn($state) => $this->tanggal_mulai = $state),
+                    ->afterStateUpdated(fn ($state) => $this->tanggal_mulai = $state),
 
                 DatePicker::make('tanggal_akhir')
                     ->label('Tanggal Akhir')
                     ->default(now()->endOfMonth())
                     ->live()
-                    ->afterStateUpdated(fn($state) => $this->tanggal_akhir = $state),
+                    ->afterStateUpdated(fn ($state) => $this->tanggal_akhir = $state),
 
                 Select::make('status')
                     ->label('Status')
@@ -70,7 +78,7 @@ class LaporanDeposito extends Page implements HasForms
                     ])
                     ->default('all')
                     ->live()
-                    ->afterStateUpdated(fn($state) => $this->status = $state),
+                    ->afterStateUpdated(fn ($state) => $this->status = $state),
 
                 Select::make('jangka_waktu')
                     ->label('Jangka Waktu')
@@ -84,7 +92,7 @@ class LaporanDeposito extends Page implements HasForms
                     ])
                     ->default('all')
                     ->live()
-                    ->afterStateUpdated(fn($state) => $this->jangka_waktu = $state),
+                    ->afterStateUpdated(fn ($state) => $this->jangka_waktu = $state),
             ])
             ->statePath('data')
             ->columns(4);
@@ -96,6 +104,14 @@ class LaporanDeposito extends Page implements HasForms
             LaporanDepositoStatsWidget::class,
             DepositoChartWidget::class,
             DepositoJangkaWaktuWidget::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int|string|array
+    {
+        return [
+            'md' => 2,
+            'xl' => 2,
         ];
     }
 
@@ -122,7 +138,7 @@ class LaporanDeposito extends Page implements HasForms
         if ($this->tanggal_mulai && $this->tanggal_akhir) {
             $query->whereBetween('tanggal_pembukaan', [
                 Carbon::parse($this->tanggal_mulai)->startOfDay(),
-                Carbon::parse($this->tanggal_akhir)->endOfDay()
+                Carbon::parse($this->tanggal_akhir)->endOfDay(),
             ]);
         }
 
@@ -156,11 +172,11 @@ class LaporanDeposito extends Page implements HasForms
                 'tanggal_akhir' => $this->tanggal_akhir,
                 'status' => $this->status,
                 'jangka_waktu' => $this->jangka_waktu,
-            ]
+            ],
         ]);
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'laporan-deposito-' . now()->format('Y-m-d') . '.pdf');
+        }, 'laporan-deposito-'.now()->format('Y-m-d').'.pdf');
     }
 }

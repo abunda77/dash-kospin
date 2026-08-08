@@ -7,8 +7,15 @@ use Filament\Widgets\ChartWidget;
 
 class DepositoChartWidget extends ChartWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected static ?string $heading = 'Trend Deposito Bulanan';
+
     protected static ?int $sort = 2;
+
+    protected static ?string $maxHeight = '300px';
+
+    protected int|string|array $columnSpan = 1;
 
     protected function getData(): array
     {
@@ -22,7 +29,7 @@ class DepositoChartWidget extends ChartWidget
         $months = [
             1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr',
             5 => 'Mei', 6 => 'Jun', 7 => 'Jul', 8 => 'Agu',
-            9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
+            9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des',
         ];
 
         $chartData = [];

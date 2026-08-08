@@ -2,18 +2,24 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Deposito;
+use App\Models\Pinjaman;
 use App\Models\Profile;
 use App\Models\TransaksiTabungan;
-use App\Models\Pinjaman;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use App\Models\Deposito;
 
 class StatistikNasabahWidget extends BaseWidget
 {
+    protected static ?int $sort = 2;
+
     protected static ?string $pollingInterval = '15s'; // Refresh setiap 15 detik
 
-    protected int | string | array $columnSpan = '4';
+    protected int|string|array $columnSpan = 'full';
+
+    protected ?string $heading = 'Ringkasan Koperasi';
+
+    protected ?string $description = 'Ikhtisar nasabah, simpanan, pinjaman, dan deposito.';
 
     protected function getStats(): array
     {
@@ -40,7 +46,7 @@ class StatistikNasabahWidget extends BaseWidget
         $totalTelatBayar = Pinjaman::where('status_pinjaman', 'approved')
             ->whereDoesntHave('transaksiPinjaman', function ($q) use ($today) {
                 $q->whereMonth('tanggal_pembayaran', $today->month)
-                  ->whereYear('tanggal_pembayaran', $today->year);
+                    ->whereYear('tanggal_pembayaran', $today->year);
             })->count();
 
         return [
@@ -49,17 +55,17 @@ class StatistikNasabahWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-users')
                 ->color('success'),
 
-            Stat::make('Total Setoran', 'Rp ' . number_format($totalSetoran, 2))
+            Stat::make('Total Setoran', 'Rp '.number_format($totalSetoran, 2))
                 ->description('Total transaksi kredit')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
 
-            Stat::make('Total Penarikan', 'Rp ' . number_format($totalPenarikan, 2))
+            Stat::make('Total Penarikan', 'Rp '.number_format($totalPenarikan, 2))
                 ->description('Total transaksi debit')
                 ->descriptionIcon('heroicon-m-arrow-trending-down')
                 ->color('danger'),
 
-            Stat::make('Total Pencairan Kredit', 'Rp ' . number_format($totalPencairanKredit, 2))
+            Stat::make('Total Pencairan Kredit', 'Rp '.number_format($totalPencairanKredit, 2))
                 ->description('Total pinjaman yang dicairkan')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('warning'),
@@ -74,7 +80,7 @@ class StatistikNasabahWidget extends BaseWidget
                 ->descriptionIcon('heroicon-m-building-library')
                 ->color('success'),
 
-            Stat::make('Total Nominal Deposito', 'Rp ' . number_format($totalNominalDeposito, 2))
+            Stat::make('Total Nominal Deposito', 'Rp '.number_format($totalNominalDeposito, 2))
                 ->description('Total penempatan deposito')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success'),

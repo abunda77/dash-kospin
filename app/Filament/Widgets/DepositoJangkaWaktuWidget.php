@@ -7,8 +7,15 @@ use Filament\Widgets\ChartWidget;
 
 class DepositoJangkaWaktuWidget extends ChartWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected static ?string $heading = 'Distribusi Jangka Waktu Deposito';
+
     protected static ?int $sort = 3;
+
+    protected static ?string $maxHeight = '300px';
+
+    protected int|string|array $columnSpan = 1;
 
     protected function getData(): array
     {
@@ -29,7 +36,7 @@ class DepositoJangkaWaktuWidget extends ChartWidget
         ];
 
         foreach ($data as $index => $item) {
-            $labels[] = $item->jangka_waktu . ' Bulan';
+            $labels[] = $item->jangka_waktu.' Bulan';
             $chartData[] = $item->count;
         }
 
