@@ -12,6 +12,8 @@ Dash-Kospin adalah aplikasi web yang dirancang untuk membantu pengelolaan kopera
 
 -   **Manajemen Anggota**: Pengelolaan data profil anggota koperasi
 -   **Tabungan**: Pencatatan dan pengelolaan rekening tabungan anggota
+-   **Setoran Simpanan**: Pengajuan setoran anggota melalui QRIS dinamis atau Transfer Rekening, konfirmasi pembayaran, verifikasi admin, dan notifikasi WhatsApp
+-   **Penarikan Simpanan**: Pengajuan penarikan ke rekening bank, upload bukti, revisi, verifikasi admin, dan posting transaksi tabungan
 -   **Pinjaman**: Pengelolaan pinjaman dengan berbagai jenis (Gadai, Kredit Elektronik, dll)
 -   **Pelunasan**: Pencatatan dan pengelolaan pelunasan pinjaman anggota
 -   **Deposito**: Pengelolaan deposito anggota dengan perhitungan bunga otomatis
@@ -19,8 +21,9 @@ Dash-Kospin adalah aplikasi web yang dirancang untuk membantu pengelolaan kopera
 -   **Laporan**: Pembuatan laporan dalam format PDF
 -   **QR Code Barcode**: Cetak barcode QR Code untuk rekening tabungan dengan scan public access
 -   **Aktivitas Log**: Pencatatan aktivitas untuk audit trail
--   **API Service**: Layanan API untuk integrasi dengan aplikasi lain
+-   **API Mobile**: Layanan API terautentikasi Sanctum untuk integrasi aplikasi mobile, termasuk workflow setoran dan penarikan simpanan
 -   **Dashboard Admin**: Panel admin yang komprehensif dengan Filament
+-   **Dashboard Anggota**: Panel anggota untuk melihat tabungan, pinjaman, deposito, serta mengajukan setoran dan penarikan
 
 ## Teknologi
 
@@ -236,6 +239,23 @@ composer dev
 Perintah ini akan menjalankan server, antrian, log, dan vite secara bersamaan.
 
 ## Fitur Khusus
+
+### Setoran dan Penarikan Simpanan
+
+Anggota dapat melakukan transaksi simpanan melalui panel user maupun aplikasi mobile:
+
+- **Setoran QRIS**: Sistem menghasilkan QRIS dinamis sesuai nominal setoran dan kode unik
+- **Setoran Transfer Rekening**: Transfer ke rekening BCA koperasi dengan nominal yang harus sama persis termasuk kode unik
+- **Konfirmasi Pembayaran**: Anggota mengirim waktu bayar, nama pembayar, referensi, bukti pembayaran, dan catatan
+- **Verifikasi Admin**: Admin dapat mereview, meminta revisi, menolak, menyetujui, dan mem-posting transaksi ke tabungan
+- **Notifikasi**: Klaim pembayaran diteruskan ke dashboard admin dan WhatsApp admin
+- **Penarikan Simpanan**: Anggota mengajukan penarikan ke rekening bank dan dapat mengirim revisi jika diminta admin
+- **Riwayat dan Pembatalan**: Transaksi aktif dapat dipantau dan dibatalkan selama masih memenuhi status yang diizinkan
+
+Endpoint mobile dilindungi Laravel Sanctum dan tersedia pada prefix `/api/setoran` serta `/api/penarikan`.
+
+**Dokumentasi Lengkap:**
+- [SIMPANAN-SETORAN-API.md](SIMPANAN-SETORAN-API.md) - Kontrak API, response, validasi, dan contoh integrasi React Native
 
 ### QR Code Barcode Tabungan
 

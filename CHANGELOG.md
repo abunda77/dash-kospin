@@ -6,6 +6,25 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-08-08]
+
+### Added
+- Metode pembayaran `Transfer Rekening` pada Setoran Simpanan sebagai alternatif QRIS, dengan rekening tujuan BCA, nomor rekening `0889333288`, atas nama `KOPERASI SINARA ARTHA`
+- Pilihan metode pembayaran pada halaman user `/user/setoran-simpanan`, beserta tampilan instruksi transfer, total pembayaran termasuk kode unik, dan form konfirmasi pembayaran
+- Penyimpanan metode pembayaran setoran melalui enum `MetodePembayaranSetoran` dan kolom `metode_pembayaran` pada tabel `setoran_tabungans`
+- Informasi dan filter metode pembayaran pada resource Setoran Simpanan di dashboard admin
+- Dukungan `transfer_rekening` pada `POST /api/setoran` serta field response `metode_pembayaran`, `metode_pembayaran_label`, dan `rekening_transfer` untuk aplikasi mobile
+- Section khusus update Transfer Rekening, kontrak TypeScript, contoh response, dan panduan implementasi React Native pada `SIMPANAN-SETORAN-API.md`
+- Feature test halaman user dan API untuk alur Transfer Rekening tanpa ketergantungan pada QRIS statis
+
+### Changed
+- Notifikasi klaim setoran pada dashboard admin dan WhatsApp kini menyertakan metode pembayaran dan berlaku untuk QRIS maupun Transfer Rekening
+- Deskripsi transaksi tabungan yang diposting kini mengikuti metode pembayaran setoran
+- Istilah dan flow Setoran Simpanan digeneralisasi dari QRIS-only menjadi QRIS / Transfer Rekening
+- Kontrak API tetap kompatibel dengan aplikasi lama: request tanpa `metode_pembayaran` menggunakan `qris`
+
+---
+
 ## [2026-08-07]
 
 ### Added
