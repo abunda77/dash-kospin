@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\StatusPenarikan;
 use App\Models\PenarikanTabungan;
 use App\Models\RiwayatStatusPenarikan;
+use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Request;
 
 class CatatRiwayatStatusPenarikanService
@@ -18,7 +19,7 @@ class CatatRiwayatStatusPenarikanService
         ?string $catatan = null,
         ?array $metadata = null
     ): RiwayatStatusPenarikan {
-        return RiwayatStatusPenarikan::create([
+        $riwayat = RiwayatStatusPenarikan::create([
             'penarikan_id' => $penarikan->id,
             'status_sebelumnya' => $statusSebelumnya?->value,
             'status_baru' => $statusBaru->value,
@@ -29,5 +30,19 @@ class CatatRiwayatStatusPenarikanService
             'ip_address' => Request::ip(),
             'user_agent' => Request::userAgent(),
         ]);
+
+        if ($statusSebelumnya !== null && $penarikan->user !== null) {
+            $penarikan->user->notify(
+                Notification::make()
+                    ->title('Status Penarikan Diperbarui')
+                    ->body("Penarikan #{$penarikan->nomor_penarikan} sekarang berstatus {$statusBaru->label()}.")
+                    ->icon('heroicon-o-arrow-up-tray')
+                    ->info()
+                    ->toDatabase()
+                    ->onConnection('sync')
+            );
+        }
+
+        return $riwayat;
     }
 }

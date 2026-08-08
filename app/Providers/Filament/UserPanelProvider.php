@@ -70,7 +70,8 @@ class UserPanelProvider extends PanelProvider
             ->plugins([
                 // \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
                 // ApiServicePlugin::make()
-            ]);
+            ])
+            ->databaseNotifications();
 
     }
 }

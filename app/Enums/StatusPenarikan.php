@@ -11,4 +11,17 @@ enum StatusPenarikan: string
     case SELESAI = 'selesai';
     case DITOLAK = 'ditolak';
     case DIBATALKAN = 'dibatalkan';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::MENUNGGU_VERIFIKASI => 'Menunggu Verifikasi',
+            self::SEDANG_DIPERIKSA => 'Sedang Diperiksa',
+            self::PERLU_REVISI => 'Perlu Revisi',
+            self::DISETUJUI => 'Disetujui',
+            self::SELESAI => 'Selesai',
+            self::DITOLAK => 'Ditolak',
+            self::DIBATALKAN => 'Dibatalkan',
+        };
+    }
 }
