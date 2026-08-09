@@ -32,15 +32,15 @@ class SendPenarikanNotificationJob implements ShouldQueue
         $dikirimAt = $this->penarikan->dikirim_at ? $this->penarikan->dikirim_at->format('d/m/Y H:i') : '-';
         $dikirimAt .= ' WIB';
 
-        $pesan = "[PERMOHONAN PENARIKAN SIMPANAN]\n\n"
-            ."Nomor Penarikan : {$this->penarikan->nomor_penarikan}\n"
-            ."Nama Anggota    : {$userName}\n"
-            ."No. Rekening    : {$noTabungan}\n"
-            ."Nominal         : {$nominal}\n"
-            ."Bank Tujuan     : {$this->penarikan->bank} - {$this->penarikan->nama_bank}\n"
-            ."Nama Nasabah    : {$this->penarikan->nama_nasabah}\n"
-            ."Waktu Pengajuan : {$dikirimAt}\n\n"
-            .'Silakan periksa dashboard admin untuk memverifikasi penarikan.';
+        $pesan = "*[PERMOHONAN PENARIKAN SIMPANAN]*\n\n"
+        ."*Nomor Penarikan:* {$this->penarikan->nomor_penarikan}\n"
+        ."*Nama Anggota:* {$userName}\n"
+        ."*No. Rekening:* {$noTabungan}\n"
+        ."*Nominal:* *{$nominal}*\n"
+        ."*Bank Tujuan:* _{$this->penarikan->bank} - {$this->penarikan->nama_bank}_\n"
+        ."*Nama Nasabah:* {$this->penarikan->nama_nasabah}\n"
+        ."*Waktu Pengajuan:* _{$dikirimAt}_\n\n"
+        .'_Silakan periksa dashboard admin untuk memverifikasi penarikan._';
 
         $adminNumbers = array_filter(array_map('trim', explode(',', config('whatsapp_gateway.admin_wa', ''))));
 

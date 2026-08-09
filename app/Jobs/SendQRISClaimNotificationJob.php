@@ -37,17 +37,17 @@ class SendQRISClaimNotificationJob implements ShouldQueue
         $namaPembayar = $this->setoran->nama_pembayar ?? '-';
         $metodePembayaran = $this->setoran->metode_pembayaran->label();
 
-        $pesan = "[KLAIM SETORAN MASUK]\n\n"
-            ."Nomor Setoran : {$this->setoran->nomor_setoran}\n"
-            ."Nama Anggota  : {$userName}\n"
-            ."No. Rekening  : {$noTabungan}\n"
-            ."Metode Bayar  : {$metodePembayaran}\n"
-            ."Nominal       : {$nominal}\n"
-            ."Kode Unik     : {$kodeUnik}\n"
-            ."Total Bayar   : {$totalBayar}\n"
-            ."Waktu Klaim   : {$waktuKlaim}\n"
-            ."Nama Pembayar : {$namaPembayar}\n\n"
-            .'Silakan periksa dashboard admin untuk memverifikasi pembayaran.';
+        $pesan = "*[KLAIM SETORAN MASUK]*\n\n"
+        ."*Nomor Setoran:* {$this->setoran->nomor_setoran}\n"
+        ."*Nama Anggota:* {$userName}\n"
+        ."*No. Rekening:* {$noTabungan}\n"
+        ."*Metode Bayar:* _{$metodePembayaran}_\n"
+        ."*Nominal:* *{$nominal}*\n"
+        ."*Kode Unik:* *{$kodeUnik}*\n"
+        ."*Total Bayar:* *{$totalBayar}*\n"
+        ."*Waktu Klaim:* _{$waktuKlaim}_\n"
+        ."*Nama Pembayar:* _{$namaPembayar}_\n\n"
+        .'_Silakan periksa dashboard admin untuk memverifikasi pembayaran._';
 
         $adminNumbers = array_filter(array_map('trim', explode(',', config('whatsapp_gateway.admin_wa', ''))));
 
