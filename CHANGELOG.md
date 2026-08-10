@@ -6,6 +6,16 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-08-10]
+
+### Added
+- Fitur Cetak Slip Setoran pada dashboard admin `/admin/setoran-tabungans` untuk status Disetujui/Selesai: action "Cetak Slip Setoran" pada kolom action tabel dan halaman View
+- Fitur Cetak Slip Penarikan pada dashboard admin `/admin/penarikan-tabungans` untuk status Disetujui/Selesai: action "Cetak Slip Penarikan" pada kolom action tabel dan halaman View
+- View PDF slip baru: `resources/views/pdf/slip-setoran.blade.php` dan `resources/views/pdf/slip-penarikan.blade.php` (ukuran thermal, mengikuti pola slip tabungan)
+- Method statis `SetoranTabunganResource::cetakSlip()` dan `PenarikanTabunganResource::cetakSlip()` untuk pembuatan PDF slip
+
+---
+
 ## [2026-08-08]
 
 ### Added
