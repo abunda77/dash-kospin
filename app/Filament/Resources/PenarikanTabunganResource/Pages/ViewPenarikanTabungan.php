@@ -2,9 +2,20 @@
 
 namespace App\Filament\Resources\PenarikanTabunganResource\Pages;
 
+use App\Enums\StatusPenarikan;
 use App\Filament\Resources\PenarikanTabunganResource;
+use App\Services\MintaRevisiPenarikanService;
+use App\Services\MulaiReviewPenarikanService;
+use App\Services\PostingPenarikanKeTabunganService;
+use App\Services\SetujuiPenarikanService;
+use App\Services\TolakPenarikanService;
 use Filament\Actions;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Carbon;
 
 class ViewPenarikanTabungan extends ViewRecord
 {
@@ -13,25 +24,33 @@ class ViewPenarikanTabungan extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('cetakSlip')
+                ->label('Cetak Slip Penarikan')
+                ->icon('heroicon-o-printer')
+                ->color('success')
+                ->visible(fn () => in_array($this->record->status, [StatusPenarikan::DISETUJUI, StatusPenarikan::SELESAI]))
+                ->action(function () {
+                    return $this->cetakSlipPenarikan();
+                }),
             Actions\Action::make('mulaiReview')
                 ->label('Mulai Review')
                 ->icon('heroicon-o-play')
                 ->color('primary')
-                ->visible(fn () => auth('admin')->user()->can('mulaiReview', $this->record) && $this->record->status === \App\Enums\StatusPenarikan::MENUNGGU_VERIFIKASI)
+                ->visible(fn () => auth('admin')->user()->can('mulaiReview', $this->record) && $this->record->status === StatusPenarikan::MENUNGGU_VERIFIKASI)
                 ->action(function () {
                     try {
-                        app(\App\Services\MulaiReviewPenarikanService::class)->execute(auth('admin')->user(), $this->record);
+                        app(MulaiReviewPenarikanService::class)->execute(auth('admin')->user(), $this->record);
                         $this->refreshFormData([
                             'status',
                             'mulai_review_at',
                             'diperiksa_oleh',
                         ]);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Proses review dimulai')
                             ->success()
                             ->send();
                     } catch (\Throwable $e) {
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Gagal memulai review')
                             ->body($e->getMessage())
                             ->danger()
@@ -43,26 +62,26 @@ class ViewPenarikanTabungan extends ViewRecord
                 ->label('Minta Revisi')
                 ->icon('heroicon-o-arrow-path')
                 ->color('warning')
-                ->visible(fn () => auth('admin')->user()->can('mintaRevisi', $this->record) && $this->record->status === \App\Enums\StatusPenarikan::SEDANG_DIPERIKSA)
+                ->visible(fn () => auth('admin')->user()->can('mintaRevisi', $this->record) && $this->record->status === StatusPenarikan::SEDANG_DIPERIKSA)
                 ->form([
-                    \Filament\Forms\Components\Textarea::make('catatan_verifikasi')
+                    Textarea::make('catatan_verifikasi')
                         ->label('Alasan / Catatan Revisi')
                         ->required()
                         ->minLength(3),
                 ])
                 ->action(function (array $data) {
                     try {
-                        app(\App\Services\MintaRevisiPenarikanService::class)->execute(auth('admin')->user(), $this->record, $data['catatan_verifikasi']);
+                        app(MintaRevisiPenarikanService::class)->execute(auth('admin')->user(), $this->record, $data['catatan_verifikasi']);
                         $this->refreshFormData([
                             'status',
                             'catatan_verifikasi',
                         ]);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Permintaan revisi dikirim')
                             ->success()
                             ->send();
                     } catch (\Throwable $e) {
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Gagal mengirim permintaan revisi')
                             ->body($e->getMessage())
                             ->danger()
@@ -74,28 +93,28 @@ class ViewPenarikanTabungan extends ViewRecord
                 ->label('Tolak')
                 ->icon('heroicon-o-x-mark')
                 ->color('danger')
-                ->visible(fn () => auth('admin')->user()->can('tolak', $this->record) && in_array($this->record->status, [\App\Enums\StatusPenarikan::MENUNGGU_VERIFIKASI, \App\Enums\StatusPenarikan::SEDANG_DIPERIKSA, \App\Enums\StatusPenarikan::PERLU_REVISI]))
+                ->visible(fn () => auth('admin')->user()->can('tolak', $this->record) && in_array($this->record->status, [StatusPenarikan::MENUNGGU_VERIFIKASI, StatusPenarikan::SEDANG_DIPERIKSA, StatusPenarikan::PERLU_REVISI]))
                 ->form([
-                    \Filament\Forms\Components\Textarea::make('alasan_penolakan')
+                    Textarea::make('alasan_penolakan')
                         ->label('Alasan Penolakan')
                         ->required()
                         ->minLength(3),
                 ])
                 ->action(function (array $data) {
                     try {
-                        app(\App\Services\TolakPenarikanService::class)->execute(auth('admin')->user(), $this->record, $data['alasan_penolakan']);
+                        app(TolakPenarikanService::class)->execute(auth('admin')->user(), $this->record, $data['alasan_penolakan']);
                         $this->refreshFormData([
                             'status',
                             'alasan_penolakan',
                             'ditolak_at',
                             'ditolak_oleh',
                         ]);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Penarikan ditolak')
                             ->success()
                             ->send();
                     } catch (\Throwable $e) {
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Gagal menolak penarikan')
                             ->body($e->getMessage())
                             ->danger()
@@ -107,22 +126,22 @@ class ViewPenarikanTabungan extends ViewRecord
                 ->label('Setujui')
                 ->icon('heroicon-o-check')
                 ->color('success')
-                ->visible(fn () => auth('admin')->user()->can('setujui', $this->record) && $this->record->status === \App\Enums\StatusPenarikan::SEDANG_DIPERIKSA)
+                ->visible(fn () => auth('admin')->user()->can('setujui', $this->record) && $this->record->status === StatusPenarikan::SEDANG_DIPERIKSA)
                 ->form([
-                    \Filament\Forms\Components\TextInput::make('referensi_transfer')
+                    TextInput::make('referensi_transfer')
                         ->label('Referensi Transfer'),
-                    \Filament\Forms\Components\DateTimePicker::make('waktu_transfer')
+                    DateTimePicker::make('waktu_transfer')
                         ->label('Waktu Transfer'),
-                    \Filament\Forms\Components\Textarea::make('catatan_verifikasi')
+                    Textarea::make('catatan_verifikasi')
                         ->label('Catatan Verifikasi'),
                 ])
                 ->action(function (array $data) {
                     try {
-                        app(\App\Services\SetujuiPenarikanService::class)->execute(
+                        app(SetujuiPenarikanService::class)->execute(
                             auth('admin')->user(),
                             $this->record,
                             $data['referensi_transfer'] ?? null,
-                            $data['waktu_transfer'] ? \Illuminate\Support\Carbon::parse($data['waktu_transfer']) : null,
+                            $data['waktu_transfer'] ? Carbon::parse($data['waktu_transfer']) : null,
                             $data['catatan_verifikasi'] ?? null
                         );
                         $this->refreshFormData([
@@ -132,12 +151,12 @@ class ViewPenarikanTabungan extends ViewRecord
                             'catatan_verifikasi',
                             'disetujui_at',
                         ]);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Penarikan disetujui')
                             ->success()
                             ->send();
                     } catch (\Throwable $e) {
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Gagal menyetujui penarikan')
                             ->body($e->getMessage())
                             ->danger()
@@ -149,21 +168,21 @@ class ViewPenarikanTabungan extends ViewRecord
                 ->label('Coba Ulang Posting')
                 ->icon('heroicon-o-arrow-path')
                 ->color('info')
-                ->visible(fn () => auth('admin')->user()->can('cobaUlangPosting', $this->record) && $this->record->status === \App\Enums\StatusPenarikan::DISETUJUI)
+                ->visible(fn () => auth('admin')->user()->can('cobaUlangPosting', $this->record) && $this->record->status === StatusPenarikan::DISETUJUI)
                 ->action(function () {
                     try {
-                        app(\App\Services\PostingPenarikanKeTabunganService::class)->execute($this->record->id, auth('admin')->user()->id);
+                        app(PostingPenarikanKeTabunganService::class)->execute($this->record->id, auth('admin')->user()->id);
                         $this->refreshFormData([
                             'status',
                             'diposting_at',
                             'selesai_at',
                         ]);
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Posting penarikan berhasil')
                             ->success()
                             ->send();
                     } catch (\Throwable $e) {
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Gagal posting penarikan')
                             ->body($e->getMessage())
                             ->danger()
@@ -171,5 +190,20 @@ class ViewPenarikanTabungan extends ViewRecord
                     }
                 }),
         ];
+    }
+
+    public function cetakSlipPenarikan()
+    {
+        try {
+            return PenarikanTabunganResource::cetakSlip($this->record);
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('Terjadi kesalahan saat mencetak slip')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            return null;
+        }
     }
 }

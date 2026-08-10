@@ -11,6 +11,8 @@ use App\Services\MulaiReviewSetoranService;
 use App\Services\PostingSetoranKeTabunganService;
 use App\Services\SetujuiSetoranService;
 use App\Services\TolakSetoranService;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
@@ -24,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SetoranTabunganResource extends Resource
 {
@@ -199,6 +202,22 @@ class SetoranTabunganResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('cetakSlip')
+                    ->label('Cetak Slip Setoran')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->visible(fn (SetoranTabungan $record) => in_array($record->status, [StatusSetoran::DISETUJUI, StatusSetoran::SELESAI]))
+                    ->action(function (SetoranTabungan $record) {
+                        try {
+                            return static::cetakSlip($record);
+                        } catch (\Throwable $e) {
+                            Notification::make()
+                                ->title('Terjadi kesalahan saat mencetak slip')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 Tables\Actions\Action::make('mulaiReview')
                     ->label('Mulai Review')
                     ->icon('heroicon-o-play')
@@ -602,5 +621,38 @@ class SetoranTabunganResource extends Resource
             'index' => Pages\ListSetoranTabungans::route('/'),
             'view' => Pages\ViewSetoranTabungan::route('/{record}'),
         ];
+    }
+
+    public static function cetakSlip(SetoranTabungan $setoran): StreamedResponse
+    {
+        $options = new Options;
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $options->set('defaultFont', 'Arial');
+        $options->set('isRemoteEnabled', true);
+        $options->set('chroot', public_path());
+
+        $dompdf = new Dompdf($options);
+        $dompdf->setPaper([0, 0, 368.504, 510.236], 'portrait');
+
+        $html = view('pdf.slip-setoran', [
+            'setoran' => $setoran,
+        ])->render();
+
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        $filename = 'slip_setoran_'.$setoran->nomor_setoran.'_'.date('Y-m-d_H-i-s').'.pdf';
+
+        return response()->streamDownload(
+            function () use ($dompdf) {
+                echo $dompdf->output();
+            },
+            $filename,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            ]
+        );
     }
 }

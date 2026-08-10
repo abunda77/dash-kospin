@@ -5,16 +5,27 @@ namespace App\Filament\Resources;
 use App\Enums\StatusPenarikan;
 use App\Filament\Resources\PenarikanTabunganResource\Pages;
 use App\Models\PenarikanTabungan;
+use App\Services\MintaRevisiPenarikanService;
+use App\Services\MulaiReviewPenarikanService;
+use App\Services\PostingPenarikanKeTabunganService;
+use App\Services\SetujuiPenarikanService;
+use App\Services\TolakPenarikanService;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PenarikanTabunganResource extends Resource
 {
@@ -170,6 +181,22 @@ class PenarikanTabunganResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('cetakSlip')
+                    ->label('Cetak Slip Penarikan')
+                    ->icon('heroicon-o-printer')
+                    ->color('success')
+                    ->visible(fn (PenarikanTabungan $record) => in_array($record->status, [StatusPenarikan::DISETUJUI, StatusPenarikan::SELESAI]))
+                    ->action(function (PenarikanTabungan $record) {
+                        try {
+                            return static::cetakSlip($record);
+                        } catch (\Throwable $e) {
+                            Notification::make()
+                                ->title('Terjadi kesalahan saat mencetak slip')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 Tables\Actions\Action::make('mulaiReview')
                     ->label('Mulai Review')
                     ->icon('heroicon-o-play')
@@ -177,13 +204,13 @@ class PenarikanTabunganResource extends Resource
                     ->visible(fn (PenarikanTabungan $record) => auth('admin')->user()->can('mulaiReview', $record) && $record->status === StatusPenarikan::MENUNGGU_VERIFIKASI)
                     ->action(function (PenarikanTabungan $record) {
                         try {
-                            app(\App\Services\MulaiReviewPenarikanService::class)->execute(auth('admin')->user(), $record);
-                            \Filament\Notifications\Notification::make()
+                            app(MulaiReviewPenarikanService::class)->execute(auth('admin')->user(), $record);
+                            Notification::make()
                                 ->title('Proses review dimulai')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal memulai review')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -203,13 +230,13 @@ class PenarikanTabunganResource extends Resource
                     ])
                     ->action(function (PenarikanTabungan $record, array $data) {
                         try {
-                            app(\App\Services\MintaRevisiPenarikanService::class)->execute(auth('admin')->user(), $record, $data['catatan_verifikasi']);
-                            \Filament\Notifications\Notification::make()
+                            app(MintaRevisiPenarikanService::class)->execute(auth('admin')->user(), $record, $data['catatan_verifikasi']);
+                            Notification::make()
                                 ->title('Permintaan revisi dikirim')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal mengirim permintaan revisi')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -229,13 +256,13 @@ class PenarikanTabunganResource extends Resource
                     ])
                     ->action(function (PenarikanTabungan $record, array $data) {
                         try {
-                            app(\App\Services\TolakPenarikanService::class)->execute(auth('admin')->user(), $record, $data['alasan_penolakan']);
-                            \Filament\Notifications\Notification::make()
+                            app(TolakPenarikanService::class)->execute(auth('admin')->user(), $record, $data['alasan_penolakan']);
+                            Notification::make()
                                 ->title('Penarikan ditolak')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal menolak penarikan')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -257,19 +284,19 @@ class PenarikanTabunganResource extends Resource
                     ])
                     ->action(function (PenarikanTabungan $record, array $data) {
                         try {
-                            app(\App\Services\SetujuiPenarikanService::class)->execute(
+                            app(SetujuiPenarikanService::class)->execute(
                                 auth('admin')->user(),
                                 $record,
                                 $data['referensi_transfer'] ?? null,
-                                $data['waktu_transfer'] ? \Illuminate\Support\Carbon::parse($data['waktu_transfer']) : null,
+                                $data['waktu_transfer'] ? Carbon::parse($data['waktu_transfer']) : null,
                                 $data['catatan_verifikasi'] ?? null
                             );
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Penarikan disetujui')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal menyetujui penarikan')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -283,13 +310,13 @@ class PenarikanTabunganResource extends Resource
                     ->visible(fn (PenarikanTabungan $record) => auth('admin')->user()->can('cobaUlangPosting', $record) && $record->status === StatusPenarikan::DISETUJUI)
                     ->action(function (PenarikanTabungan $record) {
                         try {
-                            app(\App\Services\PostingPenarikanKeTabunganService::class)->execute($record->id, auth('admin')->user()->id);
-                            \Filament\Notifications\Notification::make()
+                            app(PostingPenarikanKeTabunganService::class)->execute($record->id, auth('admin')->user()->id);
+                            Notification::make()
                                 ->title('Posting penarikan berhasil')
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Gagal posting penarikan')
                                 ->body($e->getMessage())
                                 ->danger()
@@ -382,10 +409,10 @@ class PenarikanTabunganResource extends Resource
                                     ->icon('heroicon-o-arrow-down-tray')
                                     ->visible(fn ($record) => ! empty($record->bukti_penarikan_path))
                                     ->action(function ($record) {
-                                        if ($record->bukti_penarikan_path && \Illuminate\Support\Facades\Storage::disk('private')->exists($record->bukti_penarikan_path)) {
-                                            return \Illuminate\Support\Facades\Storage::disk('private')->download($record->bukti_penarikan_path);
+                                        if ($record->bukti_penarikan_path && Storage::disk('private')->exists($record->bukti_penarikan_path)) {
+                                            return Storage::disk('private')->download($record->bukti_penarikan_path);
                                         }
-                                        \Filament\Notifications\Notification::make()
+                                        Notification::make()
                                             ->title('File tidak ditemukan')
                                             ->danger()
                                             ->send();
@@ -415,10 +442,10 @@ class PenarikanTabunganResource extends Resource
                                             ->label('Download')
                                             ->icon('heroicon-o-arrow-down-tray')
                                             ->action(function ($record) {
-                                                if ($record && $record->file_path && \Illuminate\Support\Facades\Storage::disk('private')->exists($record->file_path)) {
-                                                    return \Illuminate\Support\Facades\Storage::disk('private')->download($record->file_path, $record->nama_asli);
+                                                if ($record && $record->file_path && Storage::disk('private')->exists($record->file_path)) {
+                                                    return Storage::disk('private')->download($record->file_path, $record->nama_asli);
                                                 }
-                                                \Filament\Notifications\Notification::make()
+                                                Notification::make()
                                                     ->title('File tidak ditemukan')
                                                     ->danger()
                                                     ->send();
@@ -523,5 +550,38 @@ class PenarikanTabunganResource extends Resource
             'index' => Pages\ListPenarikanTabungans::route('/'),
             'view' => Pages\ViewPenarikanTabungan::route('/{record}'),
         ];
+    }
+
+    public static function cetakSlip(PenarikanTabungan $penarikan): StreamedResponse
+    {
+        $options = new Options;
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isPhpEnabled', true);
+        $options->set('defaultFont', 'Arial');
+        $options->set('isRemoteEnabled', true);
+        $options->set('chroot', public_path());
+
+        $dompdf = new Dompdf($options);
+        $dompdf->setPaper([0, 0, 368.504, 510.236], 'portrait');
+
+        $html = view('pdf.slip-penarikan', [
+            'penarikan' => $penarikan,
+        ])->render();
+
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+
+        $filename = 'slip_penarikan_'.$penarikan->nomor_penarikan.'_'.date('Y-m-d_H-i-s').'.pdf';
+
+        return response()->streamDownload(
+            function () use ($dompdf) {
+                echo $dompdf->output();
+            },
+            $filename,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            ]
+        );
     }
 }
