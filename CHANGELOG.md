@@ -6,6 +6,15 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-08-11]
+
+### Added
+- Rate limiting pada halaman login user `/login` (`ModernLogin`): maksimal 5 percobaan login per menit per email + IP menggunakan `RateLimiter`, dengan kunci sementara 1 menit dan pesan "Terlalu banyak percobaan login" yang di-reset setelah login berhasil
+- CAPTCHA internal progresif pada halaman login user: soal matematika acak (mis. `7 × 3 = ?`) yang muncul setelah 3 kali percobaan login gagal, jawaban disimpan di session, tombol "Ganti soal", dan validasi jawaban sebelum autentikasi
+- Feature test `ModernLoginTest` (6 skenario: render halaman, login sukses/gagal, captcha muncul setelah kegagalan berulang, jawaban captcha salah ditolak, reset counter setelah login sukses) menggunakan `DatabaseTransactions` agar tidak menghapus database
+
+---
+
 ## [2026-08-10]
 
 ### Added

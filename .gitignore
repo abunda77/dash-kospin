@@ -53,3 +53,4 @@ boost.json
 .agent/*
 .kilocode/*
 
+/.codegraph
