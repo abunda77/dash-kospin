@@ -6,6 +6,16 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-08-12]
+
+### Fixed
+- Widget `Total Saldo Tabungan` pada dashboard user `/user` (`UserStatsOverview`): perbaiki foreign key query dari `$profile->id_user` menjadi `$profile->id` agar sesuai dengan relasi `tabungans.id_profile` → `profiles.id`, sehingga total saldo menampilkan nilai yang benar sesuai rekening tabungan aktif milik user
+- Perhitungan total saldo tabungan kini memanfaatkan accessor `saldo_akhir` pada model `Tabungan` (`saldo_awal + (total_debit - total_kredit)`) agar konsisten dengan widget tabel `TabunganWidget`
+- Tambah factory baru: `TabunganFactory`, `TransaksiTabunganFactory`, `ProdukTabunganFactory`, dan tambah `id_user` pada `ProfileFactory`
+- Feature test `UserStatsOverviewWidgetTest` (3 skenario: perhitungan total saldo benar, hanya menghitung rekening aktif, dan penanganan user tanpa profile)
+
+---
+
 ## [2026-08-11]
 
 ### Added

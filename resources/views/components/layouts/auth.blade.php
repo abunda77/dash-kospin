@@ -9,7 +9,7 @@
     <title>{{ $title ?? 'Masuk' }} - Kospin Sinara Artha</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&family=poppins:600,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800|plus-jakarta-sans:500,600,700,800|ibm-plex-mono:500,600&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
@@ -26,7 +26,47 @@
         }
 
         .auth-brand-font {
-            font-family: Poppins, Inter, sans-serif;
+            font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+        }
+
+        .display-font {
+            font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+        }
+
+        .mono-font {
+            font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+        }
+
+        /* signature: growing savings sparkline */
+        .sparkline-path {
+            stroke-dasharray: 1;
+            stroke-dashoffset: 1;
+            animation: draw-line 2.4s cubic-bezier(.22, 1, .36, 1) .45s forwards;
+        }
+
+        .sparkline-fill {
+            opacity: 0;
+            animation: fade-fill .8s ease .9s forwards;
+        }
+
+        .sparkline-dot {
+            opacity: 0;
+            transform: scale(0);
+            transform-origin: center;
+            transform-box: fill-box;
+            animation: pop-dot .5s cubic-bezier(.34, 1.56, .64, 1) 1.5s forwards;
+        }
+
+        @keyframes draw-line {
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes fade-fill {
+            to { opacity: 1; }
+        }
+
+        @keyframes pop-dot {
+            to { opacity: 1; transform: scale(1); }
         }
 
         .auth-page {
@@ -73,10 +113,13 @@
 
         @media (prefers-reduced-motion: reduce) {
             .auth-reveal,
-            .auth-glow {
+            .auth-glow,
+            .sparkline-path,
+            .sparkline-fill,
+            .sparkline-dot {
                 opacity: 1;
-                animation: none;
                 transform: none;
+                animation: none;
             }
         }
     </style>
