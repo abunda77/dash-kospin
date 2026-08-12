@@ -11,6 +11,7 @@ use App\Services\BuatSetoranTabunganService;
 use App\Services\KirimKlaimPembayaranService;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -113,12 +114,7 @@ class SetoranSimpanan extends Page implements HasForms
                     ->minValue(10000)
                     ->maxValue(100000000),
 
-                Radio::make('metode_pembayaran')
-                    ->label('Pilih Metode Pembayaran')
-                    ->options([
-                        MetodePembayaranSetoran::Qris->value => MetodePembayaranSetoran::Qris->label(),
-                        MetodePembayaranSetoran::TransferRekening->value => MetodePembayaranSetoran::TransferRekening->label(),
-                    ])
+                Hidden::make('metode_pembayaran')
                     ->default(MetodePembayaranSetoran::Qris->value)
                     ->required(),
             ])

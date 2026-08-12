@@ -154,6 +154,127 @@
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Isi Formulir Setoran Baru</h3>
 
                 <form wire:submit.prevent="createSetoran" class="space-y-4">
+                    {{-- Card Selector Metode Pembayaran --}}
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Pilih Metode Pembayaran
+                        </label>
+                        <div
+                            x-data="{
+                                selected: $wire.entangle('generateData.metode_pembayaran'),
+                                init() {
+                                    if (!this.selected) {
+                                        this.selected = 'qris';
+                                    }
+                                }
+                            }"
+                            class="grid grid-cols-2 gap-3"
+                        >
+                            {{-- QRIS --}}
+                            <button
+                                type="button"
+                                @click="selected = 'qris'"
+                                :class="selected === 'qris'
+                                    ? 'border-primary-300 bg-gradient-to-br from-primary-100/90 via-white/70 to-primary-200/70 ring-2 ring-primary-500 shadow-lg shadow-primary-500/15 backdrop-blur-xl dark:border-primary-500/70 dark:from-primary-900/70 dark:via-gray-900/60 dark:to-primary-950/80'
+                                    : 'border-gray-200 bg-white/90 hover:border-gray-300 hover:bg-white hover:shadow-sm dark:border-gray-700 dark:bg-gray-800/90 dark:hover:border-gray-600 dark:hover:bg-gray-800'"
+                                class="relative flex min-w-0 flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border-2 p-5 text-center transition-all duration-300 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                            >
+                                <div
+                                    x-show="selected === 'qris'"
+                                    x-transition.opacity.duration.300ms
+                                    aria-hidden="true"
+                                    class="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-90 dark:via-white/60"
+                                ></div>
+                                <div
+                                    x-show="selected === 'qris'"
+                                    x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 scale-75"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-150"
+                                    x-transition:leave-start="opacity-100 scale-100"
+                                    x-transition:leave-end="opacity-0 scale-75"
+                                    class="absolute top-2.5 right-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary-500"
+                                >
+                                    <svg class="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
+                                        <path d="M2 6L4.5 8.5L10 3.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+
+                                <div
+                                    :class="selected === 'qris'
+                                        ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'"
+                                    class="flex h-14 w-14 items-center justify-center rounded-full transition-colors duration-300"
+                                >
+                                    {{-- QR Code Icon --}}
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75V16.5zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75z" />
+                                    </svg>
+                                </div>
+
+                                <div>
+                                    <p
+                                        :class="selected === 'qris' ? 'text-primary-700 dark:text-primary-300' : 'text-gray-800 dark:text-gray-200'"
+                                        class="text-sm font-bold transition-colors duration-300"
+                                    >QRIS</p>
+                                    <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Scan & bayar instan</p>
+                                </div>
+                            </button>
+
+                            {{-- Transfer Rekening --}}
+                            <button
+                                type="button"
+                                @click="selected = 'transfer_rekening'"
+                                :class="selected === 'transfer_rekening'
+                                    ? 'border-primary-300 bg-gradient-to-br from-primary-100/90 via-white/70 to-primary-200/70 ring-2 ring-primary-500 shadow-lg shadow-primary-500/15 backdrop-blur-xl dark:border-primary-500/70 dark:from-primary-900/70 dark:via-gray-900/60 dark:to-primary-950/80'
+                                    : 'border-gray-200 bg-white/90 hover:border-gray-300 hover:bg-white hover:shadow-sm dark:border-gray-700 dark:bg-gray-800/90 dark:hover:border-gray-600 dark:hover:bg-gray-800'"
+                                class="relative flex min-w-0 flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border-2 p-5 text-center transition-all duration-300 ease-out motion-safe:hover:-translate-y-0.5 motion-safe:active:scale-[0.98] motion-reduce:transition-none cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                            >
+                                <div
+                                    x-show="selected === 'transfer_rekening'"
+                                    x-transition.opacity.duration.300ms
+                                    aria-hidden="true"
+                                    class="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-90 dark:via-white/60"
+                                ></div>
+                                <div
+                                    x-show="selected === 'transfer_rekening'"
+                                    x-transition:enter="transition ease-out duration-200"
+                                    x-transition:enter-start="opacity-0 scale-75"
+                                    x-transition:enter-end="opacity-100 scale-100"
+                                    x-transition:leave="transition ease-in duration-150"
+                                    x-transition:leave-start="opacity-100 scale-100"
+                                    x-transition:leave-end="opacity-0 scale-75"
+                                    class="absolute top-2.5 right-2.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary-500"
+                                >
+                                    <svg class="h-3 w-3 text-white" viewBox="0 0 12 12" fill="none">
+                                        <path d="M2 6L4.5 8.5L10 3.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+
+                                <div
+                                    :class="selected === 'transfer_rekening'
+                                        ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400'
+                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'"
+                                    class="flex h-14 w-14 items-center justify-center rounded-full transition-colors duration-300"
+                                >
+                                    {{-- Bank Building Icon --}}
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
+                                    </svg>
+                                </div>
+
+                                <div>
+                                    <p
+                                        :class="selected === 'transfer_rekening' ? 'text-primary-700 dark:text-primary-300' : 'text-gray-800 dark:text-gray-200'"
+                                        class="text-sm font-bold transition-colors duration-300"
+                                    >Transfer Rekening</p>
+                                    <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">Transfer antar bank</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
                     {{ $this->generateForm }}
 
                     <div class="flex justify-end mt-4">
