@@ -9,6 +9,7 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [2026-08-13]
 
 ### Changed
+- Ikon menu sidebar/panel dashboard user `/user` kini berwarna-warni (bervariasi per menu: Simpanan hijau, Setoran biru, Penarikan amber, Pinjaman rose, Deposito violet, Profile cyan) lengkap dengan state hover, state aktif (ikon + label), transisi, dan dukungan dark mode via CSS pada `resources/css/filament/user/theme.css`
 - UI card selector metode pembayaran pada halaman user `/user/setoran-simpanan`: layout 2 kolom kanan-kiri (konsisten di semua breakpoint), state terpilih dengan gradasi background bergaya glass (`backdrop-blur`), highlight garis atas, shadow lembut, dan transisi 300ms; efek klik halus (`motion-safe:active:scale-[0.98]`) serta dukungan dark mode dan reduced motion
 - Metode pembayaran pada halaman setoran kini dirender langsung di view halaman sebagai card selector (mengikat ke state Livewire melalui `wire:model`/Alpine `entangle`) menggantikan partial Blade form component, dan field `metode_pembayaran` menjadi `Hidden` di form
 

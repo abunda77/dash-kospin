@@ -34,4 +34,84 @@
     .fi-wi-stats-overview-stat-value {
         @apply mt-1 text-2xl font-bold tracking-tight text-gray-950 dark:text-white;
     }
+
+    .fi-sidebar-item-icon {
+        @apply text-gray-400 dark:text-gray-500;
+    }
+
+    .fi-sidebar-item:hover .fi-sidebar-item-icon {
+        @apply text-gray-700 dark:text-gray-200;
+    }
+
+    .fi-sidebar-item .fi-sidebar-item-button[href*="/user/tabungan-saya"] .fi-sidebar-item-icon {
+        @apply text-emerald-500 dark:text-emerald-400;
+    }
+
+    .fi-sidebar-item .fi-sidebar-item-button[href*="/user/setoran-simpanan"] .fi-sidebar-item-icon {
+        @apply text-sky-500 dark:text-sky-400;
+    }
+
+    .fi-sidebar-item .fi-sidebar-item-button[href*="/user/penarikan-simpanan"] .fi-sidebar-item-icon {
+        @apply text-amber-500 dark:text-amber-400;
+    }
+
+    .fi-sidebar-item .fi-sidebar-item-button[href*="/user/pinjaman-saya"] .fi-sidebar-item-icon {
+        @apply text-rose-500 dark:text-rose-400;
+    }
+
+    .fi-sidebar-item .fi-sidebar-item-button[href*="/user/deposito-saya"] .fi-sidebar-item-icon {
+        @apply text-violet-500 dark:text-violet-400;
+    }
+
+    .fi-sidebar-item .fi-sidebar-item-button[href*="/user/profile"] .fi-sidebar-item-icon {
+        @apply text-cyan-500 dark:text-cyan-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/tabungan-saya"] .fi-sidebar-item-icon {
+        @apply text-emerald-600 dark:text-emerald-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/setoran-simpanan"] .fi-sidebar-item-icon {
+        @apply text-sky-600 dark:text-sky-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/penarikan-simpanan"] .fi-sidebar-item-icon {
+        @apply text-amber-600 dark:text-amber-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/pinjaman-saya"] .fi-sidebar-item-icon {
+        @apply text-rose-600 dark:text-rose-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/deposito-saya"] .fi-sidebar-item-icon {
+        @apply text-violet-600 dark:text-violet-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/profile"] .fi-sidebar-item-icon {
+        @apply text-cyan-600 dark:text-cyan-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/tabungan-saya"] .fi-sidebar-item-label {
+        @apply text-emerald-600 dark:text-emerald-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/setoran-simpanan"] .fi-sidebar-item-label {
+        @apply text-sky-600 dark:text-sky-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/penarikan-simpanan"] .fi-sidebar-item-label {
+        @apply text-amber-600 dark:text-amber-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/pinjaman-saya"] .fi-sidebar-item-label {
+        @apply text-rose-600 dark:text-rose-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/deposito-saya"] .fi-sidebar-item-label {
+        @apply text-violet-600 dark:text-violet-400;
+    }
+
+    .fi-sidebar-item.fi-active .fi-sidebar-item-button[href*="/user/profile"] .fi-sidebar-item-label {
+        @apply text-cyan-600 dark:text-cyan-400;
+    }
 }
