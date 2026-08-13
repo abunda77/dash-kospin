@@ -1,8 +1,13 @@
 <?php
 
+use App\Console\Commands\HitungBungaTabungan;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,44 +18,46 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // App\Http\Middleware\TrustProxies.php
+        $middleware->redirectGuestsTo(fn () => route('login.modern'));
+
         $middleware->trustProxies(
             '*',
-            \Illuminate\Http\Request::HEADER_X_FORWARDED_FOR |
-            \Illuminate\Http\Request::HEADER_X_FORWARDED_HOST |
-            \Illuminate\Http\Request::HEADER_X_FORWARDED_PORT |
-            \Illuminate\Http\Request::HEADER_X_FORWARDED_PROTO |
-            \Illuminate\Http\Request::HEADER_X_FORWARDED_AWS_ELB
+            Request::HEADER_X_FORWARDED_FOR |
+            Request::HEADER_X_FORWARDED_HOST |
+            Request::HEADER_X_FORWARDED_PORT |
+            Request::HEADER_X_FORWARDED_PROTO |
+            Request::HEADER_X_FORWARDED_AWS_ELB
         );
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        $exceptions->render(function (\Throwable $e, $request) {
+        $exceptions->render(function (Throwable $e, $request) {
             if ($request->is('api/*') || $request->expectsJson()) {
                 // Biarkan Laravel menangani validasi (422) dengan format standar
-                if ($e instanceof \Illuminate\Validation\ValidationException) {
+                if ($e instanceof ValidationException) {
                     return response()->json([
                         'status' => false,
                         'message' => 'Validasi gagal',
-                        'errors' => $e->errors()
+                        'errors' => $e->errors(),
                     ], 422);
                 }
 
                 // Token tidak valid / tidak ada -> 401, bukan 500
-                if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                if ($e instanceof AuthenticationException) {
                     return response()->json([
                         'status' => false,
-                        'message' => 'Unauthenticated'
+                        'message' => 'Unauthenticated',
                     ], 401);
                 }
 
                 // Tentukan status code dengan fallback
-                $statusCode = $e instanceof \Symfony\Component\HttpKernel\Exception\HttpException
+                $statusCode = $e instanceof HttpException
                     ? $e->getStatusCode()
                     : 500;
 
                 // Struktur response JSON
                 $response = [
                     'status' => false,
-                    'message' => 'Terjadi kesalahan pada server'
+                    'message' => 'Terjadi kesalahan pada server',
                 ];
 
                 // Tambahkan informasi error jika mode debug aktif
@@ -58,7 +65,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     $response['error'] = [
                         'message' => $e->getMessage(),
                         'file' => $e->getFile(),
-                        'line' => $e->getLine()
+                        'line' => $e->getLine(),
                     ];
                 }
 
@@ -68,6 +75,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
     ->withCommands([
-        App\Console\Commands\HitungBungaTabungan::class,
+        HitungBungaTabungan::class,
     ])
     ->create();

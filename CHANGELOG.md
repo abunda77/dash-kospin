@@ -8,6 +8,10 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [2026-08-13]
 
+### Fixed
+- Registrasi user di `/register` (`ModernRegister`) gagal dengan `RoleDoesNotExist`: `assignRole('user')` diganti ke `assignRole('panel_user')` karena role untuk guard `web` bernama `panel_user` (bukan `user`); perbaikan yang sama pada `POST /api/register`
+- Redirect tamu setelah sesi tidak valid crash dengan `Route [login] not defined`: `redirectGuestsTo` di `bootstrap/app.php` kini memakai `route('login.modern')` sesuai nama route halaman login `/login`
+
 ### Changed
 - Ikon menu sidebar/panel dashboard user `/user` kini berwarna-warni (bervariasi per menu: Simpanan hijau, Setoran biru, Penarikan amber, Pinjaman rose, Deposito violet, Profile cyan) lengkap dengan state hover, state aktif (ikon + label), transisi, dan dukungan dark mode via CSS pada `resources/css/filament/user/theme.css`
 - UI card selector metode pembayaran pada halaman user `/user/setoran-simpanan`: layout 2 kolom kanan-kiri (konsisten di semua breakpoint), state terpilih dengan gradasi background bergaya glass (`backdrop-blur`), highlight garis atas, shadow lembut, dan transisi 300ms; efek klik halus (`motion-safe:active:scale-[0.98]`) serta dukungan dark mode dan reduced motion

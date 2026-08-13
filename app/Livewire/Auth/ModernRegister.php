@@ -55,7 +55,7 @@ class ModernRegister extends Component
             'password' => $validated['password'],
         ]);
 
-        $user->assignRole('user');
+        $user->assignRole('panel_user');
 
         Auth::login($user);
         session()->regenerate();

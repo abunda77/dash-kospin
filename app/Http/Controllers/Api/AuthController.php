@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-//use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Validation\Rules\Password as PasswordRules;
-use Illuminate\Support\Str;
-use Illuminate\Auth\Events\PasswordReset;
 use App\Jobs\SendResetPasswordEmail;
+use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Http\Request;
+// use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password as PasswordRules;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -23,7 +23,7 @@ class AuthController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8',
-                'password_confirmation' => 'required|same:password'
+                'password_confirmation' => 'required|same:password',
             ]);
 
             $user = User::create([
@@ -32,7 +32,7 @@ class AuthController extends Controller
                 'password' => Hash::make($validatedData['password']),
             ]);
 
-            $user->assignRole('user');
+            $user->assignRole('panel_user');
 
             $token = $user->createToken('API Token')->plainTextToken;
 
@@ -41,21 +41,21 @@ class AuthController extends Controller
                 'message' => 'User registered successfully',
                 'data' => [
                     'user' => $user,
-                    'token' => $token
-                ]
+                    'token' => $token,
+                ],
             ], 201);
 
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Validation failed',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Registration failed',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -73,7 +73,7 @@ class AuthController extends Controller
             if (! $user || ! Hash::check($validatedData['password'], $user->password)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Invalid credentials'
+                    'message' => 'Invalid credentials',
                 ], 401);
             }
 
@@ -84,25 +84,24 @@ class AuthController extends Controller
                 'message' => 'Login successful',
                 'data' => [
                     'user' => $user,
-                    'token' => $token
-                ]
+                    'token' => $token,
+                ],
             ], 200);
 
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Validation failed',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Login failed',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
-
 
     public function logout(Request $request)
     {
@@ -112,14 +111,14 @@ class AuthController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Logout berhasil'
+                'message' => 'Logout berhasil',
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Logout gagal',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -136,38 +135,38 @@ class AuthController extends Controller
                 'new_password.required' => 'Password baru wajib diisi',
                 'new_password.min' => 'Password baru minimal 8 karakter',
                 'new_password.confirmed' => 'Konfirmasi password tidak cocok',
-                'new_password_confirmation.required' => 'Konfirmasi password wajib diisi'
+                'new_password_confirmation.required' => 'Konfirmasi password wajib diisi',
             ]);
 
             $user = $request->user();
 
-            if (!Hash::check($validatedData['old_password'], $user->password)) {
+            if (! Hash::check($validatedData['old_password'], $user->password)) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Password lama tidak sesuai'
+                    'message' => 'Password lama tidak sesuai',
                 ], 422);
             }
 
             $user->update([
-                'password' => Hash::make($validatedData['new_password'])
+                'password' => Hash::make($validatedData['new_password']),
             ]);
 
             return response()->json([
                 'status' => true,
-                'message' => 'Password berhasil diperbarui'
+                'message' => 'Password berhasil diperbarui',
             ], 200);
 
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Validasi gagal',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Gagal memperbarui password',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -180,7 +179,7 @@ class AuthController extends Controller
             ], [
                 'email.required' => 'Email wajib diisi',
                 'email.email' => 'Format email tidak valid',
-                'email.exists' => 'Email tidak terdaftar'
+                'email.exists' => 'Email tidak terdaftar',
             ]);
 
             // Dispatch job untuk mengirim email
@@ -188,20 +187,20 @@ class AuthController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Link reset password akan dikirim ke email Anda'
+                'message' => 'Link reset password akan dikirim ke email Anda',
             ], 200);
 
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Validasi gagal',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Gagal memproses permintaan',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -216,8 +215,8 @@ class AuthController extends Controller
                     // ->mixedCase()
                     ->letters()
                     ->numbers()],
-                    // ->symbols()],
-                'password_confirmation' => 'required'
+                // ->symbols()],
+                'password_confirmation' => 'required',
             ], [
                 'token.required' => 'Token tidak valid',
                 'email.required' => 'Email wajib diisi',
@@ -225,14 +224,14 @@ class AuthController extends Controller
                 'email.exists' => 'Email tidak terdaftar',
                 'password.required' => 'Password baru wajib diisi',
                 'password.confirmed' => 'Konfirmasi password tidak cocok',
-                'password_confirmation.required' => 'Konfirmasi password wajib diisi'
+                'password_confirmation.required' => 'Konfirmasi password wajib diisi',
             ]);
 
             $status = Password::reset(
                 $request->only('email', 'password', 'password_confirmation', 'token'),
                 function ($user, $password) {
                     $user->forceFill([
-                        'password' => Hash::make($password)
+                        'password' => Hash::make($password),
                     ])->setRememberToken(Str::random(60));
 
                     $user->save();
@@ -244,20 +243,20 @@ class AuthController extends Controller
             if ($status === Password::PASSWORD_RESET) {
                 return response()->json([
                     'status' => true,
-                    'message' => 'Password berhasil direset'
+                    'message' => 'Password berhasil direset',
                 ], 200);
             }
 
             return response()->json([
                 'status' => false,
-                'message' => trans($status)
+                'message' => trans($status),
             ], 400);
 
         } catch (ValidationException $e) {
             return response()->json([
                 'status' => false,
                 'message' => 'Validasi gagal',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
@@ -266,10 +265,9 @@ class AuthController extends Controller
                 'error' => [
                     'message' => $e->getMessage(),
                     'file' => $e->getFile(),
-                    'line' => $e->getLine()
-                ]
+                    'line' => $e->getLine(),
+                ],
             ], 500);
         }
     }
-
 }
