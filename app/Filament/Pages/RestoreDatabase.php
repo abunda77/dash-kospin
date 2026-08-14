@@ -29,6 +29,16 @@ class RestoreDatabase extends Page
 
     protected static string $view = 'filament.pages.restore-database';
 
+    // NONAKTIFKAN FITUR RESTORE DATABASE
+    // Menonaktifkan fitur ini karena berisiko tinggi: restore dapat menghapus
+    // seluruh tabel dan memicu error pada aplikasi yang masih dalam posisi login/aktif.
+    // Fitur restore tetap bisa dijalankan secara manual lewat CLI / database management.
+    public static function canAccess(): bool
+    {
+        // Comment: blokir seluruh akses (menu disembunyikan & URL tidak bisa dibuka)
+        return false;
+    }
+
     public ?array $data = [];
 
     public function form(Form $form): Form
@@ -116,6 +126,14 @@ class RestoreDatabase extends Page
 
     public function restore(): void
     {
+        // COMMENT: Fitur restore database DINONAKTIFKAN (lihat canAccess di atas).
+        // Isi logika di bawah ini di-comment karena berisiko tinggi:
+        // - Men-DROP seluruh tabel lalu mengeksekusi SQL secara mentah (DB::unprepared)
+        // - DROP TABLE bersifat non-transaksional, DB::rollBack() tidak dapat memulihkannya
+        // jika gagal di tengah, mengakibatkan database "separuh" dan aplikasi error.
+        // Gunakan restore langsung di level DB (CLI/phpMyAdmin) saat aplikasi maintenance.
+
+        /*
         try {
             DB::beginTransaction();
 
@@ -127,8 +145,8 @@ class RestoreDatabase extends Page
                 $filePath = storage_path('app/' . $backup->path);
             }
             // Atau gunakan file yang diupload
-            elseif (!empty($this->data['upload_file'])) {
-                /** @var TemporaryUploadedFile $uploadedFile */
+elseif (!empty($this->data['upload_file'])) {
+                // @var TemporaryUploadedFile $uploadedFile
                 $uploadedFile = $this->data['upload_file'];
 
                 // Validasi file yang diupload
@@ -177,7 +195,7 @@ class RestoreDatabase extends Page
         } catch (\Exception $e) {
             DB::rollBack();
 
-            Log::error('Restore error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Restore error: ' . $e->getMessage());
 
             Notification::make()
                 ->danger()
@@ -185,5 +203,6 @@ class RestoreDatabase extends Page
                 ->body($e->getMessage())
                 ->send();
         }
+        */
     }
 }

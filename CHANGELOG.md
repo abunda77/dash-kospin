@@ -6,6 +6,13 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-08-14]
+
+### Security
+- Fitur Restore Database pada dashboard admin `/admin/restore-database` (`RestoreDatabase`) dinonaktifkan karena berisiko tinggi: proses restore men-DROP seluruh tabel lalu mengeksekusi SQL secara mentah (`DB::unprepared`) pada database yang sama dengan yang dipakai aplikasi saat login, dan `DROP TABLE` bersifat non-transaksional sehingga `rollBack()` tidak dapat memulihkan database bila gagal di tengah (berpotensi database "separuh" dan aplikasi error). Menu disembunyikan, akses URL diblokir lewat `canAccess()` → `false`, dan isi `restore()` dikomentari; restore tetap dapat dijalankan manual via CLI/phpMyAdmin saat aplikasi dalam mode maintenance
+
+---
+
 ## [2026-08-13]
 
 ### Fixed
