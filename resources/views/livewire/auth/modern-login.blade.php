@@ -158,11 +158,6 @@
                     </button>
                 </form>
 
-                <p class="mt-7 text-center text-sm text-[#789b83]">
-                    Belum punya akun?
-                    <a href="{{ route('register') }}" wire:navigate class="font-bold text-green-400 transition hover:text-green-300">Daftar sekarang</a>
-                </p>
-
                 <p class="mt-8 border-t border-white/[.07] pt-6 text-center text-xs text-[#55705e]">&copy; {{ date('Y') }} Koperasi Sinara Artha Naya</p>
             </div>
         </section>

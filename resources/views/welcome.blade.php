@@ -451,10 +451,12 @@
                                 <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                             </a>
                         @else
-                            <a href="{{ route('register') }}" class="group inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-7 py-3.5 text-sm font-bold text-[#08110b] transition duration-300 hover:-translate-y-1 hover:bg-green-400 hover:shadow-xl hover:shadow-green-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400">
-                                Daftar sebagai anggota
-                                <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                            </a>
+                            @if (Route::has('register'))
+                                <a href="{{ route('register') }}" class="group inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-7 py-3.5 text-sm font-bold text-[#08110b] transition duration-300 hover:-translate-y-1 hover:bg-green-400 hover:shadow-xl hover:shadow-green-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400">
+                                    Daftar sebagai anggota
+                                    <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                </a>
+                            @endif
                             @if (Route::has('login.modern'))
                                 <a href="{{ route('login.modern') }}" class="inline-flex items-center justify-center rounded-lg border border-white/15 bg-white/[.03] px-7 py-3.5 text-sm font-bold text-white transition duration-300 hover:-translate-y-1 hover:border-green-400/50 hover:bg-white/[.07] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400">
                                     Masuk anggota

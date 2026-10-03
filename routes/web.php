@@ -1,8 +1,17 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\TabunganBarcodeController;
 use App\Http\Controllers\WelcomeController;
+use App\Livewire\Auth\ModernForgotPassword;
+use App\Livewire\Auth\ModernLogin;
+use App\Livewire\MakanBergizisGratisCheckout;
+use App\Livewire\MobileAppRequest;
+use App\Livewire\QrisPublicGenerator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', [WelcomeController::class, 'index']);
 
@@ -15,20 +24,21 @@ Route::get('/reset-password/{token}', function (string $token) {
     return view('auth.reset-password', ['token' => $token]);
 })->middleware('guest')->name('password.reset');
 
-Route::post('/reset-password', [App\Http\Controllers\Api\AuthController::class, 'resetPassword'])
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])
     ->middleware('guest')
     ->name('password.update');
 
 // Modern minimalis login page
-Route::get('/login', \App\Livewire\Auth\ModernLogin::class)
+Route::get('/login', ModernLogin::class)
     ->middleware('guest')
     ->name('login.modern');
 
-Route::get('/register', \App\Livewire\Auth\ModernRegister::class)
-    ->middleware('guest')
-    ->name('register');
+// Route register dinonaktifkan
+// Route::get('/register', \App\Livewire\Auth\ModernRegister::class)
+//     ->middleware('guest')
+//     ->name('register');
 
-Route::get('/forgot-password', \App\Livewire\Auth\ModernForgotPassword::class)
+Route::get('/forgot-password', ModernForgotPassword::class)
     ->middleware('guest')
     ->name('password.request');
 
@@ -40,11 +50,11 @@ Route::get('/download-report/{filename}', function (string $filename) {
         abort(403, 'Invalid file type');
     }
 
-    if (! \Illuminate\Support\Facades\Storage::disk('public')->exists('reports/'.$filename)) {
+    if (! Storage::disk('public')->exists('reports/'.$filename)) {
         abort(404, 'File not found');
     }
 
-    return \Illuminate\Support\Facades\Storage::disk('public')->download('reports/'.$filename, $filename, [
+    return Storage::disk('public')->download('reports/'.$filename, $filename, [
         'Content-Type' => 'application/pdf',
     ]);
 })->name('report.download');
@@ -56,7 +66,7 @@ Route::get('/export-monitor', function () {
 
 // Progress check route for AJAX monitoring
 Route::get('/export-progress/{key}', function (string $key) {
-    $progress = \Illuminate\Support\Facades\Cache::get($key);
+    $progress = Cache::get($key);
 
     if (! $progress) {
         return response()->json(['error' => 'Progress not found'], 404);
@@ -66,25 +76,25 @@ Route::get('/export-progress/{key}', function (string $key) {
 })->name('export.progress');
 
 // Tabungan Barcode Routes
-Route::get('/tabungan/{id}/print-barcode', [App\Http\Controllers\TabunganBarcodeController::class, 'printBarcode'])
+Route::get('/tabungan/{id}/print-barcode', [TabunganBarcodeController::class, 'printBarcode'])
     ->name('tabungan.print-barcode');
 
-Route::get('/tabungan/{hash}/scan', [App\Http\Controllers\TabunganBarcodeController::class, 'scan'])
+Route::get('/tabungan/{hash}/scan', [TabunganBarcodeController::class, 'scan'])
     ->middleware('throttle:60,1') // 60 requests per minute
     ->name('tabungan.scan');
 
 // Debug route untuk test QR code
-Route::get('/test-qr/{id}', [App\Http\Controllers\TabunganBarcodeController::class, 'testQrCode'])
+Route::get('/test-qr/{id}', [TabunganBarcodeController::class, 'testQrCode'])
     ->name('tabungan.test-qr');
 
 // Makan Bergizi Gratis Public Routes
-Route::get('/makan-bergizi-sinara/{hash?}', App\Livewire\MakanBergizisGratisCheckout::class)
+Route::get('/makan-bergizi-sinara/{hash?}', MakanBergizisGratisCheckout::class)
     ->name('makan-bergizi-gratis.checkout');
 
 // QRIS Public Generator
-Route::get('/qris-generator', App\Livewire\QrisPublicGenerator::class)
+Route::get('/qris-generator', QrisPublicGenerator::class)
     ->name('qris.public-generator');
 
 // Mobile App Request - Public page for closed beta access request
-Route::get('/mobile-app', App\Livewire\MobileAppRequest::class)
+Route::get('/mobile-app', MobileAppRequest::class)
     ->name('mobile-app.request');
