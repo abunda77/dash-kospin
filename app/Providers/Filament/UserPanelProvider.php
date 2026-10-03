@@ -30,7 +30,7 @@ class UserPanelProvider extends PanelProvider
             ->id('user')
             ->path('user')
             ->login()
-            ->registration()
+            ->registration(false)
             ->passwordReset()
             ->brandName('Kospin Sinara Artha')
             ->brandLogo(asset('images/logo_kospin.png'))
