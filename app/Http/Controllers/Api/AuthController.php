@@ -5,17 +5,39 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendResetPasswordEmail;
 use App\Models\User;
+use App\Services\BlacklistService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 // use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password as PasswordRules;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    private const MAX_LOGIN_ATTEMPTS = 5;
+
+    private const MAX_LOGIN_ATTEMPTS_PER_IP = 20;
+
+    private const LOGIN_LOCKOUT_SECONDS = 300;
+
+    /**
+     * Tolak email yang domainnya masuk blacklist.
+     *
+     * Dicek di luar array rules agar Scramble tetap bisa membuat dokumentasi request.
+     */
+    private function ensureEmailDomainNotBlacklisted(string $email): void
+    {
+        if (app(BlacklistService::class)->isBlacklistedEmailDomain($email)) {
+            throw ValidationException::withMessages([
+                'email' => ['Unknown occurs'],
+            ]);
+        }
+    }
+
     public function register(Request $request)
     {
         try {
@@ -25,6 +47,8 @@ class AuthController extends Controller
                 'password' => 'required|string|min:8',
                 'password_confirmation' => 'required|same:password',
             ]);
+
+            $this->ensureEmailDomainNotBlacklisted($validatedData['email']);
 
             $user = User::create([
                 'name' => $validatedData['name'],
@@ -68,14 +92,33 @@ class AuthController extends Controller
                 'password' => 'required|string',
             ]);
 
+            $emailKey = 'api-login:'.Str::lower($validatedData['email']).'|'.$request->ip();
+            $ipKey = 'api-login:ip:'.$request->ip();
+
+            if (RateLimiter::tooManyAttempts($emailKey, self::MAX_LOGIN_ATTEMPTS)
+                || RateLimiter::tooManyAttempts($ipKey, self::MAX_LOGIN_ATTEMPTS_PER_IP)) {
+                $seconds = max(1, RateLimiter::availableIn($emailKey), RateLimiter::availableIn($ipKey));
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Terlalu banyak percobaan login. Coba lagi dalam '.ceil($seconds / 60).' menit.',
+                ], 429)->header('Retry-After', (string) $seconds);
+            }
+
             $user = User::where('email', $validatedData['email'])->first();
 
             if (! $user || ! Hash::check($validatedData['password'], $user->password)) {
+                RateLimiter::hit($emailKey, self::LOGIN_LOCKOUT_SECONDS);
+                RateLimiter::hit($ipKey, self::LOGIN_LOCKOUT_SECONDS);
+
                 return response()->json([
                     'status' => false,
                     'message' => 'Invalid credentials',
                 ], 401);
             }
+
+            RateLimiter::clear($emailKey);
+            RateLimiter::clear($ipKey);
 
             $token = $user->createToken('API Token')->plainTextToken;
 
@@ -175,19 +218,22 @@ class AuthController extends Controller
     {
         try {
             $validatedData = $request->validate([
-                'email' => 'required|email|exists:users',
+                'email' => 'required|email',
             ], [
                 'email.required' => 'Email wajib diisi',
                 'email.email' => 'Format email tidak valid',
-                'email.exists' => 'Email tidak terdaftar',
             ]);
 
-            // Dispatch job untuk mengirim email
-            SendResetPasswordEmail::dispatch($validatedData['email']);
+            $this->ensureEmailDomainNotBlacklisted($validatedData['email']);
+
+            // Selalu balas pesan generik agar keberadaan email tidak terbocorkan.
+            if (User::where('email', $validatedData['email'])->exists()) {
+                SendResetPasswordEmail::dispatch($validatedData['email']);
+            }
 
             return response()->json([
                 'status' => true,
-                'message' => 'Link reset password akan dikirim ke email Anda',
+                'message' => 'Jika email terdaftar, link reset password akan dikirim.',
             ], 200);
 
         } catch (ValidationException $e) {

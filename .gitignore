@@ -33,6 +33,7 @@ storage/framework/testing/.gitignore
 storage/framework/views/.gitignore
 storage/logs/.gitignore
 PENTING.txt
+/blacklist.txt
 
 
 **/caddy
@@ -54,3 +55,5 @@ boost.json
 .kilocode/*
 
 /.codegraph
+blacklist.txt
+

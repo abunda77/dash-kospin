@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Deposito;
+use App\Models\PenarikanTabungan;
 use App\Models\Pinjaman;
+use App\Models\SetoranTabungan;
 use App\Models\Tabungan;
 use App\Models\TransaksiPinjaman;
 use App\Models\TransaksiTabungan;
@@ -12,11 +14,19 @@ use App\Observers\PinjamanObserver;
 use App\Observers\TabunganObserver;
 use App\Observers\TransaksiPinjamanObserver;
 use App\Observers\TransaksiTabunganObserver;
+use App\Policies\ActivityLogPolicy;
+use App\Policies\ActivityPolicy;
+use App\Policies\ArtisanPolicy;
+use App\Policies\PenarikanTabunganPolicy;
+use App\Policies\SetoranTabunganPolicy;
 use Carbon\Carbon;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Activitylog\Models\Activity;
@@ -24,6 +34,8 @@ use Spatie\Health\Checks\Checks\DebugModeCheck;
 use Spatie\Health\Checks\Checks\EnvironmentCheck;
 use Spatie\Health\Checks\Checks\OptimizedAppCheck;
 use Spatie\Health\Facades\Health;
+use TomatoPHP\FilamentArtisan\Pages\Artisan;
+use TomatoPHP\FilamentLogger\Filament\Resources\ActivityResource;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,6 +52,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->configureRateLimiters();
+
         // Configure Scramble for API documentation
         Scramble::afterOpenApiGenerated(function (OpenApi $openApi) {
             $openApi->secure(
@@ -59,15 +73,15 @@ class AppServiceProvider extends ServiceProvider
         // }
 
         // Filament Logger
-        Gate::policy(\TomatoPHP\FilamentLogger\Models\Activity::class, \App\Policies\ActivityPolicy::class);
-        Gate::policy(\TomatoPHP\FilamentLogger\Filament\Resources\ActivityResource::class, \App\Policies\ActivityPolicy::class);
+        Gate::policy(\TomatoPHP\FilamentLogger\Models\Activity::class, ActivityPolicy::class);
+        Gate::policy(ActivityResource::class, ActivityPolicy::class);
 
         // Filament Artisan
-        Gate::policy(\TomatoPHP\FilamentArtisan\Pages\Artisan::class, \App\Policies\ArtisanPolicy::class);
+        Gate::policy(Artisan::class, ArtisanPolicy::class);
         // Activity Log
-        Gate::policy(Activity::class, \App\Policies\ActivityLogPolicy::class);
-        Gate::policy(\App\Models\SetoranTabungan::class, \App\Policies\SetoranTabunganPolicy::class);
-        Gate::policy(\App\Models\PenarikanTabungan::class, \App\Policies\PenarikanTabunganPolicy::class);
+        Gate::policy(Activity::class, ActivityLogPolicy::class);
+        Gate::policy(SetoranTabungan::class, SetoranTabunganPolicy::class);
+        Gate::policy(PenarikanTabungan::class, PenarikanTabunganPolicy::class);
 
         Health::checks([
             OptimizedAppCheck::new(),
@@ -87,5 +101,20 @@ class AppServiceProvider extends ServiceProvider
 
         // Opsional: Set fallback locale jika terjemahan tidak tersedia
         Carbon::setFallbackLocale('id');
+    }
+
+    /**
+     * Limiter untuk endpoint autentikasi API.
+     */
+    protected function configureRateLimiters(): void
+    {
+        RateLimiter::for('api-register', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
+
+        RateLimiter::for('api-forgot-password', fn (Request $request) => [
+            Limit::perMinute(3)->by('email:'.(string) $request->input('email')),
+            Limit::perMinute(5)->by('ip:'.$request->ip()),
+        ]);
+
+        RateLimiter::for('api-reset-password', fn (Request $request) => Limit::perMinute(5)->by($request->ip()));
     }
 }

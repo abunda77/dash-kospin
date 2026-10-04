@@ -22,7 +22,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('throttle:api-register');
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
@@ -65,8 +66,10 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])
+    ->middleware('throttle:api-forgot-password');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])
+    ->middleware('throttle:api-reset-password');
 
 Route::get('banner-mobile/type/{type?}', [BannerMobileController::class, 'getByType']);
 

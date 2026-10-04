@@ -6,6 +6,25 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2026-10-04]
+
+### Added
+- Rate limiting endpoint autentikasi API: `POST /api/login` maksimal 5 percobaan gagal per 5 menit (kunci `email|ip`) ditambah jaring 20 percobaan gagal per 5 menit per IP; `POST /api/register` 5/menit per IP; `POST /api/forgot-password` 3/menit per email + 5/menit per IP; `POST /api/reset-password` 5/menit per IP
+- Named rate limiter `api-register`, `api-forgot-password`, dan `api-reset-password` di `AppServiceProvider` (`configureRateLimiters()`)
+- Blacklist domain email & alamat IP berbasis file teks root `blacklist.txt` (di-`.gitignore`): service `BlacklistService` (parsing + cache per-versi-file via signature `mtime`+`size`) dan middleware `BlockBlacklistedIp` yang di-`prepend` ke grup middleware `api`
+- Config `config/security.php` (`SECURITY_BLACKLIST_PATH`, default `base_path('blacklist.txt')`) dan dokumentasi rujukan `API_SECURITY.md`
+- Feature test `ApiAuthSecurityTest` (8 skenario: limit login, reset limiter setelah sukses, limit register, limit forgot per email, anti user enumeration, domain email blacklist, domain normal lolos, IP blacklist)
+
+### Changed
+- Respons 429 pada API kini memakai envelope `{status:false, message, retry_after}` plus header `Retry-After` melalui render `ThrottleRequestsException` di `bootstrap/app.php` (sebelumnya jatuh ke pesan generik "Terjadi kesalahan pada server")
+- `POST /api/forgot-password` tidak lagi memakai validasi `exists:users` dan selalu membalas pesan generik untuk menutup user enumeration; email reset hanya dikirim bila user terdaftar
+- Validasi domain email blacklist pada `register` dan `forgot-password` mengembalikan pesan `Unknown occurs` agar alasan pemblokiran tidak terbocorkan ke klien
+
+### Fixed
+- Error Scramble pada halaman docs API (`Call to undefined method ...ValidateCallExtractor::blacklistedEmailDomainRule()`): cek blacklist dipindah dari array rules `$request->validate()` ke method `ensureEmailDomainNotBlacklisted()` yang dipanggil setelah validasi
+
+---
+
 ## [2026-08-14]
 
 ### Security

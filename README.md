@@ -22,6 +22,7 @@ Dash-Kospin adalah aplikasi web yang dirancang untuk membantu pengelolaan kopera
 -   **QR Code Barcode**: Cetak barcode QR Code untuk rekening tabungan dengan scan public access
 -   **Aktivitas Log**: Pencatatan aktivitas untuk audit trail
 -   **API Mobile**: Layanan API terautentikasi Sanctum untuk integrasi aplikasi mobile, termasuk workflow setoran dan penarikan simpanan
+-   **Keamanan API**: Rate limiting endpoint autentikasi (login/register/forgot-password/reset-password), blacklist domain email & alamat IP berbasis file teks, dan respons 429 terstandar
 -   **Dashboard Admin**: Panel admin yang komprehensif dengan Filament
 -   **Dashboard Anggota**: Panel anggota untuk melihat tabungan, pinjaman, deposito, serta mengajukan setoran dan penarikan
 
@@ -282,6 +283,20 @@ Aplikasi ini dilengkapi dengan fitur cetak barcode QR Code untuk setiap rekening
 **Dokumentasi Lengkap:** 
 - [BARCODE_TABUNGAN.md](BARCODE_TABUNGAN.md) - Detail implementasi dan troubleshooting
 - [SECURITY_HASHIDS.md](SECURITY_HASHIDS.md) - Security implementation dengan Hashids
+
+## Keamanan API
+
+Endpoint autentikasi API (`/api/login`, `/api/register`, `/api/forgot-password`, `/api/reset-password`) dilindungi berlapis:
+
+-   **Rate Limiting**: login dibatasi 5 percobaan **gagal** per 5 menit per `email|ip` (plus jaring 20 gagal/5 menit per IP); register 5/menit per IP; forgot-password 3/menit per email + 5/menit per IP; reset-password 5/menit per IP. Semua melewati limit dibalas `429` dengan header `Retry-After`
+-   **Blacklist File**: daftar domain email dan alamat IP diblokir dikelola lewat file teks `blacklist.txt` di root (di-`.gitignore`) — domain email ditolak saat register/forgot-password (`422`), IP blacklist ditolak di semua request API (`403`)
+-   **Anti User Enumeration**: `forgot-password` selalu membalas pesan generik sehingga keberadaan email tidak terbocorkan
+-   **Kerahasiaan Alasan**: penolakan domain email memakai pesan seragam `Unknown occurs`
+
+Konfigurasi path file blacklist melalui `SECURITY_BLACKLIST_PATH` (opsional, default `base_path('blacklist.txt')`).
+
+**Dokumentasi Lengkap:**
+- [API_SECURITY.md](API_SECURITY.md) - Panduan rujukan: pola rate limiting, blacklist domain email & IP, respons 429, anti user enumeration, dan checklist adopsi untuk proyek Laravel lain
 
 ## Lisensi
 

@@ -1,10 +1,12 @@
 <?php
 
 use App\Console\Commands\HitungBungaTabungan;
+use App\Http\Middleware\BlockBlacklistedIp;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -19,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // App\Http\Middleware\TrustProxies.php
         $middleware->redirectGuestsTo(fn () => route('login.modern'));
+
+        // Blokir alamat IP blacklist sebelum middleware lain di grup API berjalan.
+        $middleware->api(prepend: [
+            BlockBlacklistedIp::class,
+        ]);
 
         $middleware->trustProxies(
             '*',
@@ -47,6 +54,20 @@ return Application::configure(basePath: dirname(__DIR__))
                         'status' => false,
                         'message' => 'Unauthenticated',
                     ], 401);
+                }
+
+                // Rate limit terlampaui -> 429 dengan header Retry-After
+                if ($e instanceof ThrottleRequestsException) {
+                    $headers = $e->getHeaders();
+                    $retryAfter = (int) ($headers['Retry-After'] ?? 0);
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => $retryAfter > 0
+                            ? "Terlalu banyak permintaan. Coba lagi dalam {$retryAfter} detik."
+                            : 'Terlalu banyak permintaan. Silakan coba lagi nanti.',
+                        'retry_after' => $retryAfter,
+                    ], 429, $headers);
                 }
 
                 // Tentukan status code dengan fallback

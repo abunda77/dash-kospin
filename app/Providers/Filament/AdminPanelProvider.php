@@ -48,6 +48,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('4rem')
             ->darkModeBrandLogo(asset('images/logo_kospin.png'))
             ->login()
+            ->registration(false)
             ->passwordReset()
             ->colors([
                 'primary' => Color::Green,
