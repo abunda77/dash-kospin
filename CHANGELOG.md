@@ -6,6 +6,15 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased]
+
+### Added
+- Halaman Filament admin **Blocklist** di grup Settings untuk mengedit file `blacklist.txt` melalui editor teks; komentar dan urutan baris tetap dipertahankan.
+- Validasi format entri `email:` dan `ip:` sebelum penyimpanan, pembatasan akses melalui Filament Shield (`page_Blocklist`), serta pembaruan cache blacklist agar perubahan langsung berlaku.
+- Feature test `BlocklistPageTest` untuk penyimpanan, validasi, pembaruan cache, penghapusan seluruh entri, dan pembatasan akses.
+
+---
+
 ## [2026-10-04]
 
 ### Added
