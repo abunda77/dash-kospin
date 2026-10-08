@@ -13,6 +13,10 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Validasi format entri `email:` dan `ip:` sebelum penyimpanan, pembatasan akses melalui Filament Shield (`page_Blocklist`), serta pembaruan cache blacklist agar perubahan langsung berlaku.
 - Feature test `BlocklistPageTest` untuk penyimpanan, validasi, pembaruan cache, penghapusan seluruh entri, dan pembatasan akses.
 
+### Fixed
+- Penghapusan admin pada `/admin/admins` gagal dengan `RoleDoesNotExist` karena role `panel_user` tidak tersedia untuk guard `admin`; tambahkan migration untuk memastikan role tersebut tersedia pada guard yang sesuai.
+- Tambahkan regression test `AdminResourceDeleteTest` untuk memastikan admin dapat dibuat dan dihapus pada request web tanpa error role.
+
 ---
 
 ## [2026-10-04]
