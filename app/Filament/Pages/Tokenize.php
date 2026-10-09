@@ -7,12 +7,15 @@ use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\PersonalAccessToken;
 
 class Tokenize extends Page implements HasTable
@@ -79,6 +82,28 @@ class Tokenize extends Page implements HasTable
                         $record->delete();
                     }),
             ])
+            ->bulkActions([
+                BulkAction::make('deleteSelected')
+                    ->label('Hapus yang Dipilih')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->deselectRecordsAfterCompletion()
+                    ->action(function (Collection $records): void {
+                        $duplicates = $records->filter(fn (PersonalAccessToken $record): bool => $record->token_count > 1);
+                        $skipped = $records->count() - $duplicates->count();
+
+                        $duplicates->each(function (PersonalAccessToken $record): void {
+                            $record->delete();
+                        });
+
+                        Notification::make()
+                            ->success()
+                            ->title("{$duplicates->count()} token ganda berhasil dihapus.")
+                            ->body($skipped > 0 ? "{$skipped} token tunggal dilewati agar user tidak kehilangan akses." : null)
+                            ->send();
+                    }),
+            ])
             ->headerActions([
                 Action::make('deleteDuplicateTokens')
                     ->label('Hapus Token Ganda')
@@ -123,10 +148,10 @@ class Tokenize extends Page implements HasTable
             ->with('tokenable.profile')
             ->select('personal_access_tokens.*')
             ->selectSub(
-                PersonalAccessToken::query()
+                DB::table('personal_access_tokens as token_counts')
                     ->selectRaw('count(*)')
-                    ->whereColumn('tokenable_id', 'personal_access_tokens.tokenable_id')
-                    ->where('tokenable_type', User::class),
+                    ->whereColumn('token_counts.tokenable_id', 'personal_access_tokens.tokenable_id')
+                    ->where('token_counts.tokenable_type', User::class),
                 'token_count',
             );
     }

@@ -46,6 +46,50 @@ class TokenizePageTest extends TestCase
             ->assertSee('Perangkat Utama');
     }
 
+    public function test_jumlah_token_dihitung_per_user(): void
+    {
+        $firstUser = User::factory()->create();
+        $firstToken = $firstUser->createToken('Perangkat 1')->accessToken;
+        $firstUser->createToken('Perangkat 2');
+        $secondUser = User::factory()->create();
+        $secondToken = $secondUser->createToken('Perangkat 3')->accessToken;
+
+        $page = Livewire::test(Tokenize::class)->instance();
+        $records = $page->getTableRecords();
+
+        $this->assertSame(2, $records->firstWhere('id', $firstToken->id)->token_count);
+        $this->assertSame(1, $records->firstWhere('id', $secondToken->id)->token_count);
+    }
+
+    public function test_bulk_hapus_token_ganda_hanya_menghapus_token_yang_dipilih(): void
+    {
+        $user = User::factory()->create();
+        $firstToken = $user->createToken('Perangkat Pertama')->accessToken;
+        $secondToken = $user->createToken('Perangkat Kedua')->accessToken;
+        $singleToken = User::factory()->create()->createToken('Satu-satunya Perangkat')->accessToken;
+
+        Livewire::test(Tokenize::class)
+            ->callTableBulkAction('deleteSelected', [$firstToken, $secondToken]);
+
+        $this->assertDatabaseMissing(PersonalAccessToken::class, ['id' => $firstToken->id]);
+        $this->assertDatabaseMissing(PersonalAccessToken::class, ['id' => $secondToken->id]);
+        $this->assertDatabaseHas(PersonalAccessToken::class, ['id' => $singleToken->id]);
+    }
+
+    public function test_bulk_hapus_token_ganda_tidak_menghapus_token_tunggal(): void
+    {
+        $singleToken = User::factory()->create()->createToken('Satu-satunya Perangkat')->accessToken;
+        $duplicateUser = User::factory()->create();
+        $duplicateToken = $duplicateUser->createToken('Perangkat Ganda A')->accessToken;
+        $duplicateUser->createToken('Perangkat Ganda B');
+
+        Livewire::test(Tokenize::class)
+            ->callTableBulkAction('deleteSelected', [$singleToken, $duplicateToken]);
+
+        $this->assertDatabaseHas(PersonalAccessToken::class, ['id' => $singleToken->id]);
+        $this->assertDatabaseMissing(PersonalAccessToken::class, ['id' => $duplicateToken->id]);
+    }
+
     public function test_hapus_token_ganda_mempertahankan_token_terakhir_digunakan(): void
     {
         $user = User::factory()->create();
