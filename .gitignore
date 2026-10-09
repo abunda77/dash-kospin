@@ -57,3 +57,5 @@ boost.json
 /.codegraph
 blacklist.txt
 
+
+.worktrees/
