@@ -12,6 +12,12 @@ Format berdasarkan [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Halaman Filament admin **Blocklist** di grup Settings untuk mengedit file `blacklist.txt` melalui editor teks; komentar dan urutan baris tetap dipertahankan.
 - Validasi format entri `email:` dan `ip:` sebelum penyimpanan, pembatasan akses melalui Filament Shield (`page_Blocklist`), serta pembaruan cache blacklist agar perubahan langsung berlaku.
 - Feature test `BlocklistPageTest` untuk penyimpanan, validasi, pembaruan cache, penghapusan seluruh entri, dan pembatasan akses.
+- Halaman Filament admin **Info System** di grup Settings (`/admin/info-system`) dengan 6 tab: ringkasan, sistem operasi, PHP, modul PHP (aktif dan yang tersedia di `extension_dir`), paket Composer, serta runtime/infra.
+- Probe sistem `App\Support\SystemInfo`: OS, CPU/RAM/uptime lintas platform (PowerShell di Windows, `/proc` di Linux), disk, konfigurasi `php.ini`, OPcache, isi `composer.lock`, versi/ukuran database, migration pending, failed jobs, ukuran log, dan status writable folder — dengan memoization per request dan cache satu jam untuk data perangkat keras, tanpa memakai `phpinfo()` mentah.
+- Tiga widget grafik (`SystemMemoryChart`, `SystemDiskChart`, `SystemModuleChart`) yang hanya dirender sebagai header widget pada tab Ringkasan, ditambah tabel interaktif Alpine (pencarian, sort, pagination) melalui partial `data-table` dan `info-rows`.
+- Tombol Refresh (membersihkan cache probe) dan toggle auto refresh 30 detik; akses dibatasi permission Filament Shield `page_InfoSystem`.
+- Feature test `InfoSystemPageTest` (8 skenario: isi probe, kategori modul, akses tanpa izin, render halaman, perpindahan tab, tab tak dikenal, notifikasi refresh, render widget grafik).
+- Dokumentasi implementasi portabel `INFO_SYSTEM_PAGE.md` berisi kode lengkap semua berkas, langkah registrasi, permission, keamanan, kustomisasi, dan troubleshooting.
 
 ### Fixed
 - Penghapusan admin pada `/admin/admins` gagal dengan `RoleDoesNotExist` karena role `panel_user` tidak tersedia untuk guard `admin`; tambahkan migration untuk memastikan role tersebut tersedia pada guard yang sesuai.
