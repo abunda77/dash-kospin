@@ -15,6 +15,16 @@ class RegisterRouteDisabledTest extends TestCase
         $this->assertFalse(Route::has('register'));
     }
 
+    public function test_endpoint_register_api_menolak_pendaftaran(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Pendaftar Baru',
+            'email' => 'pendaftar@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ])->assertNotFound();
+    }
+
     public function test_halaman_login_masih_dapat_dirender(): void
     {
         $this->get('/login')->assertSuccessful();

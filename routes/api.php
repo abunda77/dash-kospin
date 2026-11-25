@@ -22,8 +22,9 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/register', [AuthController::class, 'register'])
-    ->middleware('throttle:api-register');
+// Pendaftaran via API dinonaktifkan.
+// Route::post('/register', [AuthController::class, 'register'])
+//     ->middleware('throttle:api-register');
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 

@@ -79,27 +79,16 @@ class ApiAuthSecurityTest extends TestCase
         ])->assertStatus(401);
     }
 
-    public function test_register_dibatasi_per_menit(): void
+    public function test_register_api_sudah_dinonaktifkan(): void
     {
-        for ($attempt = 0; $attempt < 5; $attempt++) {
-            $this->postJson('/api/register', [
-                'name' => 'Pendaftar '.$attempt,
-                'email' => "pendaftar{$attempt}@example.com",
-                'password' => 'password123',
-                'password_confirmation' => 'password123',
-            ]);
-        }
+        $this->writeBlacklist("email:*@fakedomain.com\n");
 
         $this->postJson('/api/register', [
-            'name' => 'Pendaftar Terakhir',
-            'email' => 'pendaftar-terakhir@example.com',
+            'name' => 'Pendaftar Fiktif',
+            'email' => 'orang@fakedomain.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
-        ])
-            ->assertStatus(429)
-            ->assertHeader('Retry-After')
-            ->assertJsonPath('status', false)
-            ->assertJsonPath('message', fn (string $message): bool => str_contains($message, 'Terlalu banyak permintaan'));
+        ])->assertNotFound();
     }
 
     public function test_forgot_password_dibatasi_per_email(): void
@@ -120,35 +109,6 @@ class ApiAuthSecurityTest extends TestCase
         $this->postJson('/api/forgot-password', ['email' => 'tidak-terdaftar@example.com'])
             ->assertStatus(200)
             ->assertJsonPath('status', true);
-    }
-
-    public function test_register_menolak_domain_email_blacklist(): void
-    {
-        $this->writeBlacklist("# Domain email yang diblokir\nemail:*@fakedomain.com\n");
-
-        $this->postJson('/api/register', [
-            'name' => 'Pendaftar Fiktif',
-            'email' => 'orang@fakedomain.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ])
-            ->assertStatus(422)
-            ->assertJsonValidationErrors('email')
-            ->assertJsonPath('errors.email.0', 'Unknown occurs');
-    }
-
-    public function test_domain_email_lain_tetap_diterima(): void
-    {
-        $this->writeBlacklist("email:*@fakedomain.com\n");
-
-        $response = $this->postJson('/api/register', [
-            'name' => 'Pendaftar Valid',
-            'email' => 'orang@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-        ]);
-
-        $this->assertNotSame(422, $response->getStatusCode());
     }
 
     public function test_request_dari_ip_blacklist_ditolak(): void
