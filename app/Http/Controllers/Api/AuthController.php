@@ -25,13 +25,13 @@ class AuthController extends Controller
     private const LOGIN_LOCKOUT_SECONDS = 300;
 
     /**
-     * Tolak email yang domainnya masuk blacklist.
+     * Tolak email yang masuk blacklist.
      *
      * Dicek di luar array rules agar Scramble tetap bisa membuat dokumentasi request.
      */
-    private function ensureEmailDomainNotBlacklisted(string $email): void
+    private function ensureEmailNotBlacklisted(string $email): void
     {
-        if (app(BlacklistService::class)->isBlacklistedEmailDomain($email)) {
+        if (app(BlacklistService::class)->isBlacklistedEmail($email)) {
             throw ValidationException::withMessages([
                 'email' => ['Unknown occurs'],
             ]);
@@ -48,7 +48,7 @@ class AuthController extends Controller
                 'password_confirmation' => 'required|same:password',
             ]);
 
-            $this->ensureEmailDomainNotBlacklisted($validatedData['email']);
+            $this->ensureEmailNotBlacklisted($validatedData['email']);
 
             $user = User::create([
                 'name' => $validatedData['name'],
@@ -224,7 +224,7 @@ class AuthController extends Controller
                 'email.email' => 'Format email tidak valid',
             ]);
 
-            $this->ensureEmailDomainNotBlacklisted($validatedData['email']);
+            $this->ensureEmailNotBlacklisted($validatedData['email']);
 
             // Selalu balas pesan generik agar keberadaan email tidak terbocorkan.
             if (User::where('email', $validatedData['email'])->exists()) {

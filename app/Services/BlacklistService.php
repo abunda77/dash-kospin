@@ -4,28 +4,46 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class BlacklistService
 {
     /**
-     * Cek apakah domain email termasuk blacklist.
+     * Cek apakah alamat email termasuk blacklist.
+     *
+     * Entri tanpa "@" (atau berawalan "@" / "*@") memblokir seluruh domain
+     * beserta subdomain. Entri lain dicocokkan sebagai pola glob terhadap
+     *
+     * alamat email penuh, sehingga "aba*@gmail.com" memblokir
+     * "aba123@gmail.com" tanpa memblokir seluruh gmail.com.
      */
-    public function isBlacklistedEmailDomain(?string $email): bool
+    public function isBlacklistedEmail(?string $email): bool
     {
         if (blank($email) || ! str_contains($email, '@')) {
             return false;
         }
 
-        $domain = strtolower((string) substr(strrchr($email, '@'), 1));
+        $email = strtolower(trim($email));
+        $domain = (string) substr(strrchr($email, '@'), 1);
 
         if ($domain === '') {
             return false;
         }
 
         foreach ($this->entries('email') as $blocked) {
-            $blocked = ltrim($blocked, '*@');
+            if (str_contains($blocked, '@') && ! str_starts_with($blocked, '*@') && ! str_starts_with($blocked, '@')) {
+                if (Str::is($blocked, $email)) {
+                    return true;
+                }
 
-            if ($blocked !== '' && ($domain === $blocked || str_ends_with($domain, '.'.$blocked))) {
+                continue;
+            }
+
+            $blockedDomain = str_starts_with($blocked, '*@')
+                ? substr($blocked, 2)
+                : ltrim($blocked, '@');
+
+            if ($blockedDomain !== '' && ($domain === $blockedDomain || str_ends_with($domain, '.'.$blockedDomain))) {
                 return true;
             }
         }
@@ -53,6 +71,47 @@ class BlacklistService
     public function entries(string $type): array
     {
         return $this->all()[$type] ?? [];
+    }
+
+    /**
+     * Validasi satu nilai entri bertipe email.
+     *
+     * Bentuk yang diterima: "example.com", "@example.com", "*@example.com",
+     *
+     * atau local-part dengan wildcard seperti "aba*@example.com" dan
+     * "*ereo@example.com".
+     */
+    public static function isValidEmailEntry(string $value): bool
+    {
+        $value = strtolower(trim($value));
+
+        if ($value === '') {
+            return false;
+        }
+
+        if (! str_contains($value, '@')) {
+            return self::isValidDomain($value);
+        }
+
+        if (str_starts_with($value, '*@') || str_starts_with($value, '@')) {
+            return self::isValidDomain(ltrim($value, '*@'));
+        }
+
+        $separator = (int) strrpos($value, '@');
+        $localPart = substr($value, 0, $separator);
+        $domain = substr($value, $separator + 1);
+
+        if (! preg_match('/^[a-z0-9._%+\-*]+$/', $localPart)) {
+            return false;
+        }
+
+        return self::isValidDomain($domain);
+    }
+
+    private static function isValidDomain(string $domain): bool
+    {
+        return str_contains($domain, '.')
+            && (bool) filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME);
     }
 
     /**

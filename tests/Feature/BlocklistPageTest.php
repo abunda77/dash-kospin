@@ -110,4 +110,55 @@ class BlocklistPageTest extends TestCase
 
         $this->assertSame("# tetap\n", file_get_contents($this->blacklistPath));
     }
+
+    public function test_pola_email_dengan_asterik_diterima_dan_tersimpan(): void
+    {
+        file_put_contents($this->blacklistPath, "ip:203.0.113.10\n");
+
+        $content = "# contoh\nemail:aba*@gmail.com\nemail:*ereo@yahoo.com\nemail:*@fakedomain.com\nemail:mailinator.com\nip:203.0.113.10\n";
+
+        Livewire::test(Blocklist::class)
+            ->set('data.content', $content)
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame($content, file_get_contents($this->blacklistPath));
+    }
+
+    public function test_tipe_entri_tidak_peka_huruf_besar(): void
+    {
+        file_put_contents($this->blacklistPath, '');
+
+        Livewire::test(Blocklist::class)
+            ->set('data.content', "EMAIL:aba*@gmail.com\nIP:203.0.113.10\n")
+            ->call('save')
+            ->assertHasNoFormErrors();
+    }
+
+    public function test_asterik_tanpa_at_ditolak_karena_ambigu(): void
+    {
+        $original = "ip:203.0.113.10\n";
+        file_put_contents($this->blacklistPath, $original);
+
+        Livewire::test(Blocklist::class)
+            ->set('data.content', "email:*gmail.com\n")
+            ->call('save')
+            ->assertHasFormErrors(['content']);
+
+        $this->assertSame($original, file_get_contents($this->blacklistPath));
+    }
+
+    public function test_pesan_error_menyebut_baris_dan_isi_baris_yang_salah(): void
+    {
+        file_put_contents($this->blacklistPath, '');
+
+        Livewire::test(Blocklist::class)
+            ->set('data.content', "# komentar\nip:203.0.113.10\nemail:aba*@gmail\n")
+            ->call('save')
+            ->assertHasFormErrors(['content' => function (array $failedRules, array $messages): bool {
+                $message = (string) ($messages[0] ?? '');
+
+                return str_contains($message, 'baris 3') && str_contains($message, 'email:aba*@gmail');
+            }]);
+    }
 }

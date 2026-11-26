@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Services\BlacklistService;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -45,7 +46,7 @@ class Blocklist extends Page implements HasForms
             ->schema([
                 Textarea::make('content')
                     ->label('Isi blacklist.txt')
-                    ->helperText('Satu entri per baris: email:domain.com, email:*@domain.com, atau ip:alamat-IP. Baris # adalah komentar.')
+                    ->helperText('Satu entri per baris: email:domain.com, email:*@domain.com, email:aba*@domain.com, atau ip:alamat-IP. Baris # adalah komentar.')
                     ->rows(20)
                     ->rules([
                         fn (): \Closure => function (string $attribute, mixed $value, \Closure $fail): void {
@@ -57,15 +58,24 @@ class Blocklist extends Page implements HasForms
                                 }
 
                                 [$type, $entry] = array_pad(explode(':', $line, 2), 2, '');
+                                $type = strtolower(trim($type));
                                 $entry = trim($entry);
-                                $domain = str_starts_with($entry, '*@') ? substr($entry, 2) : $entry;
 
-                                if (($type === 'email' && filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) && str_contains($domain, '.'))
-                                    || ($type === 'ip' && filter_var($entry, FILTER_VALIDATE_IP))) {
+                                $isValid = match ($type) {
+                                    'email' => BlacklistService::isValidEmailEntry($entry),
+                                    'ip' => (bool) filter_var($entry, FILTER_VALIDATE_IP),
+                                    default => false,
+                                };
+
+                                if ($isValid) {
                                     continue;
                                 }
 
-                                $fail('Format tidak valid pada baris '.($index + 1).'. Gunakan email:domain.com atau ip:alamat-IP.');
+                                $fail(sprintf(
+                                    'Format tidak valid pada baris %d (%s). Gunakan email:domain.com, email:*@domain.com, email:aba*@domain.com, atau ip:alamat-IP.',
+                                    $index + 1,
+                                    $line,
+                                ));
                                 break;
                             }
                         },
