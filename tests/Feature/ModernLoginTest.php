@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Livewire\Auth\ModernLogin;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -95,5 +96,69 @@ class ModernLoginTest extends TestCase
         $component->assertRedirect('/user');
 
         $this->assertNull(session('login_failures'));
+    }
+
+    public function test_login_diblokir_setelah_lima_kegagalan(): void
+    {
+        $component = Livewire::test(ModernLogin::class);
+
+        foreach (range(1, ModernLogin::MAX_ATTEMPTS) as $attempt) {
+            $this->attemptLogin($component, 'none@example.com', 'wrongpass');
+        }
+
+        $this->attemptLogin($component, 'none@example.com', 'wrongpass');
+
+        $this->assertStringContainsString(
+            'Terlalu banyak percobaan login',
+            (string) $component->errors()->first('email')
+        );
+        $this->assertGuest();
+    }
+
+    public function test_login_diblokir_per_ip_walau_email_diganti(): void
+    {
+        $component = Livewire::test(ModernLogin::class);
+
+        foreach (range(1, ModernLogin::MAX_ATTEMPTS_PER_IP) as $attempt) {
+            $this->attemptLogin($component, "attacker{$attempt}@example.com", 'wrongpass');
+        }
+
+        $this->attemptLogin($component, 'fresh@example.com', 'wrongpass');
+
+        $this->assertStringContainsString(
+            'Terlalu banyak percobaan login',
+            (string) $component->errors()->first('email')
+        );
+        $this->assertGuest();
+    }
+
+    public function test_limiter_dibersihkan_setelah_login_berhasil(): void
+    {
+        $user = User::factory()->create(['password' => bcrypt('password')]);
+
+        $component = Livewire::test(ModernLogin::class);
+
+        for ($attempt = 0; $attempt < ModernLogin::MAX_ATTEMPTS - 1; $attempt++) {
+            $this->attemptLogin($component, 'none@example.com', 'wrongpass');
+        }
+
+        $this->attemptLogin($component, $user->email, 'password');
+        $component->assertRedirect('/user');
+
+        $fresh = Livewire::test(ModernLogin::class);
+        $this->attemptLogin($fresh, 'none@example.com', 'wrongpass');
+
+        $this->assertSame('Email atau password salah.', $fresh->errors()->first('email'));
+    }
+
+    private function attemptLogin(Testable $component, string $email, string $password): void
+    {
+        $component->set('email', $email)->set('password', $password);
+
+        if ($component->get('showCaptcha')) {
+            $component->set('captchaAnswer', (string) session('login_captcha_result'));
+        }
+
+        $component->call('login');
     }
 }

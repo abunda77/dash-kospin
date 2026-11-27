@@ -4,6 +4,7 @@ namespace App\Livewire\Auth;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -14,7 +15,9 @@ class ModernLogin extends Component
 {
     public const MAX_ATTEMPTS = 5;
 
-    public const LOCKOUT_MINUTES = 1;
+    public const MAX_ATTEMPTS_PER_IP = 20;
+
+    public const LOCKOUT_MINUTES = 5;
 
     public const CAPTCHA_THRESHOLD = 3;
 
@@ -75,9 +78,12 @@ class ModernLogin extends Component
     {
         $this->validate();
 
-        $key = $this->rateLimitKey();
-        if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
-            $seconds = RateLimiter::availableIn($key);
+        $emailKey = $this->emailRateLimitKey();
+        $ipKey = $this->ipRateLimitKey();
+
+        if (RateLimiter::tooManyAttempts($emailKey, self::MAX_ATTEMPTS)
+            || RateLimiter::tooManyAttempts($ipKey, self::MAX_ATTEMPTS_PER_IP)) {
+            $seconds = max(1, RateLimiter::availableIn($emailKey), RateLimiter::availableIn($ipKey));
 
             $minutes = ceil($seconds / 60);
             $this->addError(
@@ -99,7 +105,8 @@ class ModernLogin extends Component
         }
 
         if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
-            RateLimiter::hit($key, self::LOCKOUT_MINUTES * 60);
+            RateLimiter::hit($emailKey, self::LOCKOUT_MINUTES * 60);
+            RateLimiter::hit($ipKey, self::LOCKOUT_MINUTES * 60);
 
             $failed = (int) session('login_failures', 0) + 1;
             session(['login_failures' => $failed]);
@@ -114,16 +121,22 @@ class ModernLogin extends Component
             return;
         }
 
-        RateLimiter::clear($key);
+        RateLimiter::clear($emailKey);
+        RateLimiter::clear($ipKey);
         session()->forget('login_failures');
         session()->regenerate();
 
         return redirect()->intended('/user');
     }
 
-    private function rateLimitKey(): string
+    private function emailRateLimitKey(): string
     {
-        return 'login:'.$this->email.':'.request()->ip();
+        return 'login:'.Str::lower(trim($this->email)).'|'.request()->ip();
+    }
+
+    private function ipRateLimitKey(): string
+    {
+        return 'login:ip:'.request()->ip();
     }
 
     private function generateCaptcha(): void
@@ -131,6 +144,10 @@ class ModernLogin extends Component
         $a = random_int(1, 9);
         $b = random_int(1, 9);
         $operator = ['+', '-', '×'][array_rand(['+', '-', '×'])];
+
+        if ($operator === '-' && $b > $a) {
+            [$a, $b] = [$b, $a];
+        }
 
         $this->captchaQuestion = "{$a} {$operator} {$b}";
         session()->put('login_captcha_result', $this->solveCaptcha($a, $b, $operator));
@@ -148,9 +165,11 @@ class ModernLogin extends Component
 
     private function isCaptchaValid(): bool
     {
-        $expected = (int) session('login_captcha_result');
+        if (! session()->has('login_captcha_result')) {
+            return false;
+        }
 
-        return $expected > 0 && (int) $this->captchaAnswer === $expected;
+        return (int) $this->captchaAnswer === (int) session('login_captcha_result');
     }
 
     private function resetCaptcha(): void
